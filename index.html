@@ -31,8 +31,59 @@ body { overflow: hidden; background: #000; user-select: none; -webkit-user-selec
 .loader { width: 60px; height: 60px; border: 4px solid rgba(255,255,255,0.1); border-left-color: #facc15; border-radius: 50%; animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .damage-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, transparent 40%, rgba(255,0,0,0.6) 100%); opacity: 0; pointer-events: none; transition: opacity 0.1s; z-index: 50; }
-.minimap { position: absolute; top: 20px; right: 20px; width: 160px; height: 160px; background: rgba(10, 10, 20, 0.8); border: 2px solid rgba(255, 255, 255, 0.2); display: none; z-index: 15; box-shadow: 0 8px 32px rgba(0,0,0,0.8); border-radius: 8px; }
-#minimapCanvas { width: 100%; height: 100%; border-radius: 6px; }
+
+/* === Minimap دائري زي Valorant === */
+.minimap { 
+    position: absolute; 
+    width: 160px; 
+    height: 160px; 
+    background: rgba(10, 10, 15, 0.85); 
+    border: 2px solid rgba(250, 204, 21, 0.5); 
+    border-radius: 50%; 
+    display: none; 
+    z-index: 15; 
+    box-shadow: 0 0 15px rgba(0,0,0,0.8), inset 0 0 10px rgba(250, 204, 21, 0.2); 
+    overflow: hidden; 
+    pointer-events: auto;
+    backdrop-filter: blur(4px);
+    transition: transform 0.1s;
+}
+.minimap::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    background: #facc15;
+    border-radius: 50%;
+    z-index: 20;
+    box-shadow: 0 0 8px #facc15;
+    pointer-events: none;
+    border: 1px solid #000;
+}
+.minimap-compass {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #facc15;
+    font-size: 12px;
+    font-weight: 900;
+    z-index: 25;
+    pointer-events: none;
+    text-shadow: 0 0 4px #facc15;
+    background: rgba(0,0,0,0.6);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+#minimapCanvas { 
+    width: 100%; 
+    height: 100%; 
+    border-radius: 50%; 
+}
+
 input[type=range] { width: 100%; margin: 10px 0; background: transparent; appearance: none; -webkit-appearance: none; }
 input[type=range]:focus { outline: none; }
 input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 8px; cursor: pointer; background: rgba(255,255,255,0.2); border-radius: 4px; }
@@ -40,36 +91,109 @@ input[type=range]::-webkit-slider-thumb { height: 20px; width: 20px; border-radi
 .settings-label { display: flex; justify-content: space-between; color: white; margin-top: 15px; font-size: 0.9rem;}
 #customizerUI { z-index: 100; }
 .customizer-panel { background: rgba(0,0,0,0.85); border: 1px solid #06b6d4; border-radius: 8px; padding: 15px; width: 300px; pointer-events: auto; box-shadow: 0 0 20px rgba(0,0,0,0.9); }
-.editing-btn { outline: 3px dashed #06b6d4; outline-offset: 4px; background: rgba(6, 182, 212, 0.3) !important; }
+.editing-btn { outline: 3px dashed #06b6d4 !important; outline-offset: 4px !important; background: rgba(6, 182, 212, 0.3) !important; cursor: move !important; }
+.hud-group { display: flex; gap: 8px; flex-wrap: wrap; pointer-events: auto; }
 </style>
 </head>
 <body>
 <div class="loading-screen" id="loadingScreen">
 <div class="loader mb-6"></div>
-<div class="text-yellow-400 text-xl font-black tracking-widest">LOADING...</div>
+<div class="text-yellow-400 text-xl font-black tracking-widest">يتم تحميل الموارد . لا تأثير عل الباقة الخاصة بك</div>
 </div>
 <div class="damage-overlay" id="damageOverlay"></div>
 <canvas id="gameCanvas"></canvas>
-<div class="minimap" id="minimap"><canvas id="minimapCanvas"></canvas></div>
+
+<!-- Minimap دائري وقابل للتخصيص -->
+<div class="minimap custom-hud" id="minimap" style="bottom: 200px; right: 20px;">
+    <div class="minimap-compass" id="minimapCompass">N</div>
+    <canvas id="minimapCanvas"></canvas>
+</div>
+
 <div class="ui-layer interactive !justify-start !items-center pl-10" id="mainMenu">
 <div class="glass-panel p-10 max-w-sm w-full">
 <h1 class="text-6xl font-black mb-1 text-white neon-text">MAZE</h1>
 <h1 class="text-5xl font-black mb-6 text-yellow-400 neon-text">ESCAPE</h1>
 <p class="text-gray-400 mb-8 text-sm font-bold tracking-widest uppercase">Season 1: Dark Woods</p>
 <div class="space-y-4">
-<button class="btn-primary custom-click" onclick="startGame(1)"><span>بداية المباراة</span> <span>▶</span></button>
+<button class="btn-primary custom-click" onclick="startGame(1)"><span>اللعب الفردي</span> <span>▶</span></button>
+<button class="btn-primary custom-click" onclick="showOnlineLobby()" style="border-left-color: #06b6d4;"><span>اللعب الجماعي</span> <span>🌐</span></button>
 <button class="btn-primary custom-click" onclick="showLevelSelect()"><span>المستويات</span> <span>▤</span></button>
 <button class="btn-primary custom-click" onclick="openSettings()"><span>الإعدادات</span> <span>⚙</span></button>
 </div>
 </div>
 </div>
+
 <div class="ui-layer interactive hidden" id="levelSelect">
 <div class="glass-panel p-10 text-center max-w-2xl w-full">
 <h2 class="text-4xl font-black text-yellow-400 mb-8">اختيار المنطقة</h2>
 <div class="grid grid-cols-5 gap-4 mb-8" id="levelGrid"></div>
-<button class="btn-primary justify-center custom-click" onclick="showMenu()">رجوع للوبي</button>
+<button class="btn-primary justify-center custom-click" onclick="showMenu()">رجوع للساحة</button>
 </div>
 </div>
+
+<!-- شاشة اللوبي الأونلاين -->
+<div class="ui-layer interactive hidden !justify-start !items-center pl-10" id="onlineLobby">
+<div class="glass-panel p-10 max-w-sm w-full" style="border-right-color: #06b6d4;">
+<h2 class="text-4xl font-black text-cyan-400 mb-2 neon-text">اللعب الجماعي</h2>
+<p class="text-gray-400 mb-4 text-sm font-bold tracking-widest uppercase">اختار وضع اللعب</p>
+<div class="mb-6">
+<p class="text-gray-400 text-xs mb-2 font-bold tracking-widest uppercase">اسمك في اللعبة</p>
+<input type="text" id="playerNameInput" placeholder="اكتب اسمك هنا..." maxlength="15"
+style="width:100%; background:rgba(255,255,255,0.05); border:2px solid rgba(6,182,212,0.5); border-radius:8px; color:white; font-size:1.1rem; font-weight:700; text-align:center; padding:12px; outline:none; font-family:'Cairo',sans-serif; direction:rtl;">
+</div>
+<div class="space-y-4">
+<button class="btn-primary custom-click" onclick="hostGame()" style="border-left-color:#22c55e; color:#22c55e;"><span>إنشاء غرفة</span><span>▶</span></button>
+<button class="btn-primary custom-click" onclick="showJoinScreen()" style="border-left-color:#facc15; color:#facc15;"><span>الانضمام للغرفة</span><span>🏠</span></button>
+<button class="btn-primary custom-click" onclick="showMenu()"><span>رجوع</span><span>✖</span></button>
+</div>
+</div>
+</div>
+
+<!-- شاشة الـ Host -->
+<div class="ui-layer interactive hidden !justify-start !items-center pl-10" id="hostWaitScreen">
+<div class="glass-panel p-10 max-w-sm w-full" style="border-right-color: #22c55e;">
+<h2 class="text-4xl font-black text-green-400 mb-2">🏠 انتظار</h2>
+<p class="text-gray-400 mb-6 text-sm font-bold tracking-widest uppercase">ابعت الكود ده لصاحبك</p>
+<div class="text-center mb-6">
+<div style="background:rgba(34,197,94,0.1); border:2px solid #22c55e; border-radius:8px; padding:20px;">
+<p class="text-gray-400 text-xs mb-2 font-bold">كود الغرفة</p>
+<p class="text-5xl font-black text-green-400 tracking-widest" id="roomCodeDisplay">------</p>
+<button onclick="copyRoomCode()" class="mt-3 text-xs text-gray-400 hover:text-white transition-colors" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); padding:6px 16px; border-radius:4px; cursor:pointer;">📋 نسخ الكود</button>
+</div>
+</div>
+<div class="text-center mb-6">
+<div class="loader mx-auto mb-3" style="width:30px;height:30px;border-width:3px;"></div>
+<p class="text-gray-400 text-sm" id="hostStatusText">انتظار الانضمام...</p>
+</div>
+<button class="btn-primary custom-click justify-center" onclick="cancelHost()" style="border-left-color:#ef4444; color:#ef4444;"><span>إلغاء</span><span>✖</span></button>
+</div>
+</div>
+
+<!-- شاشة الـ Join -->
+<div class="ui-layer interactive hidden !justify-start !items-center pl-10" id="joinScreen">
+<div class="glass-panel p-10 max-w-sm w-full" style="border-right-color: #facc15;">
+<h2 class="text-4xl font-black text-yellow-400 mb-2">انضم</h2>
+<p class="text-gray-400 mb-6 text-sm font-bold tracking-widest uppercase">ادخل كود الغرفة</p>
+<div class="mb-6">
+<input type="text" id="joinCodeInput" placeholder="XXXXXX" maxlength="6"
+style="width:100%; background:rgba(255,255,255,0.05); border:2px solid rgba(250,204,21,0.5); border-radius:8px; color:white; font-size:2rem; font-weight:900; text-align:center; padding:16px; letter-spacing:8px; outline:none; font-family:monospace;"
+oninput="this.value=this.value.toUpperCase().replace(/[^0-9]/g,'')">
+</div>
+<p class="text-red-400 text-sm mb-4 text-center hidden" id="joinError">❌ الكود غلط أو الغرفة مش موجودة!</p>
+<div class="space-y-3">
+<button class="btn-primary custom-click justify-center" onclick="joinGame()" style="border-left-color:#facc15; color:#facc15;"><span>انضم دلوقتي</span><span>▶</span></button>
+<button class="btn-primary custom-click justify-center" onclick="showOnlineLobby()"><span>رجوع</span><span>✖</span></button>
+</div>
+</div>
+</div>
+
+<!-- HUD الأونلاين - قابل للتخصيص -->
+<div class="custom-hud" id="onlineHUD" style="position:fixed; top:20px; right:195px; z-index:20; display:none; pointer-events:none;">
+<div class="hud-stat" style="border-bottom-color:#06b6d4; background:rgba(6,182,212,0.15);">
+<span>🟢</span><span id="onlinePlayerName">لاعب 2</span><span class="text-cyan-400 text-xs" id="onlinePing">متصل</span>
+</div>
+</div>
+
 <div class="ui-layer interactive hidden" id="settingsMenu">
 <div class="glass-panel p-10 max-w-sm w-full" style="border-right-color: #06b6d4;">
 <h2 class="text-4xl font-black text-cyan-400 mb-6 text-center">الإعدادات</h2>
@@ -78,46 +202,66 @@ input[type=range]::-webkit-slider-thumb { height: 20px; width: 20px; border-radi
 <input type="range" id="sensRange" min="0.001" max="0.01" step="0.001" value="0.005" oninput="updateSettings()">
 </div>
 <div class="mb-8">
-<div class="settings-label"><span>جودة الجرافيك</span></div>
-<input type="range" id="qualRange" min="0.5" max="1.5" step="0.1" value="1.0" oninput="updateSettings()">
+<div class="settings-label"><span>جودة الرسومات</span></div>
+<input type="range" id="qualRange" min="0.1" max="1" step="0.1" value="1.0" oninput="updateSettings()">
 </div>
 <button class="btn-primary justify-center mb-4 custom-click" style="border-color:#facc15; color:#facc15;" onclick="openCustomControls()">تخصيص التحكم</button>
 <button class="btn-primary justify-center custom-click" style="border-color:#06b6d4; color:#06b6d4;" onclick="closeSettings()">حفظ ورجوع</button>
 </div>
 </div>
+
+<!-- واجهة التخصيص -->
 <div class="ui-layer hidden" id="customizerUI">
 <div class="absolute top-4 interactive flex gap-2 right-4 z-50">
 <button class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded font-bold shadow-lg" onclick="resetCustomControls()">إعادة الضبط</button>
 <button class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded font-bold shadow-lg" onclick="saveCustomControls()">حفظ وخروج</button>
 </div>
 <div class="absolute top-4 left-1/2 transform -translate-x-1/2 customizer-panel" id="customizerPanel" style="display: none;">
-<p class="text-white text-center mb-4 font-bold border-b border-gray-600 pb-2">تعديل الزر</p>
+<p class="text-white text-center mb-4 font-bold border-b border-gray-600 pb-2">تعديل العنصر</p>
 <div class="mb-2">
-<div class="settings-label !mt-0 !mb-1"><span>حجم الزر</span></div>
-<input type="range" id="cSize" min="0.5" max="2.5" step="0.1" value="1" oninput="updateSelectedBtnStyle()">
+<div class="settings-label !mt-0 !mb-1"><span>الموضع X</span></div>
+<input type="range" id="cX" min="0" max="100" step="1" value="50" oninput="updateSelectedElementStyle()">
+</div>
+<div class="mb-2">
+<div class="settings-label !mt-0 !mb-1"><span>الموضع Y</span></div>
+<input type="range" id="cY" min="0" max="100" step="1" value="50" oninput="updateSelectedElementStyle()">
+</div>
+<div class="mb-2">
+<div class="settings-label !mt-0 !mb-1"><span>الحجم</span></div>
+<input type="range" id="cSize" min="0.3" max="3" step="0.1" value="1" oninput="updateSelectedElementStyle()">
 </div>
 <div>
 <div class="settings-label !mt-0 !mb-1"><span>الشفافية</span></div>
-<input type="range" id="cOpac" min="0.1" max="1" step="0.1" value="1" oninput="updateSelectedBtnStyle()">
+<input type="range" id="cOpac" min="0.05" max="1" step="0.1" value="1" oninput="updateSelectedElementStyle()">
 </div>
 </div>
 </div>
+
+<!-- HUD اللعبة -->
 <div class="ui-layer hidden !items-start !justify-start playing-mode" id="gameHUD">
-<div class="absolute top-4 left-4 flex gap-3 flex-wrap z-10">
+<!-- إحصائيات اللعبة - مجموعة قابلة للتخصيص -->
+<div class="custom-hud hud-group" id="hudStats" style="position:absolute; top:20px; left:20px; z-index:10;">
 <div class="hud-stat"><span class="text-red-500">❤</span> <span id="livesDisplay">3</span></div>
 <div class="hud-stat"><span class="text-yellow-400">⭐</span> <span id="scoreDisplay">0</span></div>
 <div class="hud-stat"><span class="text-cyan-400">💎</span> <span id="itemsDisplay">0/0</span></div>
 <div class="hud-stat"><span class="text-green-400">⏱</span> <span id="timeDisplay">120</span>s</div>
 </div>
-<button class="absolute top-4 right-4 w-12 h-12 glass-panel text-white text-xl interactive flex items-center justify-center z-30 transition-transform hover:scale-105 active:scale-95 custom-click" id="pauseBtnHUD" style="border-right: none; border-bottom: 2px solid #facc15;" onclick="togglePause()">⏸</button>
+
+<!-- زر الإيقاف - قابل للتخصيص -->
+<button class="custom-hud absolute w-12 h-12 glass-panel text-white text-xl interactive flex items-center justify-center z-30 transition-transform hover:scale-105 active:scale-95 custom-click" 
+id="pauseBtnHUD" style="top:20px; right:20px; border-right: none; border-bottom: 2px solid #facc15;" onclick="togglePause()">⏸</button>
+
 <div class="joystick-zone" id="joystickZone"></div>
 <div class="joystick-base" id="joystickBase"><div class="joystick-knob" id="joystickKnob"></div></div>
 <div class="look-zone" id="lookZone"></div>
-<button class="action-btn custom-btn" id="jumpBtn" style="bottom: 180px; right: 20px;">⬆</button>
-<button class="action-btn custom-btn" id="crouchBtn" style="bottom: 100px; right: 20px;">⬇</button>
-<button class="action-btn custom-btn" id="sprintBtn" style="bottom: 20px; right: 20px; border-color: #facc15; color: #facc15;">Made By ONKI</button>
-<button class="action-btn custom-btn" id="flashlightBtn" style="bottom: 20px; left: 20px;">💡</button>
+
+<!-- أزرار التحكم -->
+<button class="action-btn custom-hud" id="jumpBtn" style="bottom: 180px; right: 20px;">⬆</button>
+<button class="action-btn custom-hud" id="crouchBtn" style="bottom: 100px; right: 20px;">⬇</button>
+<button class="action-btn custom-hud" id="sprintBtn" style="bottom: 20px; right: 20px; border-color: #facc15; color: #facc15;">🏃</button>
+<button class="action-btn custom-hud" id="flashlightBtn" style="bottom: 20px; left: 20px;">💡</button>
 </div>
+
 <div class="ui-layer interactive hidden" id="pauseMenu">
 <div class="glass-panel p-10 max-w-sm w-full">
 <h2 class="text-4xl font-black text-yellow-400 mb-8 text-center">اللعبة متوقفة</h2>
@@ -125,27 +269,29 @@ input[type=range]::-webkit-slider-thumb { height: 20px; width: 20px; border-radi
 <button class="btn-primary custom-click" onclick="togglePause()"><span>إكمال</span> <span>▶</span></button>
 <button class="btn-primary custom-click" onclick="openSettings()"><span>الإعدادات</span> <span>⚙</span></button>
 <button class="btn-primary custom-click" onclick="restartLevel()"><span>إعادة</span> <span>↺</span></button>
-<button class="btn-primary custom-click" onclick="showMenu()"><span>خروج للوبي</span> <span>✖</span></button>
+<button class="btn-primary custom-click" onclick="showMenu()"><span>خروج للساحة</span> <span>✖</span></button>
 </div>
 </div>
 </div>
+
 <div class="ui-layer interactive hidden" id="gameOver">
 <div class="glass-panel p-10 max-w-sm w-full" style="border-right-color: #ef4444;">
-<h2 class="text-5xl font-black text-red-500 mb-2 text-center">مات اللاعب!</h2>
+<h2 class="text-5xl font-black text-red-500 mb-2 text-center">أنت ميت</h2>
 <p class="text-white text-xl mb-8 text-center">النقاط: <span id="finalScore" class="text-yellow-400">0</span></p>
 <div class="space-y-4">
 <button class="btn-primary custom-click" onclick="restartLevel()"><span>مباراة جديدة</span> <span>↺</span></button>
-<button class="btn-primary custom-click" onclick="showMenu()"><span>العودة للوبي</span> <span>✖</span></button>
+<button class="btn-primary custom-click" onclick="showMenu()"><span>العودة للساحة</span> <span>✖</span></button>
 </div>
 </div>
 </div>
+
 <div class="ui-layer interactive hidden" id="winScreen">
 <div class="glass-panel p-10 max-w-sm w-full" style="border-right-color: #22c55e;">
 <h2 class="text-5xl font-black text-green-400 mb-2 text-center">WINNER!</h2>
 <p class="text-white text-center mb-6">أتممت المستوى <span id="completedLevel" class="font-bold text-yellow-400">1</span></p>
 <div class="space-y-4">
 <button class="btn-primary custom-click" onclick="nextLevel()"><span>المستوى التالي</span> <span>▶</span></button>
-<button class="btn-primary custom-click" onclick="showMenu()"><span>العودة للوبي</span> <span>✖</span></button>
+<button class="btn-primary custom-click" onclick="showMenu()"><span>العودة للساحة</span> <span>✖</span></button>
 </div>
 </div>
 </div>
@@ -155,6 +301,7 @@ const GameState = { MENU: 'menu', PLAYING: 'playing', PAUSED: 'paused', GAME_OVE
 let currentState = GameState.MENU;
 let previousState = GameState.MENU;
 let currentLevel = 1, maxLevels = 10;
+let unlockedLevel = 1; // المستويات المفتوحة (محفوظة)
 let score = 0, lives = 3, collectedItems = 0, totalCollectibles = 0, levelTime = 0, maxTime = 120;
 let scene, camera, renderer, flashLight, playerArm, playerModel, starsParticles, dustVFX, ceilingMesh;
 let wallInstancedMesh, floorMesh;
@@ -169,682 +316,1119 @@ let lookSensitivity = 0.005; let mouseSensitivity = 0.002;
 let spiders = [], collectibles = [], exitPosition = { x: 0, z: 0 };
 let mazeWidth, mazeHeight, mazeGrid = []; let materials = {};
 let spiderMat, eyeMat;
-let ceilingLights = []; // مصفوفة لتخزين لمبات السقف
-
+let ceilingLights = [];
+let charArmLGroup, charArmRGroup, charHeadGroup, charNeck, charTorso;
+let charLegLGroup, charLegRGroup, charForeArmL, charForeArmR;
+let charFlashlightLens;
+let playerAnimState = 'idle';
+let playerAnimTime = 0;
 let keys = {};
 let joystick = { active: false, id: null, x: 0, y: 0, originX: 0, originY: 0 };
 let lookTouch = { active: false, id: null, currentX: 0, currentY: 0 };
+let selectedElement = null; let isDraggingElement = false; let dragOffset = {x:0, y:0};
 
-let selectedBtn = null; let isDraggingBtn = false; let dragOffset = {x:0, y:0};
+// === إعدادات التخصيص الكاملة لكل عناصر HUD ===
 const defaultControls = {
-jumpBtn: { left: 'auto', right: '20px', top: 'auto', bottom: '180px', scale: 1, opacity: 1 },
-crouchBtn: { left: 'auto', right: '20px', top: 'auto', bottom: '100px', scale: 1, opacity: 1 },
-sprintBtn: { left: 'auto', right: '20px', top: 'auto', bottom: '20px', scale: 1, opacity: 1 },
-flashlightBtn: { left: '20px', right: 'auto', top: 'auto', bottom: '20px', scale: 1, opacity: 1 }
+    minimap: { left: 'auto', right: '20px', top: 'auto', bottom: '200px', scale: 1, opacity: 1 },
+    hudStats: { left: '20px', right: 'auto', top: '20px', bottom: 'auto', scale: 1, opacity: 1 },
+    pauseBtnHUD: { left: 'auto', right: '20px', top: '20px', bottom: 'auto', scale: 1, opacity: 1 },
+    jumpBtn: { left: 'auto', right: '20px', top: 'auto', bottom: '180px', scale: 1, opacity: 1 },
+    crouchBtn: { left: 'auto', right: '20px', top: 'auto', bottom: '100px', scale: 1, opacity: 1 },
+    sprintBtn: { left: 'auto', right: '20px', top: 'auto', bottom: '20px', scale: 1, opacity: 1 },
+    flashlightBtn: { left: '20px', right: 'auto', top: 'auto', bottom: '20px', scale: 1, opacity: 1 },
+    onlineHUD: { left: 'auto', right: '195px', top: '20px', bottom: 'auto', scale: 1, opacity: 1 }
 };
 
-// --- نظام الصوت ---
+// === نظام الصوت ===
 let audioContext = false;
 let audioCache = {};
-
 function initAudio() {
-    if (audioContext) return;
-    audioContext = true;
-    const sfxPaths = {
-        attack: 'SFX/Attack_spider.mp3',
-        bgm: 'SFX/background_gameplay_sfx.mp3',
-        btn: 'SFX/click_btn.mp3',
-        flashlight: 'SFX/click_flashlight.mp3',
-        collect: 'SFX/Collect.mp3',
-        hit: 'SFX/hit_player.mp3',
-        jump: 'SFX/jumplanding_player.mp3',
-        run: 'SFX/Run_player.mp3',
-        call: 'SFX/Spider_call.mp3',
-        walk: 'SFX/Walk_player.mp3'
-    };
-    for(let key in sfxPaths) {
-        let audio = new Audio(sfxPaths[key]);
-        if(key === 'bgm' || key === 'walk' || key === 'run') { audio.loop = true; }
-        audioCache[key] = audio;
-    }
-    document.querySelectorAll('.custom-click').forEach(btn => {
-        btn.addEventListener('click', () => playSound('btn'));
-    });
+if (audioContext) return;
+audioContext = true;
+const sfxPaths = {
+attack: 'SFX/Attack_spider.mp3',
+bgm: 'SFX/background_gameplay_sfx.mp3',
+btn: 'SFX/click_btn.mp3',
+flashlight: 'SFX/click_flashlight.mp3',
+collect: 'SFX/Collect.mp3',
+hit: 'SFX/hit_player.mp3',
+jump: 'SFX/jumplanding_player.mp3',
+run: 'SFX/Run_player.mp3',
+call: 'SFX/Spider_call.mp3',
+walk: 'SFX/Walk_player.mp3'
+};
+for(let key in sfxPaths) {
+let audio = new Audio(sfxPaths[key]);
+if(key === 'bgm' || key === 'walk' || key === 'run') { audio.loop = true; }
+audioCache[key] = audio;
 }
-
+document.querySelectorAll('.custom-click').forEach(btn => {
+btn.addEventListener('click', () => playSound('btn'));
+});
+}
 function playSound(type) {
-    if (!audioContext || !audioCache[type]) return;
-    let snd = audioCache[type];
-    if(!snd.loop) { snd.currentTime = 0; }
-    let playPromise = snd.play();
-    if (playPromise !== undefined) { playPromise.catch(error => {}); }
+if (!audioContext || !audioCache[type]) return;
+let snd = audioCache[type];
+if(!snd.loop) { snd.currentTime = 0; }
+let playPromise = snd.play();
+if (playPromise !== undefined) { playPromise.catch(error => {}); }
 }
-
 function stopSound(type) {
-    if (!audioContext || !audioCache[type]) return;
-    audioCache[type].pause();
-    if(!audioCache[type].loop) audioCache[type].currentTime = 0;
+if (!audioContext || !audioCache[type]) return;
+audioCache[type].pause();
+if(!audioCache[type].loop) audioCache[type].currentTime = 0;
 }
 
-// --- VFX: Dust Particles ---
+// === VFX: Dust Particles ===
 function createDustVFX() {
-    if (dustVFX) scene.remove(dustVFX);
-    const dustCount = 800;
-    const geometry = new THREE.BufferGeometry();
-    const positions = new Float32Array(dustCount * 3);
-    for(let i = 0; i < dustCount * 3; i++) {
-        positions[i] = (Math.random() - 0.5) * mazeWidth * 1.5;
-    }
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    const material = new THREE.PointsMaterial({
-        size: 0.03,
-        color: 0xffffff,
-        transparent: true,
-        opacity: 0.2,
-        blending: THREE.AdditiveBlending
-    });
-    dustVFX = new THREE.Points(geometry, material);
-    scene.add(dustVFX);
+if (dustVFX) scene.remove(dustVFX);
+const dustCount = 800;
+const geometry = new THREE.BufferGeometry();
+const positions = new Float32Array(dustCount * 3);
+for(let i = 0; i < dustCount * 3; i++) {
+positions[i] = (Math.random() - 0.5) * mazeWidth * 1.5;
+}
+geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+const material = new THREE.PointsMaterial({
+size: 0.03,
+color: 0xffffff,
+transparent: true,
+opacity: 0.2,
+blending: THREE.AdditiveBlending
+});
+dustVFX = new THREE.Points(geometry, material);
+scene.add(dustVFX);
 }
 
-// --- VFX: Collection Spark ---
+// === VFX: Collection Spark ===
 function createCollectVFX(x, z) {
-    const particleCount = 12;
-    const geo = new THREE.SphereGeometry(0.04, 4, 4);
-    const mat = new THREE.MeshBasicMaterial({ color: 0x06b6d4 });
-    for (let i = 0; i < particleCount; i++) {
-        const p = new THREE.Mesh(geo, mat);
-        p.position.set(x, 0.8, z);
-        scene.add(p);
-        const angle = Math.random() * Math.PI * 2;
-        const force = Math.random() * 0.15;
-        const vel = { x: Math.cos(angle) * force, y: Math.random() * 0.15, z: Math.sin(angle) * force };
-        let life = 1.0;
-        const animateP = () => {
-            p.position.x += vel.x; p.position.y += vel.y; p.position.z += vel.z;
-            life -= 0.04;
-            p.scale.set(life, life, life);
-            if(life > 0) requestAnimationFrame(animateP);
-            else scene.remove(p);
-        };
-        animateP();
-    }
+const particleCount = 12;
+const geo = new THREE.SphereGeometry(0.04, 4, 4);
+const mat = new THREE.MeshBasicMaterial({ color: 0x06b6d4 });
+for (let i = 0; i < particleCount; i++) {
+const p = new THREE.Mesh(geo, mat);
+p.position.set(x, 0.8, z);
+scene.add(p);
+const angle = Math.random() * Math.PI * 2;
+const force = Math.random() * 0.15;
+const vel = { x: Math.cos(angle) * force, y: Math.random() * 0.15, z: Math.sin(angle) * force };
+let life = 1.0;
+const animateP = () => {
+p.position.x += vel.x; p.position.y += vel.y; p.position.z += vel.z;
+life -= 0.04;
+p.scale.set(life, life, life);
+if(life > 0) requestAnimationFrame(animateP);
+else scene.remove(p);
+};
+animateP();
+}
 }
 
 function createRealisticSpider() {
-    const spiderGroup = new THREE.Group();
-    
-    const thoraxMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.1, metalness: 0.2 });
-    const abdomenMat = new THREE.MeshStandardMaterial({ color: 0x080808, roughness: 0.8, metalness: 0.1 });
-    const jointMat = new THREE.MeshStandardMaterial({ color: 0x0b0b0b, roughness: 0.7, metalness: 0.15 });
-    const eyeMatLocal = new THREE.MeshStandardMaterial({ color: 0xff2200, emissive: 0xff2200, emissiveIntensity: 1 });
-
-    const thorax = new THREE.Mesh(new THREE.SphereGeometry(0.4, 32, 32), thoraxMat);
-    thorax.scale.set(1, 0.6, 1);
-    thorax.position.set(0, 0, 0);
-    thorax.castShadow = true;
-    spiderGroup.add(thorax);
-
-    const abdomen = new THREE.Mesh(new THREE.SphereGeometry(0.8, 32, 32), abdomenMat);
-    abdomen.position.set(0, 0, -1.1);
-    abdomen.scale.set(1, 0.7, 1.4);
-    abdomen.castShadow = true;
-    spiderGroup.add(abdomen);
-
-    const eyePositions = [
-        [0.12, 0.12, 0.32, 0.03], [-0.12, 0.12, 0.32, 0.03],
-        [0.22, 0.08, 0.25, 0.025], [-0.22, 0.08, 0.25, 0.025],
-        [0.05, 0.18, 0.3, 0.02], [-0.05, 0.18, 0.3, 0.02],
-        [0.3, 0.15, 0.18, 0.02], [-0.3, 0.15, 0.18, 0.02]
-    ];
-    const eyes = [];
-    eyePositions.forEach(pos => {
-        const eye = new THREE.Mesh(new THREE.SphereGeometry(pos[3], 16, 16), eyeMatLocal);
-        eye.position.set(pos[0], pos[1], pos[2]);
-        thorax.add(eye);
-        eyes.push(eye);
-    });
-
-    const legSegments = [];
-    function createLeg(side, index) {
-        const root = new THREE.Group();
-        const baseX = 0.25 * side;
-        const baseZ = -0.1 - index * 0.15;
-        root.position.set(baseX, 0, baseZ);
-
-        const b1 = new THREE.Group();
-        const m1 = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.07, 0.6), jointMat);
-        m1.rotation.z = Math.PI / 2 * side;
-        m1.position.x = 0.3 * side;
-        m1.castShadow = true;
-        b1.add(m1);
-        root.add(b1);
-
-        const b2 = new THREE.Group();
-        const m2 = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.05, 1.0), jointMat);
-        b2.position.set(0.5 * side, 0, 0);
-        m2.rotation.z = -Math.PI / 4 * side;
-        m2.position.set(0.4 * side, 0.35, 0);
-        m2.castShadow = true;
-        b1.add(b2); b2.add(m2);
-
-        const b3 = new THREE.Group();
-        const m3 = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.035, 1.2), jointMat);
-        b3.position.set(0.75 * side, 0.7, 0);
-        m3.rotation.z = Math.PI / 6 * side;
-        m3.position.set(0.25 * side, -0.5, 0);
-        m3.castShadow = true;
-        b2.add(b3); b3.add(m3);
-
-        const angle = (index * 0.45 - 0.75) * side;
-        root.rotation.y = angle;
-        spiderGroup.add(root);
-        legSegments.push({ b1, b2, b3, root, side, index });
-        return { b1, b2, b3, root };
-    }
-
-    const allLegs = [];
-    for (let i = 0; i < 4; i++) {
-        allLegs.push(createLeg(1, i));
-        allLegs.push(createLeg(-1, i));
-    }
-
-    spiderGroup.userData = { legs: allLegs, legSegments: legSegments, abdomen: abdomen, eyes: eyes, eyeMat: eyeMatLocal, walkCycle: 0, idleCycle: 0, jumpCycle: 0, isJumping: false, jumpStartTime: 0, jumpHeight: 0, jumpDistance: 0, jumpDirection: { x: 0, z: 0 }, originalY: 0.3, originalX: 0, originalZ: 0, walkSpeed: 0, lastWalkTime: 0, state: 'idle', aggression: 0, twitchTimer: 0, twitchAmount: 0, hasCalled: false };
-    spiderGroup.scale.set(0.5, 0.5, 0.5);
-    return spiderGroup;
+const spiderGroup = new THREE.Group();
+const thoraxMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.1, metalness: 0.2 });
+const abdomenMat = new THREE.MeshStandardMaterial({ color: 0x080808, roughness: 0.8, metalness: 0.1 });
+const jointMat = new THREE.MeshStandardMaterial({ color: 0x0b0b0b, roughness: 0.7, metalness: 0.15 });
+const eyeMatLocal = new THREE.MeshStandardMaterial({ color: 0xff2200, emissive: 0xff2200, emissiveIntensity: 1 });
+const thorax = new THREE.Mesh(new THREE.SphereGeometry(0.4, 32, 32), thoraxMat);
+thorax.scale.set(1, 0.6, 1);
+thorax.position.set(0, 0, 0);
+thorax.castShadow = true;
+spiderGroup.add(thorax);
+const abdomen = new THREE.Mesh(new THREE.SphereGeometry(0.8, 32, 32), abdomenMat);
+abdomen.position.set(0, 0, -1.1);
+abdomen.scale.set(1, 0.7, 1.4);
+abdomen.castShadow = true;
+spiderGroup.add(abdomen);
+const eyePositions = [
+[0.12, 0.12, 0.32, 0.03], [-0.12, 0.12, 0.32, 0.03],
+[0.22, 0.08, 0.25, 0.025], [-0.22, 0.08, 0.25, 0.025],
+[0.05, 0.18, 0.3, 0.02], [-0.05, 0.18, 0.3, 0.02],
+[0.3, 0.15, 0.18, 0.02], [-0.3, 0.15, 0.18, 0.02]
+];
+const eyes = [];
+eyePositions.forEach(pos => {
+const eye = new THREE.Mesh(new THREE.SphereGeometry(pos[3], 16, 16), eyeMatLocal);
+eye.position.set(pos[0], pos[1], pos[2]);
+thorax.add(eye);
+eyes.push(eye);
+});
+const legSegments = [];
+function createLeg(side, index) {
+const root = new THREE.Group();
+const baseX = 0.25 * side;
+const baseZ = -0.1 - index * 0.15;
+root.position.set(baseX, 0, baseZ);
+const b1 = new THREE.Group();
+const m1 = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.07, 0.6), jointMat);
+m1.rotation.z = Math.PI / 2 * side;
+m1.position.x = 0.3 * side;
+m1.castShadow = true;
+b1.add(m1);
+root.add(b1);
+const b2 = new THREE.Group();
+const m2 = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.05, 1.0), jointMat);
+b2.position.set(0.5 * side, 0, 0);
+m2.rotation.z = -Math.PI / 4 * side;
+m2.position.set(0.4 * side, 0.35, 0);
+m2.castShadow = true;
+b1.add(b2); b2.add(m2);
+const b3 = new THREE.Group();
+const m3 = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.035, 1.2), jointMat);
+b3.position.set(0.75 * side, 0.7, 0);
+m3.rotation.z = Math.PI / 6 * side;
+m3.position.set(0.25 * side, -0.5, 0);
+m3.castShadow = true;
+b2.add(b3); b3.add(m3);
+const angle = (index * 0.45 - 0.75) * side;
+root.rotation.y = angle;
+spiderGroup.add(root);
+legSegments.push({ b1, b2, b3, root, side, index });
+return { b1, b2, b3, root };
+}
+const allLegs = [];
+for (let i = 0; i < 4; i++) {
+allLegs.push(createLeg(1, i));
+allLegs.push(createLeg(-1, i));
+}
+spiderGroup.userData = { legs: allLegs, legSegments: legSegments, abdomen: abdomen, eyes: eyes, eyeMat: eyeMatLocal, walkCycle: 0, idleCycle: 0, jumpCycle: 0, isJumping: false, jumpStartTime: 0, jumpHeight: 0, jumpDistance: 0, jumpDirection: { x: 0, z: 0 }, originalY: 0.3, originalX: 0, originalZ: 0, walkSpeed: 0, lastWalkTime: 0, state: 'idle', aggression: 0, twitchTimer: 0, twitchAmount: 0, hasCalled: false };
+spiderGroup.scale.set(0.5, 0.5, 0.5);
+return spiderGroup;
 }
 
 function updateSpiders(dt, elapsedTime) {
-    spiders.forEach(spider => {
-        const spiderData = spider.group.userData;
-        spiderData.idleCycle += dt * 2; spiderData.jumpCycle += dt; spiderData.twitchTimer += dt;
-        if (spiderData.walkSpeed > 0.1) {
-            spiderData.walkCycle += dt * spiderData.walkSpeed * 4; spiderData.lastWalkTime = elapsedTime; spiderData.state = spiderData.aggression > 0.7 ? 'attacking' : 'chasing';
-        } else {
-            spiderData.walkSpeed = Math.max(0, spiderData.walkSpeed - dt * 2); spiderData.state = 'idle';
-        }
-        const timeSinceWalk = elapsedTime - spiderData.lastWalkTime;
-        if (timeSinceWalk > 2) {
-            spiderData.abdomen.position.y = Math.sin(spiderData.idleCycle * 0.5) * 0.05; spiderData.abdomen.rotation.x = Math.sin(spiderData.idleCycle) * 0.1;
-            if (spiderData.twitchTimer > 3 + Math.random() * 2) { spiderData.twitchAmount = Math.random() * 0.3; spiderData.twitchTimer = 0; }
-            spiderData.abdomen.rotation.y = Math.sin(spiderData.twitchTimer * 10) * spiderData.twitchAmount;
-        }
-        animateLegs(spiderData, dt);
-        if (spiderData.isJumping) {
-            const jumpTime = elapsedTime - spiderData.jumpStartTime; const jumpDuration = 0.4;
-            if (jumpTime < jumpDuration) {
-                const progress = jumpTime / jumpDuration; const jumpHeight = Math.sin(progress * Math.PI) * spiderData.jumpHeight; const forwardProgress = progress;
-                spider.group.position.y = spiderData.originalY + jumpHeight; spider.group.position.x = spiderData.originalX + spiderData.jumpDirection.x * spiderData.jumpDistance * forwardProgress; spider.group.position.z = spiderData.originalZ + spiderData.jumpDirection.z * spiderData.jumpDistance * forwardProgress;
-                spiderData.abdomen.scale.y = 1 - jumpHeight * 0.4; spiderData.abdomen.scale.x = 1 + jumpHeight * 0.3; spiderData.abdomen.rotation.z = Math.sin(progress * 20) * 0.2;
-            } else {
-                spider.group.position.y = spiderData.originalY; spiderData.abdomen.scale.set(1, 0.8, 1.4); spiderData.abdomen.rotation.z = 0; spiderData.isJumping = false; spiderData.state = 'idle';
-            }
-        }
-        const distToPlayer = Math.sqrt((player.x - spider.x) ** 2 + (player.z - spider.z) ** 2);
-        spiderData.targetDist = distToPlayer; spiderData.aggression = Math.min(1, distToPlayer < 15 ? (15 - distToPlayer) / 15 : 0);
-        if (distToPlayer < 10) {
-            const blinkSpeed = distToPlayer < 3 ? 20 : 10; const blinkIntensity = 0.3 + Math.sin(elapsedTime * blinkSpeed) * 0.7;
-            spiderData.eyes.forEach(eye => {
-                if (distToPlayer < 3) { 
-                    eye.material.color.setRGB(1, 0.1, 0.1); 
-                    if(eye.material.emissive) eye.material.emissive.setRGB(1, 0.1, 0.1);
-                } 
-                else if (distToPlayer < 5) { 
-                    eye.material.color.setRGB(1, blinkIntensity * 0.5, 0); 
-                    if(eye.material.emissive) eye.material.emissive.setRGB(1, blinkIntensity * 0.5, 0);
-                } 
-                else { 
-                    eye.material.color.setRGB(1, blinkIntensity, blinkIntensity); 
-                    if(eye.material.emissive) eye.material.emissive.setRGB(1, blinkIntensity, blinkIntensity);
-                }
-            });
-        } else {
-            spiderData.eyes.forEach(eye => { 
-                eye.material.color.setRGB(0.8, 0, 0); 
-                if(eye.material.emissive) eye.material.emissive.setRGB(0.8, 0, 0);
-            });
-        }
-    });
+spiders.forEach(spider => {
+const spiderData = spider.group.userData;
+spiderData.idleCycle += dt * 2; spiderData.jumpCycle += dt; spiderData.twitchTimer += dt;
+if (spiderData.walkSpeed > 0.1) {
+spiderData.walkCycle += dt * spiderData.walkSpeed * 4; spiderData.lastWalkTime = elapsedTime; spiderData.state = spiderData.aggression > 0.7 ? 'attacking' : 'chasing';
+} else {
+spiderData.walkSpeed = Math.max(0, spiderData.walkSpeed - dt * 2); spiderData.state = 'idle';
+}
+const timeSinceWalk = elapsedTime - spiderData.lastWalkTime;
+if (timeSinceWalk > 2) {
+spiderData.abdomen.position.y = Math.sin(spiderData.idleCycle * 0.5) * 0.05; spiderData.abdomen.rotation.x = Math.sin(spiderData.idleCycle) * 0.1;
+if (spiderData.twitchTimer > 3 + Math.random() * 2) { spiderData.twitchAmount = Math.random() * 0.3; spiderData.twitchTimer = 0; }
+spiderData.abdomen.rotation.y = Math.sin(spiderData.twitchTimer * 10) * spiderData.twitchAmount;
+}
+animateLegs(spiderData, dt);
+if (spiderData.isJumping) {
+const jumpTime = elapsedTime - spiderData.jumpStartTime; const jumpDuration = 0.4;
+if (jumpTime < jumpDuration) {
+const progress = jumpTime / jumpDuration; const jumpHeight = Math.sin(progress * Math.PI) * spiderData.jumpHeight; const forwardProgress = progress;
+spider.group.position.y = spiderData.originalY + jumpHeight; spider.group.position.x = spiderData.originalX + spiderData.jumpDirection.x * spiderData.jumpDistance * forwardProgress; spider.group.position.z = spiderData.originalZ + spiderData.jumpDirection.z * spiderData.jumpDistance * forwardProgress;
+spiderData.abdomen.scale.y = 1 - jumpHeight * 0.4; spiderData.abdomen.scale.x = 1 + jumpHeight * 0.3; spiderData.abdomen.rotation.z = Math.sin(progress * 20) * 0.2;
+} else {
+spider.group.position.y = spiderData.originalY; spiderData.abdomen.scale.set(1, 0.8, 1.4); spiderData.abdomen.rotation.z = 0; spiderData.isJumping = false; spiderData.state = 'idle';
+}
+}
+const distToPlayer = Math.sqrt((player.x - spider.x) ** 2 + (player.z - spider.z) ** 2);
+spiderData.targetDist = distToPlayer; spiderData.aggression = Math.min(1, distToPlayer < 15 ? (15 - distToPlayer) / 15 : 0);
+if (distToPlayer < 10) {
+const blinkSpeed = distToPlayer < 3 ? 20 : 10; const blinkIntensity = 0.3 + Math.sin(elapsedTime * blinkSpeed) * 0.7;
+spiderData.eyes.forEach(eye => {
+if (distToPlayer < 3) {
+eye.material.color.setRGB(1, 0.1, 0.1);
+if(eye.material.emissive) eye.material.emissive.setRGB(1, 0.1, 0.1);
+}
+else if (distToPlayer < 5) {
+eye.material.color.setRGB(1, blinkIntensity * 0.5, 0);
+if(eye.material.emissive) eye.material.emissive.setRGB(1, blinkIntensity * 0.5, 0);
+}
+else {
+eye.material.color.setRGB(1, blinkIntensity, blinkIntensity);
+if(eye.material.emissive) eye.material.emissive.setRGB(1, blinkIntensity, blinkIntensity);
+}
+});
+} else {
+spiderData.eyes.forEach(eye => {
+eye.material.color.setRGB(0.8, 0, 0);
+if(eye.material.emissive) eye.material.emissive.setRGB(0.8, 0, 0);
+});
+}
+});
+}
+
+// للـ Guest فقط: أنيميشن بصري للعناكب بدون AI (المواقع تأتي من Firebase)
+function updateSpidersVisualOnly(dt, elapsedTime) {
+spiders.forEach(spider => {
+const spiderData = spider.group.userData;
+spiderData.idleCycle += dt * 2;
+spiderData.walkCycle += dt * 3;
+spiderData.twitchTimer += dt;
+// تحديد حالة العنكبوت بناءً على السرعة المقدّرة
+const dx = player.x - spider.x, dz = player.z - spider.z;
+const distToPlayer = Math.sqrt(dx*dx + dz*dz);
+spiderData.walkSpeed = distToPlayer < 15 ? spider.speed : spider.speed * 0.4;
+spiderData.state = distToPlayer < 12 ? 'chasing' : 'idle';
+spiderData.aggression = Math.min(1, distToPlayer < 15 ? (15 - distToPlayer) / 15 : 0);
+animateLegs(spiderData, dt);
+// تأثير العيون
+if (distToPlayer < 10) {
+const blinkSpeed = distToPlayer < 3 ? 20 : 10;
+const blinkIntensity = 0.3 + Math.sin(elapsedTime * blinkSpeed) * 0.7;
+spiderData.eyes.forEach(eye => {
+if (distToPlayer < 3) { eye.material.color.setRGB(1, 0.1, 0.1); if(eye.material.emissive) eye.material.emissive.setRGB(1, 0.1, 0.1); }
+else { eye.material.color.setRGB(1, blinkIntensity, blinkIntensity); if(eye.material.emissive) eye.material.emissive.setRGB(1, blinkIntensity, blinkIntensity); }
+});
+}
+// تحقق من اللمس (Guest يتأثر بالعناكب أيضاً)
+if (distToPlayer < 0.9) { loseLife(); }
+if (distToPlayer < 2.5 && !spiderData.hasCalled) { playSound('call'); spiderData.hasCalled = true; }
+else if (distToPlayer > 5) { spiderData.hasCalled = false; }
+});
 }
 
 function animateLegs(spiderData, dt) {
-    const walkCycle = spiderData.walkCycle;
-    const legSegments = spiderData.legSegments;
-    const state = spiderData.state;
-    
-    legSegments.forEach((leg, i) => {
-        const phase = i * 0.5 + walkCycle;
-        if (state === 'idle') {
-            const idlePhase = spiderData.idleCycle * 2 + i * 0.5;
-            leg.b1.rotation.z = Math.sin(idlePhase) * 0.1;
-            leg.b2.rotation.z = Math.cos(idlePhase) * 0.2;
-        } else {
-            const speedMultiplier = (state === 'chasing' || state === 'attacking') ? 1.5 : 1;
-            const movePhase = walkCycle * 4 * speedMultiplier + i * 0.5;
-            leg.b1.rotation.z = Math.sin(movePhase) * 0.15;
-            leg.b2.rotation.z = Math.cos(movePhase) * 0.35;
-            leg.b3.rotation.y = Math.sin(movePhase * 0.5) * 0.08;
-        }
-    });
+const walkCycle = spiderData.walkCycle;
+const legSegments = spiderData.legSegments;
+const state = spiderData.state;
+legSegments.forEach((leg, i) => {
+const phase = i * 0.5 + walkCycle;
+if (state === 'idle') {
+const idlePhase = spiderData.idleCycle * 2 + i * 0.5;
+leg.b1.rotation.z = Math.sin(idlePhase) * 0.1;
+leg.b2.rotation.z = Math.cos(idlePhase) * 0.2;
+} else {
+const speedMultiplier = (state === 'chasing' || state === 'attacking') ? 1.5 : 1;
+const movePhase = walkCycle * 4 * speedMultiplier + i * 0.5;
+leg.b1.rotation.z = Math.sin(movePhase) * 0.15;
+leg.b2.rotation.z = Math.cos(movePhase) * 0.35;
+leg.b3.rotation.y = Math.sin(movePhase * 0.5) * 0.08;
+}
+});
 }
 
 function triggerSpiderJump(spider) {
-    const spiderData = spider.group.userData;
-    if (!spiderData.isJumping && spiderData.jumpCycle > 1) {
-        spiderData.isJumping = true; spiderData.state = 'jumping'; spiderData.jumpStartTime = clock.getElapsedTime(); spiderData.jumpHeight = 0.8 + Math.random() * 0.5; spiderData.jumpDistance = 2 + Math.random() * 1; spiderData.jumpCycle = 0;
-        spiderData.originalX = spider.x; spiderData.originalZ = spider.z; spiderData.originalY = spider.group.position.y;
-        const dx = player.x - spider.x; const dz = player.z - spider.z; const dist = Math.sqrt(dx*dx + dz*dz);
-        spiderData.jumpDirection.x = dx / dist; spiderData.jumpDirection.z = dz / dist;
-        playSound('attack');
-        if (Math.random() < 0.5) { cameraRotation.x += (Math.random() - 0.5) * 0.2; }
-    }
+const spiderData = spider.group.userData;
+if (!spiderData.isJumping && spiderData.jumpCycle > 1) {
+spiderData.isJumping = true; spiderData.state = 'jumping'; spiderData.jumpStartTime = clock.getElapsedTime(); spiderData.jumpHeight = 0.8 + Math.random() * 0.5; spiderData.jumpDistance = 2 + Math.random() * 1; spiderData.jumpCycle = 0;
+spiderData.originalX = spider.x; spiderData.originalZ = spider.z; spiderData.originalY = spider.group.position.y;
+const dx = player.x - spider.x; const dz = player.z - spider.z; const dist = Math.sqrt(dx*dx + dz*dz);
+spiderData.jumpDirection.x = dx / dist; spiderData.jumpDirection.z = dz / dist;
+playSound('attack');
+if (Math.random() < 0.5) { cameraRotation.x += (Math.random() - 0.5) * 0.2; }
+}
+}
+
+// === دوال حفظ وتحميل الإعدادات والمستويات ===
+function loadUnlockedLevel() {
+  const saved = localStorage.getItem('mazeUnlockedLevel');
+  if (saved) unlockedLevel = parseInt(saved);
+  else unlockedLevel = 1;
+}
+function saveUnlockedLevel() {
+  localStorage.setItem('mazeUnlockedLevel', unlockedLevel);
+}
+function saveSettings() {
+  const sens = document.getElementById('sensRange').value;
+  const qual = document.getElementById('qualRange').value;
+  localStorage.setItem('mazeSettings', JSON.stringify({ sensitivity: sens, quality: qual }));
+}
+function loadSettings() {
+  const saved = localStorage.getItem('mazeSettings');
+  if (saved) {
+    const { sensitivity, quality } = JSON.parse(saved);
+    document.getElementById('sensRange').value = sensitivity;
+    document.getElementById('qualRange').value = quality;
+  }
+  updateSettings(); // يطبق الإعدادات ويحفظها (عن طريق saveSettings داخله)
 }
 
 window.onload = () => {
-    initThreeJS(); generateStylizedTextures(); buildLobbyScene(); 
-    document.addEventListener('click', initAudio, { once: true }); document.addEventListener('touchstart', initAudio, { once: true });
-    generateLevelButtons(); setupInputs(); setupCustomControls(); updateSettings(); loadCustomControls();
-    setTimeout(() => { document.getElementById('loadingScreen').style.opacity = '0'; setTimeout(() => document.getElementById('loadingScreen').style.display = 'none', 500); }, 1000);
-    requestAnimationFrame(mainLoop);
+initThreeJS(); generateStylizedTextures(); buildLobbyScene();
+document.addEventListener('click', initAudio, { once: true }); document.addEventListener('touchstart', initAudio, { once: true });
+loadUnlockedLevel();          // تحميل المستويات المفتوحة
+loadSettings();                // تحميل الإعدادات
+generateLevelButtons(); setupInputs(); setupCustomControls(); loadCustomControls();
+setTimeout(() => { document.getElementById('loadingScreen').style.opacity = '0'; setTimeout(() => document.getElementById('loadingScreen').style.display = 'none', 500); }, 1000);
+requestAnimationFrame(mainLoop);
 };
 
-function updateSettings() { lookSensitivity = parseFloat(document.getElementById('sensRange').value); mouseSensitivity = lookSensitivity * 0.4; const quality = parseFloat(document.getElementById('qualRange').value); renderer.setPixelRatio(Math.min(window.devicePixelRatio * quality, 2)); }
+function updateSettings() { lookSensitivity = parseFloat(document.getElementById('sensRange').value); mouseSensitivity = lookSensitivity * 0.4; const quality = parseFloat(document.getElementById('qualRange').value); renderer.setPixelRatio(Math.min(window.devicePixelRatio * quality, 2)); saveSettings(); }
 function openSettings() { previousState = currentState; currentState = GameState.SETTINGS; showScreen('settingsMenu'); }
 function closeSettings() { updateSettings(); if(previousState === GameState.PAUSED) { currentState = GameState.PAUSED; showScreen('pauseMenu'); } else { currentState = GameState.MENU; showScreen('mainMenu'); } }
 
+// === نظام التخصيص الكامل ===
 function setupCustomControls() {
-    const btns = document.querySelectorAll('.custom-btn');
-    btns.forEach(btn => {
-        btn.addEventListener('touchstart', (e) => { if(currentState !== GameState.CUSTOMIZING) return; e.preventDefault(); selectButtonForEdit(btn, e.touches[0].clientX, e.touches[0].clientY); }, {passive: false});
-        btn.addEventListener('mousedown', (e) => { if(currentState !== GameState.CUSTOMIZING) return; e.preventDefault(); selectButtonForEdit(btn, e.clientX, e.clientY); });
-        btn.addEventListener('touchstart', (e) => { if(currentState !== GameState.PLAYING) return; if(btn.id === 'jumpBtn') jump(e); if(btn.id === 'crouchBtn') startCrouch(e); if(btn.id === 'sprintBtn') startSprint(e); if(btn.id === 'flashlightBtn') toggleFlashlight(e); }, {passive: false});
-        btn.addEventListener('touchend', (e) => { if(currentState !== GameState.PLAYING) return; if(btn.id === 'crouchBtn') endCrouch(e); if(btn.id === 'sprintBtn') endSprint(e); }, {passive: false});
-    });
-    document.addEventListener('touchmove', (e) => { if(currentState === GameState.CUSTOMIZING && isDraggingBtn && selectedBtn) { e.preventDefault(); moveSelectedButton(e.touches[0].clientX, e.touches[0].clientY); } }, {passive: false});
-    document.addEventListener('mousemove', (e) => { if(currentState === GameState.CUSTOMIZING && isDraggingBtn && selectedBtn) { moveSelectedButton(e.clientX, e.clientY); } });
-    document.addEventListener('touchend', () => isDraggingBtn = false); document.addEventListener('mouseup', () => isDraggingBtn = false);
-}
-function selectButtonForEdit(btn, clientX, clientY) { document.querySelectorAll('.custom-btn').forEach(b => b.classList.remove('editing-btn')); selectedBtn = btn; selectedBtn.classList.add('editing-btn'); const panel = document.getElementById('customizerPanel'); panel.style.display = 'block'; document.getElementById('cSize').value = selectedBtn.dataset.scale || 1; document.getElementById('cOpac').value = selectedBtn.style.opacity || 1; const rect = selectedBtn.getBoundingClientRect(); dragOffset.x = clientX - rect.left; dragOffset.y = clientY - rect.top; isDraggingBtn = true; }
-function moveSelectedButton(clientX, clientY) { let x = clientX - dragOffset.x; let y = clientY - dragOffset.y; x = Math.max(0, Math.min(window.innerWidth - selectedBtn.offsetWidth, x)); y = Math.max(0, Math.min(window.innerHeight - selectedBtn.offsetHeight, y)); selectedBtn.style.left = x + 'px'; selectedBtn.style.top = y + 'px'; selectedBtn.style.right = 'auto'; selectedBtn.style.bottom = 'auto'; }
-function updateSelectedBtnStyle() { if(!selectedBtn) return; const size = document.getElementById('cSize').value; const opac = document.getElementById('cOpac').value; selectedBtn.style.transform = `scale(${size})`; selectedBtn.style.opacity = opac; selectedBtn.dataset.scale = size; }
-function openCustomControls() { currentState = GameState.CUSTOMIZING; document.querySelectorAll('.ui-layer').forEach(el => el.classList.add('hidden')); document.getElementById('gameHUD').classList.remove('hidden'); document.getElementById('gameHUD').classList.remove('playing-mode'); document.getElementById('customizerUI').classList.remove('hidden'); document.getElementById('pauseBtnHUD').style.display = 'none'; document.getElementById('customizerPanel').style.display = 'none'; document.querySelectorAll('.custom-btn').forEach(b => b.classList.remove('editing-btn')); selectedBtn = null; }
-function saveCustomControls() { const saved = {}; document.querySelectorAll('.custom-btn').forEach(btn => { saved[btn.id] = { left: btn.style.left || 'auto', right: btn.style.right || 'auto', top: btn.style.top || 'auto', bottom: btn.style.bottom || 'auto', scale: btn.dataset.scale || 1, opacity: btn.style.opacity || 1 }; }); localStorage.setItem('mazeControls', JSON.stringify(saved)); exitCustomizer(); }
-function resetCustomControls() { Object.keys(defaultControls).forEach(id => { const btn = document.getElementById(id); const def = defaultControls[id]; btn.style.left = def.left; btn.style.right = def.right; btn.style.top = def.top; btn.style.bottom = def.bottom; btn.style.transform = `scale(${def.scale})`; btn.style.opacity = def.opacity; btn.dataset.scale = def.scale; }); document.getElementById('customizerPanel').style.display = 'none'; selectedBtn = null; document.querySelectorAll('.custom-btn').forEach(b => b.classList.remove('editing-btn')); }
-function loadCustomControls() { const saved = JSON.parse(localStorage.getItem('mazeControls')); if(saved) { Object.keys(saved).forEach(id => { const btn = document.getElementById(id); if(btn) { btn.style.left = saved[id].left; btn.style.right = saved[id].right; btn.style.top = saved[id].top; btn.style.bottom = saved[id].bottom; btn.style.transform = `scale(${saved[id].scale})`; btn.style.opacity = saved[id].opacity; btn.dataset.scale = saved[id].scale; } }); } }
-function exitCustomizer() { document.getElementById('pauseBtnHUD').style.display = 'flex'; document.getElementById('gameHUD').classList.add('playing-mode'); document.querySelectorAll('.custom-btn').forEach(b => b.classList.remove('editing-btn')); closeSettings(); }
+const elements = document.querySelectorAll('.custom-hud');
+elements.forEach(el => {
+// للتخصيص
+el.addEventListener('touchstart', (e) => { if(currentState !== GameState.CUSTOMIZING) return; e.preventDefault(); selectElementForEdit(el, e.touches[0].clientX, e.touches[0].clientY); }, {passive: false});
+el.addEventListener('mousedown', (e) => { if(currentState !== GameState.CUSTOMIZING) return; e.preventDefault(); selectElementForEdit(el, e.clientX, e.clientY); });
 
+// للعب العادي (الأزرار فقط)
+if(el.classList.contains('action-btn')) {
+el.addEventListener('touchstart', (e) => { if(currentState !== GameState.PLAYING) return; if(el.id === 'jumpBtn') jump(e); if(el.id === 'crouchBtn') startCrouch(e); if(el.id === 'sprintBtn') startSprint(e); if(el.id === 'flashlightBtn') toggleFlashlight(e); }, {passive: false});
+el.addEventListener('touchend', (e) => { if(currentState !== GameState.PLAYING) return; if(el.id === 'crouchBtn') endCrouch(e); if(el.id === 'sprintBtn') endSprint(e); }, {passive: false});
+}
+});
+
+document.addEventListener('touchmove', (e) => { if(currentState === GameState.CUSTOMIZING && isDraggingElement && selectedElement) { e.preventDefault(); moveSelectedElement(e.touches[0].clientX, e.touches[0].clientY); } }, {passive: false});
+document.addEventListener('mousemove', (e) => { if(currentState === GameState.CUSTOMIZING && isDraggingElement && selectedElement) { moveSelectedElement(e.clientX, e.clientY); } });
+document.addEventListener('touchend', () => isDraggingElement = false); document.addEventListener('mouseup', () => isDraggingElement = false);
+}
+
+function selectElementForEdit(el, clientX, clientY) {
+document.querySelectorAll('.custom-hud').forEach(e => e.classList.remove('editing-btn'));
+selectedElement = el;
+selectedElement.classList.add('editing-btn');
+const panel = document.getElementById('customizerPanel');
+panel.style.display = 'block';
+
+// تحميل القيم الحالية
+const rect = el.getBoundingClientRect();
+const scaleX = parseFloat(el.dataset.scale || 1);
+const opacity = parseFloat(el.style.opacity || 1);
+
+// حساب الموضع كنسبة مئوية
+const percentX = (rect.left / window.innerWidth) * 100;
+const percentY = (rect.top / window.innerHeight) * 100;
+
+document.getElementById('cX').value = Math.round(percentX);
+document.getElementById('cY').value = Math.round(percentY);
+document.getElementById('cSize').value = scaleX;
+document.getElementById('cOpac').value = opacity;
+
+dragOffset.x = clientX - rect.left;
+dragOffset.y = clientY - rect.top;
+isDraggingElement = true;
+}
+
+function moveSelectedElement(clientX, clientY) {
+let x = clientX - dragOffset.x;
+let y = clientY - dragOffset.y;
+x = Math.max(0, Math.min(window.innerWidth - selectedElement.offsetWidth, x));
+y = Math.max(0, Math.min(window.innerHeight - selectedElement.offsetHeight, y));
+selectedElement.style.left = x + 'px';
+selectedElement.style.top = y + 'px';
+selectedElement.style.right = 'auto';
+selectedElement.style.bottom = 'auto';
+}
+
+function updateSelectedElementStyle() {
+if(!selectedElement) return;
+const size = document.getElementById('cSize').value;
+const opac = document.getElementById('cOpac').value;
+const percentX = document.getElementById('cX').value;
+const percentY = document.getElementById('cY').value;
+
+selectedElement.style.transform = `scale(${size})`;
+selectedElement.style.opacity = opac;
+selectedElement.dataset.scale = size;
+
+// تحديث الموضع بناءً على النسبة المئوية
+selectedElement.style.left = (percentX / 100 * window.innerWidth) + 'px';
+selectedElement.style.top = (percentY / 100 * window.innerHeight) + 'px';
+selectedElement.style.right = 'auto';
+selectedElement.style.bottom = 'auto';
+}
+
+function openCustomControls() {
+currentState = GameState.CUSTOMIZING;
+document.querySelectorAll('.ui-layer').forEach(el => el.classList.add('hidden'));
+document.getElementById('gameHUD').classList.remove('hidden');
+document.getElementById('gameHUD').classList.remove('playing-mode');
+document.getElementById('customizerUI').classList.remove('hidden');
+document.getElementById('pauseBtnHUD').style.display = 'flex';
+document.getElementById('customizerPanel').style.display = 'none';
+document.querySelectorAll('.custom-hud').forEach(b => b.classList.remove('editing-btn'));
+selectedElement = null;
+
+// إظهار رسالة توجيهية
+const guide = document.createElement('div');
+guide.id = 'customGuide';
+guide.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.9);color:white;padding:20px 40px;border-radius:10px;font-size:1.2rem;font-weight:bold;z-index:200;pointer-events:none;text-align:center;border:2px solid #06b6d4;';
+guide.innerHTML = ' اضغط على أي عنصر في الشاشة<br>لتغيير مكانه وحجمه وشفافيته';
+document.body.appendChild(guide);
+setTimeout(() => { if(guide) guide.remove(); }, 3000);
+}
+
+function saveCustomControls() {
+const saved = {};
+document.querySelectorAll('.custom-hud').forEach(el => {
+saved[el.id] = {
+left: el.style.left || 'auto',
+right: el.style.right || 'auto',
+top: el.style.top || 'auto',
+bottom: el.style.bottom || 'auto',
+scale: el.dataset.scale || 1,
+opacity: el.style.opacity || 1
+};
+});
+localStorage.setItem('mazeFullHUD', JSON.stringify(saved));
+exitCustomizer();
+}
+
+function resetCustomControls() {
+Object.keys(defaultControls).forEach(id => {
+const el = document.getElementById(id);
+const def = defaultControls[id];
+if(el) {
+el.style.left = def.left;
+el.style.right = def.right;
+el.style.top = def.top;
+el.style.bottom = def.bottom;
+el.style.transform = `scale(${def.scale})`;
+el.style.opacity = def.opacity;
+el.dataset.scale = def.scale;
+}
+});
+document.getElementById('customizerPanel').style.display = 'none';
+selectedElement = null;
+document.querySelectorAll('.custom-hud').forEach(b => b.classList.remove('editing-btn'));
+}
+
+function loadCustomControls() {
+const saved = JSON.parse(localStorage.getItem('mazeFullHUD'));
+if(saved) {
+Object.keys(saved).forEach(id => {
+const el = document.getElementById(id);
+if(el) {
+el.style.left = saved[id].left;
+el.style.right = saved[id].right;
+el.style.top = saved[id].top;
+el.style.bottom = saved[id].bottom;
+el.style.transform = `scale(${saved[id].scale})`;
+el.style.opacity = saved[id].opacity;
+el.dataset.scale = saved[id].scale;
+}
+});
+}
+}
+
+function exitCustomizer() {
+document.getElementById('pauseBtnHUD').style.display = 'flex';
+document.getElementById('gameHUD').classList.add('playing-mode');
+document.querySelectorAll('.custom-hud').forEach(b => b.classList.remove('editing-btn'));
+const guide = document.getElementById('customGuide');
+if(guide) guide.remove();
+closeSettings();
+}
+
+// === باقي الدوال (Textures, Player, Game Logic) ===
 function generateStylizedTextures() {
-    // أرضية قذرة ومظلمة
-    const fC = document.createElement('canvas'); fC.width = 512; fC.height = 512; const fCtx = fC.getContext('2d'); 
-    fCtx.fillStyle = '#111111'; fCtx.fillRect(0, 0, 512, 512);
-    for(let i=0; i<512; i+=64) { 
-        fCtx.fillStyle = (i/64)%2===0 ? '#1a1a1a' : '#151515'; fCtx.fillRect(i, 0, 64, 512); 
-        fCtx.strokeStyle = '#050505'; fCtx.lineWidth = 4; fCtx.strokeRect(i, 0, 64, 512); 
-        // إضافة بقع حمراء داكنة (كالدم القديم)
-        if(Math.random() < 0.3) { fCtx.fillStyle = '#3a0000'; fCtx.beginPath(); fCtx.arc(Math.random()*512, Math.random()*512, Math.random()*30+10, 0, Math.PI*2); fCtx.fill(); }
-    }
-    const floorTex = new THREE.CanvasTexture(fC); floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping; floorTex.repeat.set(20, 20); 
-    materials.floor = new THREE.MeshStandardMaterial({ map: floorTex, roughness: 1.0 });
+const fC = document.createElement('canvas'); fC.width = 512; fC.height = 512; const fCtx = fC.getContext('2d');
+fCtx.fillStyle = '#111111'; fCtx.fillRect(0, 0, 512, 512);
+for(let i=0; i<512; i+=64) {
+fCtx.fillStyle = (i/64)%2===0 ? '#1a1a1a' : '#151515'; fCtx.fillRect(i, 0, 64, 512);
+fCtx.strokeStyle = '#050505'; fCtx.lineWidth = 4; fCtx.strokeRect(i, 0, 64, 512);
+if(Math.random() < 0.3) { fCtx.fillStyle = '#3a0000'; fCtx.beginPath(); fCtx.arc(Math.random()*512, Math.random()*512, Math.random()*30+10, 0, Math.PI*2); fCtx.fill(); }
+}
+const floorTex = new THREE.CanvasTexture(fC); floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping; floorTex.repeat.set(20, 20);
+materials.floor = new THREE.MeshStandardMaterial({ map: floorTex, roughness: 1.0 });
 
-    // جدران مرعبة ومظلمة
-    const wC = document.createElement('canvas'); wC.width = 512; wC.height = 512; const wCtx = wC.getContext('2d'); 
-    wCtx.fillStyle = '#1c1c1c'; wCtx.fillRect(0, 0, 512, 512); wCtx.strokeStyle = '#000000'; wCtx.lineWidth = 8;
-    for(let y=0; y<=512; y+=128) { 
-        for(let x=0; x<=512; x+=128) { 
-            wCtx.fillStyle = Math.random()>0.5 ? '#2a2a2a' : '#222222'; wCtx.fillRect(x, y, 128, 128); wCtx.strokeRect(x, y, 128, 128); 
-            // صدأ وخطوط مرعبة
-            wCtx.strokeStyle = '#4a0d0d'; wCtx.lineWidth = 2; wCtx.beginPath(); wCtx.moveTo(x, y); wCtx.lineTo(x+128, y+128); wCtx.stroke();
-        } 
-    }
-    const wallTex = new THREE.CanvasTexture(wC); wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping; wallTex.repeat.set(1, 4); 
-    materials.wall = new THREE.MeshStandardMaterial({ map: wallTex, roughness: 0.9, metalness: 0.1 });
+const wC = document.createElement('canvas'); wC.width = 512; wC.height = 512; const wCtx = wC.getContext('2d');
+wCtx.fillStyle = '#1c1c1c'; wCtx.fillRect(0, 0, 512, 512); wCtx.strokeStyle = '#000000'; wCtx.lineWidth = 8;
+for(let y=0; y<=512; y+=128) {
+for(let x=0; x<=512; x+=128) {
+wCtx.fillStyle = Math.random()>0.5 ? '#2a2a2a' : '#222222'; wCtx.fillRect(x, y, 128, 128); wCtx.strokeRect(x, y, 128, 128);
+wCtx.strokeStyle = '#4a0d0d'; wCtx.lineWidth = 2; wCtx.beginPath(); wCtx.moveTo(x, y); wCtx.lineTo(x+128, y+128); wCtx.stroke();
+}
+}
+const wallTex = new THREE.CanvasTexture(wC); wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping; wallTex.repeat.set(1, 4);
+materials.wall = new THREE.MeshStandardMaterial({ map: wallTex, roughness: 0.9, metalness: 0.1 });
 
-    // سقف مظلم
-    const cC = document.createElement('canvas'); cC.width = 512; cC.height = 512; const cCtx = cC.getContext('2d');
-    cCtx.fillStyle = '#050505'; cCtx.fillRect(0, 0, 512, 512);
-    cCtx.strokeStyle = '#111111'; cCtx.lineWidth = 8;
-    for(let i=0; i<=512; i+=64) {
-        cCtx.beginPath(); cCtx.moveTo(i, 0); cCtx.lineTo(i, 512); cCtx.stroke();
-        cCtx.beginPath(); cCtx.moveTo(0, i); cCtx.lineTo(512, i); cCtx.stroke();
-    }
-    const ceilTex = new THREE.CanvasTexture(cC); ceilTex.wrapS = ceilTex.wrapT = THREE.RepeatWrapping; ceilTex.repeat.set(10, 10);
-    materials.ceiling = new THREE.MeshStandardMaterial({ map: ceilTex, transparent: true, opacity: 0.9, side: THREE.DoubleSide });
+const cC = document.createElement('canvas'); cC.width = 512; cC.height = 512; const cCtx = cC.getContext('2d');
+cCtx.fillStyle = '#050505'; cCtx.fillRect(0, 0, 512, 512);
+cCtx.strokeStyle = '#111111'; cCtx.lineWidth = 8;
+for(let i=0; i<=512; i+=64) {
+cCtx.beginPath(); cCtx.moveTo(i, 0); cCtx.lineTo(i, 512); cCtx.stroke();
+cCtx.beginPath(); cCtx.moveTo(0, i); cCtx.lineTo(512, i); cCtx.stroke();
+}
+const ceilTex = new THREE.CanvasTexture(cC); ceilTex.wrapS = ceilTex.wrapT = THREE.RepeatWrapping; ceilTex.repeat.set(10, 10);
+materials.ceiling = new THREE.MeshStandardMaterial({ map: ceilTex, transparent: true, opacity: 0.9, side: THREE.DoubleSide });
 }
 
-function createPlayerArm() {
-    const armGroup = new THREE.Group();
-    const hand = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.15, 0.25), new THREE.MeshStandardMaterial({color: 0x222222})); hand.position.set(0.4, -0.4, -0.5); armGroup.add(hand);
-    const flashlightObj = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.05, 0.25, 16).rotateX(Math.PI/2), new THREE.MeshStandardMaterial({color: 0x333333, metalness: 0.7})); flashlightObj.position.set(0.4, -0.35, -0.6);
-    const lens = new THREE.Mesh(new THREE.CircleGeometry(0.048, 16), new THREE.MeshBasicMaterial({color: 0xffffff})); lens.position.set(0, 0, -0.126); lens.name = "lens"; flashlightObj.add(lens); armGroup.add(flashlightObj); return armGroup;
+function createDetailedFlashlight() {
+const flGroup = new THREE.Group();
+const bodyMat = new THREE.MeshStandardMaterial({ color: 0x2a2a2a, roughness: 0.35, metalness: 0.85 });
+const darkMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9, metalness: 0.5 });
+const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.90, 16), bodyMat);
+handle.position.y = 0;
+flGroup.add(handle);
+for (let i = 0; i < 5; i++) {
+const ring = new THREE.Mesh(new THREE.TorusGeometry(0.128, 0.018, 8, 16), darkMat);
+ring.position.y = -0.30 + i * 0.14;
+ring.rotation.x = Math.PI / 2;
+flGroup.add(ring);
+}
+const headGeo = new THREE.CylinderGeometry(0.21, 0.13, 0.48, 16);
+const flHead = new THREE.Mesh(headGeo, bodyMat);
+flHead.position.y = 0.69;
+flGroup.add(flHead);
+const rim = new THREE.Mesh(new THREE.TorusGeometry(0.215, 0.022, 8, 16), new THREE.MeshStandardMaterial({ color: 0x555555, metalness: 0.9, roughness: 0.2 }));
+rim.position.y = 0.93;
+rim.rotation.x = Math.PI / 2;
+flGroup.add(rim);
+const lensMesh = new THREE.Mesh(new THREE.CircleGeometry(0.195, 24), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+lensMesh.position.y = 0.94;
+lensMesh.name = 'flashlightLens';
+flGroup.add(lensMesh);
+const innerLens = new THREE.Mesh(new THREE.CircleGeometry(0.16, 24), new THREE.MeshStandardMaterial({ color: 0xaaddff, transparent: true, opacity: 0.4, metalness: 0.3 }));
+innerLens.position.y = 0.93;
+flGroup.add(innerLens);
+const btn = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.06, 12), new THREE.MeshStandardMaterial({ color: 0xcc0000, roughness: 0.4 }));
+btn.position.set(0.13, 0.18, 0);
+btn.rotation.z = Math.PI / 2;
+flGroup.add(btn);
+flGroup.rotation.x = Math.PI / 2;
+return flGroup;
+}
+
+function createPlayerCharacter() {
+const C = { skin: 0xC4916A, skinDark: 0xAA7A58, suit: 0x4A8070, suitDark: 0x3A6860, suitShade: 0x2E5550, belt: 0x606060, buckle: 0xB0B0B0, boot: 0xA08060, bootDark: 0x887048 };
+function bMat(color, rough = 0.85, metal = 0) { return new THREE.MeshStandardMaterial({ color, roughness: rough, metalness: metal }); }
+function bBox(sx, sy, sz, color, rough = 0.85) { const m = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), bMat(color, rough)); m.castShadow = true; return m; }
+function pl(m, x, y, z) { m.position.set(x, y, z); return m; }
+const ch = new THREE.Group();
+ch.add(pl(bBox(0.55, 0.28, 0.65, C.bootDark), -0.35, 0.14, 0.04));
+ch.add(pl(bBox(0.55, 0.28, 0.65, C.bootDark),  0.35, 0.14, 0.04));
+ch.add(pl(bBox(0.52, 0.18, 0.60, C.boot),      -0.35, 0.32, 0.02));
+ch.add(pl(bBox(0.52, 0.18, 0.60, C.boot),       0.35, 0.32, 0.02));
+charLegLGroup = new THREE.Group(); charLegRGroup = new THREE.Group();
+charLegLGroup.position.set(-0.35, 0.82, 0); charLegRGroup.position.set(0.35, 0.82, 0);
+charLegLGroup.add(pl(bBox(0.48, 0.80, 0.46, C.suitDark), 0, 0, 0));
+charLegRGroup.add(pl(bBox(0.48, 0.80, 0.46, C.suitDark), 0, 0, 0));
+ch.add(charLegLGroup, charLegRGroup);
+ch.add(pl(bBox(0.50, 0.18, 0.48, C.suitShade), -0.35, 0.52, 0.01));
+ch.add(pl(bBox(0.50, 0.18, 0.48, C.suitShade),  0.35, 0.52, 0.01));
+ch.add(pl(bBox(1.12, 0.16, 0.50, C.belt, 0.5), 0, 1.24, 0));
+ch.add(pl(bBox(0.22, 0.14, 0.52, C.buckle, 0.3), 0, 1.24, 0.01));
+charTorso = pl(bBox(1.10, 0.90, 0.50, C.suit), 0, 1.77, 0);
+ch.add(charTorso);
+ch.add(pl(bBox(0.28, 0.22, 0.52, C.suitShade), -0.28, 1.88, 0.02));
+ch.add(pl(bBox(0.28, 0.22, 0.52, C.suitShade),  0.28, 1.88, 0.02));
+ch.add(pl(bBox(1.12, 0.12, 0.52, C.suitDark), 0, 1.27, 0));
+ch.add(pl(bBox(0.60, 0.12, 0.52, C.suitDark), 0, 2.24, 0));
+ch.add(pl(bBox(0.30, 0.28, 0.46, C.suit), -0.70, 2.10, 0));
+ch.add(pl(bBox(0.30, 0.28, 0.46, C.suit),  0.70, 2.10, 0));
+charArmLGroup = new THREE.Group(); charArmRGroup = new THREE.Group();
+charArmLGroup.position.set(-0.70, 1.90, 0); charArmRGroup.position.set(0.70, 1.90, 0);
+ch.add(charArmLGroup, charArmRGroup);
+charArmLGroup.add(pl(bBox(0.42, 0.72, 0.40, C.suit), 0, -0.36, 0));
+charArmRGroup.add(pl(bBox(0.42, 0.72, 0.40, C.suit), 0, -0.36, 0));
+charForeArmL = new THREE.Group(); charForeArmR = new THREE.Group();
+charForeArmL.position.set(0, -0.72, 0); charForeArmR.position.set(0, -0.72, 0);
+charArmLGroup.add(charForeArmL); charArmRGroup.add(charForeArmR);
+charForeArmL.add(pl(bBox(0.38, 0.68, 0.36, C.suitDark), 0, -0.34, 0));
+charForeArmR.add(pl(bBox(0.38, 0.68, 0.36, C.suitDark), 0, -0.34, 0));
+charForeArmL.add(pl(bBox(0.40, 0.14, 0.38, C.suitShade), 0, -0.65, 0));
+charForeArmR.add(pl(bBox(0.40, 0.14, 0.38, C.suitShade), 0, -0.65, 0));
+const handLGrp = new THREE.Group(); const handRGrp = new THREE.Group();
+handLGrp.position.set(0, -0.78, 0); handRGrp.position.set(0, -0.78, 0);
+charForeArmL.add(handLGrp); charForeArmR.add(handRGrp);
+handLGrp.add(pl(bBox(0.30, 0.28, 0.26, C.skin), 0, -0.14, 0));
+const thumbL = pl(bBox(0.10, 0.16, 0.10, C.skinDark), -0.18, -0.06, 0.05);
+handLGrp.add(thumbL);
+handRGrp.add(pl(bBox(0.30, 0.28, 0.26, C.skin), 0, -0.10, 0));
+const thumbR = pl(bBox(0.10, 0.16, 0.10, C.skinDark), 0.18, -0.06, 0.05);
+handRGrp.add(thumbR);
+const fl = createDetailedFlashlight();
+fl.scale.set(0.30, 0.30, 0.30);
+fl.position.set(0, -0.22, -0.06);
+fl.rotation.x = -Math.PI / 2;
+charFlashlightLens = fl.getObjectByName('flashlightLens');
+handRGrp.add(fl);
+charNeck = pl(bBox(0.34, 0.22, 0.32, C.skin), 0, 2.42, 0);
+ch.add(charNeck);
+charHeadGroup = new THREE.Group();
+charHeadGroup.position.set(0, 2.78, 0);
+const headMesh = pl(bBox(0.95, 0.92, 0.82, C.skin), 0, 0, 0);
+charHeadGroup.add(headMesh);
+charHeadGroup.add(pl(bBox(0.04, 0.88, 0.80, C.skinDark), -0.475, 0, 0));
+charHeadGroup.add(pl(bBox(0.04, 0.88, 0.80, C.skinDark),  0.475, 0, 0));
+charHeadGroup.add(pl(bBox(0.96, 0.15, 0.84, 0xA09078), 0, 0.535, 0));
+charHeadGroup.add(pl(bBox(0.08, 0.38, 0.82, 0xA09078), -0.47, 0.22, 0));
+charHeadGroup.add(pl(bBox(0.08, 0.38, 0.82, 0xA09078),  0.47, 0.22, 0));
+[[-0.23],[0.23]].forEach(([ex]) => {
+const eye = new THREE.Group();
+eye.add(pl(bBox(0.22, 0.16, 0.06, 0xEEEEEE), 0, 0, 0));
+eye.add(pl(bBox(0.13, 0.13, 0.07, 0x4A7FA5), 0, 0, 0));
+eye.add(pl(bBox(0.07, 0.07, 0.08, 0x111111), 0, 0, 0));
+pl(eye, ex, 0.10, -0.44);
+charHeadGroup.add(eye);
+});
+charHeadGroup.add(pl(bBox(0.18, 0.16, 0.18, C.skinDark), 0, -0.06, -0.48));
+charHeadGroup.add(pl(bBox(0.36, 0.09, 0.12, 0x7A5A44), 0, -0.14, -0.46));
+charHeadGroup.add(pl(bBox(0.72, 0.32, 0.14, 0x7A5A44), 0, -0.32, -0.44));
+ch.add(charHeadGroup);
+charHeadGroup.visible = false;
+charNeck.visible = false;
+ch.traverse(obj => { if (obj.isMesh) { obj.castShadow = true; obj.receiveShadow = false; } });
+return ch;
 }
 
 function toggleFlashlight(e) {
-    if(e) e.preventDefault();
-    isFlashlightOn = !isFlashlightOn;
-    flashLight.intensity = isFlashlightOn ? 2.5 : 0;
-    const lens = playerArm.getObjectByName("lens");
-    if(lens) lens.material.color.setHex(isFlashlightOn ? 0xffffff : 0x222222);
-    playSound('flashlight');
+if(e) e.preventDefault();
+isFlashlightOn = !isFlashlightOn;
+flashLight.intensity = isFlashlightOn ? 5.0 : 0;
+if(charFlashlightLens) charFlashlightLens.material.color.setHex(isFlashlightOn ? 0xffffff : 0x222222);
+playSound('flashlight');
 }
 
 function initThreeJS() {
-    const canvas = document.getElementById('gameCanvas');
-    renderer = new THREE.WebGLRenderer({ canvas, antialias: true }); renderer.setSize(window.innerWidth, window.innerHeight); renderer.shadowMap.enabled = true;
-    scene = new THREE.Scene(); camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 500); scene.add(camera);
-    playerArm = createPlayerArm(); camera.add(playerArm);
-    
-    // جعل الكشاف أضيق وأكثر توجيهًا للرعب
-    flashLight = new THREE.SpotLight(0xfffaee, 2.0, 25, Math.PI/4.5, 0.8, 1.5); 
-    flashLight.position.set(0.4, -0.35, -0.75);
-    const targetObject = new THREE.Object3D(); targetObject.position.set(0, 0, -10); camera.add(targetObject); flashLight.target = targetObject; camera.add(flashLight);
-    
-    // إضاءة محيطية شبه معدومة
-    scene.add(new THREE.AmbientLight(0x0a0505, 0.15));
-    
-    window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
-    const loader = new THREE.GLTFLoader();
-    loader.load('assets/Adventurer.gltf', (gltf) => {
-        playerModel = gltf.scene; playerModel.scale.set(0.6, 0.6, 0.6); playerModel.position.set(0, -1.2, -0.3); playerModel.rotation.y = Math.PI; camera.add(playerModel);
-        if(playerArm) playerArm.visible = false;
-    }, undefined, (error) => { console.error('Model not found, using default arm.'); });
+const canvas = document.getElementById('gameCanvas');
+renderer = new THREE.WebGLRenderer({ canvas, antialias: true }); renderer.setSize(window.innerWidth, window.innerHeight); renderer.shadowMap.enabled = true;
+scene = new THREE.Scene();
+camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.05, 500);
+scene.add(camera);
+flashLight = new THREE.SpotLight(0xfffaee, 5.0, 25, Math.PI/4.5, 0.8, 1.5);
+flashLight.position.set(0.32, -0.28, -0.6);
+const targetObject = new THREE.Object3D(); targetObject.position.set(0.5, -0.5, -15);
+camera.add(targetObject); flashLight.target = targetObject; camera.add(flashLight);
+scene.add(new THREE.AmbientLight(0x0a0505, 0.15));
+window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+charArmRGroup  = new THREE.Group();
+charArmLGroup  = new THREE.Group();
+charForeArmR   = new THREE.Group();
+charForeArmL   = new THREE.Group();
+charLegLGroup  = new THREE.Group();
+charLegRGroup  = new THREE.Group();
+charTorso      = null;
+charFlashlightLens = null;
+const textureLoader = new THREE.TextureLoader();
+playerArm = new THREE.Group();
+playerArm.position.set(0, -0.55, -1.0);
+playerArm.rotation.x = 0.08;
+camera.add(playerArm);
+textureLoader.load('Textures/view.png', function(tex) {
+const aspect = tex.image.width / tex.image.height;
+const planeW = 1.8;
+const planeH = planeW / aspect;
+const geo = new THREE.PlaneGeometry(planeW, planeH);
+const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, alphaTest: 0.05, depthTest: false, depthWrite: false, side: THREE.FrontSide });
+const handMesh = new THREE.Mesh(geo, mat);
+handMesh.renderOrder = 999;
+playerArm.add(handMesh);
+});
 }
 
 function buildLobbyScene() {
-    const starGeo = new THREE.BufferGeometry(); const starPos = new Float32Array(2000 * 3); for(let i=0; i<2000*3; i++) starPos[i] = (Math.random() - 0.5) * 600;
-    starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3)); starsParticles = new THREE.Points(starGeo, new THREE.PointsMaterial({color: 0xffeebb, size: 0.7, transparent: true, opacity: 0.8}));
-    scene.add(starsParticles); scene.fog = new THREE.FogExp2(0x1a0b2e, 0.04); scene.background = new THREE.Color(0x1a0b2e);
-    const platform = new THREE.Mesh(new THREE.CylinderGeometry(3, 3.5, 0.5, 16), materials.floor); platform.position.set(0, -0.25, 0); lobbyGroup.add(platform);
-    const spiderShowcase = createRealisticSpider(); spiderShowcase.position.set(0, 0.5, 0); spiderShowcase.scale.set(0.8, 0.8, 0.8); lobbyGroup.add(spiderShowcase);
-    const lobbyLight = new THREE.PointLight(0xfacc15, 1.5, 10); lobbyLight.position.set(0, 3, 0); lobbyGroup.add(lobbyLight); scene.add(lobbyGroup);
+const starGeo = new THREE.BufferGeometry(); const starPos = new Float32Array(2000 * 3); for(let i=0; i<2000*3; i++) starPos[i] = (Math.random() - 0.5) * 600;
+starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3)); starsParticles = new THREE.Points(starGeo, new THREE.PointsMaterial({color: 0xffeebb, size: 0.7, transparent: true, opacity: 0.8}));
+scene.add(starsParticles); scene.fog = new THREE.FogExp2(0x1a0b2e, 0.04); scene.background = new THREE.Color(0x1a0b2e);
+const platform = new THREE.Mesh(new THREE.CylinderGeometry(3, 3.5, 0.5, 16), materials.floor); platform.position.set(0, -0.25, 0); lobbyGroup.add(platform);
+const spiderShowcase = createRealisticSpider(); spiderShowcase.position.set(0, 0.5, 0); spiderShowcase.scale.set(0.8, 0.8, 0.8); lobbyGroup.add(spiderShowcase);
+const lobbyLight = new THREE.PointLight(0xfacc15, 1.5, 10); lobbyLight.position.set(0, 3, 0); lobbyGroup.add(lobbyLight); scene.add(lobbyGroup);
 }
 
 function generateLevelButtons() {
-    const grid = document.getElementById('levelGrid'); grid.innerHTML = '';
-    for (let i = 1; i <= maxLevels; i++) {
-        const btn = document.createElement('button');
-        btn.className = `w-full aspect-square rounded font-black text-2xl transition-all ${i <= currentLevel ? 'bg-yellow-400 text-black hover:scale-105 custom-click' : 'bg-gray-800 text-gray-600 cursor-not-allowed border border-gray-700'}`;
-        btn.textContent = i; btn.onclick = () => { if (i <= currentLevel) startGame(i); }; 
-        if(i <= currentLevel) btn.addEventListener('click', () => playSound('btn'));
-        grid.appendChild(btn);
-    }
+const grid = document.getElementById('levelGrid'); grid.innerHTML = '';
+for (let i = 1; i <= maxLevels; i++) {
+const btn = document.createElement('button');
+btn.className = `w-full aspect-square rounded font-black text-2xl transition-all ${i <= unlockedLevel ? 'bg-yellow-400 text-black hover:scale-105 custom-click' : 'bg-gray-800 text-gray-600 cursor-not-allowed border border-gray-700'}`;
+btn.textContent = i; btn.onclick = () => { if (i <= unlockedLevel) startGame(i); };
+if(i <= unlockedLevel) btn.addEventListener('click', () => playSound('btn'));
+grid.appendChild(btn);
+}
 }
 
 function setupInputs() {
-    document.addEventListener('keydown', (e) => {
-        keys[e.code] = true;
-        if (e.code === 'Space') jump(); if (e.code === 'KeyC') startCrouch(); if (e.code === 'ShiftLeft') startSprint();
-        if (e.code === 'KeyF') toggleFlashlight(); if (e.code === 'Escape') togglePause();
-    });
-    document.addEventListener('keyup', (e) => { keys[e.code] = false; if (e.code === 'KeyC') endCrouch(); if (e.code === 'ShiftLeft') endSprint(); });
-    document.addEventListener('mousemove', (e) => {
-        if (currentState === GameState.PLAYING && document.pointerLockElement === document.getElementById('gameCanvas')) {
-            cameraRotation.y -= e.movementX * mouseSensitivity; cameraRotation.x -= e.movementY * mouseSensitivity; cameraRotation.x = Math.max(-Math.PI/2.2, Math.min(Math.PI/2.2, cameraRotation.x));
-        }
-    });
-    document.getElementById('gameCanvas').addEventListener('click', () => { if (currentState === GameState.PLAYING && !isMobile()) document.getElementById('gameCanvas').requestPointerLock(); });
-    setupMobileTouchZones();
+document.addEventListener('keydown', (e) => {
+keys[e.code] = true;
+if (e.code === 'Space') jump(); if (e.code === 'KeyC') startCrouch(); if (e.code === 'ShiftLeft') startSprint();
+if (e.code === 'KeyF') toggleFlashlight(); if (e.code === 'Escape') togglePause();
+});
+document.addEventListener('keyup', (e) => { keys[e.code] = false; if (e.code === 'KeyC') endCrouch(); if (e.code === 'ShiftLeft') endSprint(); });
+document.addEventListener('mousemove', (e) => {
+if (currentState === GameState.PLAYING && document.pointerLockElement === document.getElementById('gameCanvas')) {
+cameraRotation.y -= e.movementX * mouseSensitivity; cameraRotation.x -= e.movementY * mouseSensitivity; cameraRotation.x = Math.max(-Math.PI/2.2, Math.min(Math.PI/2.2, cameraRotation.x));
 }
+});
+document.getElementById('gameCanvas').addEventListener('click', () => { if (currentState === GameState.PLAYING && !isMobile()) document.getElementById('gameCanvas').requestPointerLock(); });
+setupMobileTouchZones();
+}
+
 function isMobile() { return 'ontouchstart' in window || navigator.maxTouchPoints > 0; }
+
 function setupMobileTouchZones() {
-    const jZone = document.getElementById('joystickZone'); const lZone = document.getElementById('lookZone'); const base = document.getElementById('joystickBase'); const knob = document.getElementById('joystickKnob');
-    jZone.addEventListener('touchstart', (e) => { if(currentState !== GameState.PLAYING) return; e.preventDefault(); for(let i=0; i<e.changedTouches.length; i++) { let t = e.changedTouches[i]; if(joystick.id === null) { joystick.id = t.identifier; joystick.active = true; joystick.originX = t.clientX; joystick.originY = t.clientY; base.style.left = t.clientX + 'px'; base.style.top = t.clientY + 'px'; base.style.display = 'block'; updateJoystick(t.clientX, t.clientY); break; } } }, { passive: false });
-    jZone.addEventListener('touchmove', (e) => { if(currentState !== GameState.PLAYING) return; e.preventDefault(); for(let i=0; i<e.changedTouches.length; i++) { if(e.changedTouches[i].identifier === joystick.id) { updateJoystick(e.changedTouches[i].clientX, e.changedTouches[i].clientY); break; } } }, { passive: false });
-    const endJoystick = (e) => { for(let i=0; i<e.changedTouches.length; i++) { if(e.changedTouches[i].identifier === joystick.id) { joystick.active = false; joystick.id = null; joystick.x = joystick.y = 0; base.style.display = 'none'; knob.style.transform = `translate(-50%, -50%)`; break; } } };
-    jZone.addEventListener('touchend', endJoystick); jZone.addEventListener('touchcancel', endJoystick);
-    lZone.addEventListener('touchstart', (e) => { if(currentState !== GameState.PLAYING) return; e.preventDefault(); for(let i=0; i<e.changedTouches.length; i++) { let t = e.changedTouches[i]; if(lookTouch.id === null) { lookTouch.id = t.identifier; lookTouch.active = true; lookTouch.currentX = t.clientX; lookTouch.currentY = t.clientY; break; } } }, { passive: false });
-    lZone.addEventListener('touchmove', (e) => { if(currentState !== GameState.PLAYING) return; e.preventDefault(); for(let i=0; i<e.changedTouches.length; i++) { if(e.changedTouches[i].identifier === lookTouch.id) { const t = e.changedTouches[i]; cameraRotation.y -= (t.clientX - lookTouch.currentX) * lookSensitivity; cameraRotation.x -= (t.clientY - lookTouch.currentY) * lookSensitivity; cameraRotation.x = Math.max(-Math.PI/2.2, Math.min(Math.PI/2.2, cameraRotation.x)); lookTouch.currentX = t.clientX; lookTouch.currentY = t.clientY; break; } } }, { passive: false });
-    const endLook = (e) => { for(let i=0; i<e.changedTouches.length; i++) { if(e.changedTouches[i].identifier === lookTouch.id) { lookTouch.active = false; lookTouch.id = null; break; } } };
-    lZone.addEventListener('touchend', endLook); lZone.addEventListener('touchcancel', endLook);
+const jZone = document.getElementById('joystickZone'); const lZone = document.getElementById('lookZone'); const base = document.getElementById('joystickBase'); const knob = document.getElementById('joystickKnob');
+jZone.addEventListener('touchstart', (e) => { if(currentState !== GameState.PLAYING) return; e.preventDefault(); for(let i=0; i<e.changedTouches.length; i++) { let t = e.changedTouches[i]; if(joystick.id === null) { joystick.id = t.identifier; joystick.active = true; joystick.originX = t.clientX; joystick.originY = t.clientY; base.style.left = t.clientX + 'px'; base.style.top = t.clientY + 'px'; base.style.display = 'block'; updateJoystick(t.clientX, t.clientY); break; } } }, { passive: false });
+jZone.addEventListener('touchmove', (e) => { if(currentState !== GameState.PLAYING) return; e.preventDefault(); for(let i=0; i<e.changedTouches.length; i++) { if(e.changedTouches[i].identifier === joystick.id) { updateJoystick(e.changedTouches[i].clientX, e.changedTouches[i].clientY); break; } } }, { passive: false });
+const endJoystick = (e) => { for(let i=0; i<e.changedTouches.length; i++) { if(e.changedTouches[i].identifier === joystick.id) { joystick.active = false; joystick.id = null; joystick.x = joystick.y = 0; base.style.display = 'none'; knob.style.transform = `translate(-50%, -50%)`; break; } } };
+jZone.addEventListener('touchend', endJoystick); jZone.addEventListener('touchcancel', endJoystick);
+lZone.addEventListener('touchstart', (e) => { if(currentState !== GameState.PLAYING) return; e.preventDefault(); for(let i=0; i<e.changedTouches.length; i++) { let t = e.changedTouches[i]; if(lookTouch.id === null) { lookTouch.id = t.identifier; lookTouch.active = true; lookTouch.currentX = t.clientX; lookTouch.currentY = t.clientY; break; } } }, { passive: false });
+lZone.addEventListener('touchmove', (e) => { if(currentState !== GameState.PLAYING) return; e.preventDefault(); for(let i=0; i<e.changedTouches.length; i++) { if(e.changedTouches[i].identifier === lookTouch.id) { const t = e.changedTouches[i]; cameraRotation.y -= (t.clientX - lookTouch.currentX) * lookSensitivity; cameraRotation.x -= (t.clientY - lookTouch.currentY) * lookSensitivity; cameraRotation.x = Math.max(-Math.PI/2.2, Math.min(Math.PI/2.2, cameraRotation.x)); lookTouch.currentX = t.clientX; lookTouch.currentY = t.clientY; break; } } }, { passive: false });
+const endLook = (e) => { for(let i=0; i<e.changedTouches.length; i++) { if(e.changedTouches[i].identifier === lookTouch.id) { lookTouch.active = false; lookTouch.id = null; break; } } };
+lZone.addEventListener('touchend', endLook); lZone.addEventListener('touchcancel', endLook);
 }
+
 function updateJoystick(cX, cY) { const maxD = 45; let dx = cX - joystick.originX, dy = cY - joystick.originY; const dist = Math.sqrt(dx*dx + dy*dy); if (dist > maxD) { dx = (dx/dist)*maxD; dy = (dy/dist)*maxD; } joystick.x = dx/maxD; joystick.y = -(dy/maxD); document.getElementById('joystickKnob').style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`; }
 
 function startGame(level) {
-    currentLevel = level; lives = 3; score = 0; cameraRotation = { x: 0, y: Math.PI };
-    if (!isMobile()) document.getElementById('gameCanvas').requestPointerLock();
-    initLevel();
+if (level > unlockedLevel) return; // لا يمكن لعب مستوى غير مفتوح
+currentLevel = level; lives = 3; score = 0; cameraRotation = { x: 0, y: Math.PI };
+if (!isMobile()) document.getElementById('gameCanvas').requestPointerLock();
+initLevel();
 }
 
 function cleanupLevel() {
-    if (wallInstancedMesh) scene.remove(wallInstancedMesh); if (floorMesh) scene.remove(floorMesh);
-    if (dustVFX) scene.remove(dustVFX);
-    if (ceilingMesh) scene.remove(ceilingMesh);
-    spiders.forEach(s => scene.remove(s.group)); collectibles.forEach(c => scene.remove(c.mesh));
-    
-    // مسح لمبات السقف
-    if(ceilingLights) {
-        ceilingLights.forEach(l => { scene.remove(l.light); scene.remove(l.mesh); });
-        ceilingLights = [];
-    }
-    
-    const exit = scene.getObjectByName("exit"); if (exit) scene.remove(exit);
-    spiders = []; collectibles = [];
+if (wallInstancedMesh) scene.remove(wallInstancedMesh); if (floorMesh) scene.remove(floorMesh);
+if (dustVFX) scene.remove(dustVFX);
+if (ceilingMesh) scene.remove(ceilingMesh);
+spiders.forEach(s => scene.remove(s.group)); collectibles.forEach(c => scene.remove(c.mesh));
+if(ceilingLights) {
+ceilingLights.forEach(l => { scene.remove(l.light); scene.remove(l.mesh); });
+ceilingLights = [];
+}
+const exit = scene.getObjectByName("exit"); if (exit) scene.remove(exit);
+spiders = []; collectibles = [];
 }
 
 function initLevel() {
-    cleanupLevel(); currentState = GameState.PLAYING; scene.remove(lobbyGroup);
-    mazeWidth = 20 + currentLevel * 5; mazeHeight = 20 + currentLevel * 5;
-    levelTime = 0; collectedItems = 0; player.x = 1.5; player.y = player.height; player.z = 1.5; velocity = { x: 0, y: 0, z: 0 };
-    camera.rotation.set(cameraRotation.x, cameraRotation.y, 0, 'YXZ');
-    generateMaze(); updateHUD();
-    document.querySelectorAll('.ui-layer').forEach(el => el.classList.add('hidden'));
-    document.getElementById('gameHUD').classList.remove('hidden'); document.getElementById('gameHUD').classList.add('playing-mode'); document.getElementById('minimap').style.display = 'block';
-    if (isMobile()) { document.getElementById('joystickZone').style.display='block'; document.getElementById('lookZone').style.display='block'; }
-    if(playerModel) playerModel.visible = true; else playerArm.visible = true;
-    flashLight.intensity = isFlashlightOn ? 2.5 : 0;
-    joystick.active = false; joystick.id = null; lookTouch.active = false; lookTouch.id = null;
-    
-    // ضباب شديد السواد وقريب جداً لتقليل الرؤية وزيادة الخوف
-    scene.fog = new THREE.FogExp2(0x020000, 0.18); 
-    createDustVFX();
-    playSound('bgm');
+cleanupLevel(); currentState = GameState.PLAYING; scene.remove(lobbyGroup);
+// إذا لم يكن online، اولد seed جديد. إذا كان online، استخدم mazeSeed الموجود (من Firebase)
+if (!onlineMode) { mazeSeed = Math.floor(Math.random() * 2147483647) + 1; }
+initSeededRand(mazeSeed);
+mazeWidth = 20 + currentLevel * 5; mazeHeight = 20 + currentLevel * 5;
+levelTime = 0; collectedItems = 0; player.x = 1.5; player.y = player.height; player.z = 1.5; velocity = { x: 0, y: 0, z: 0 };
+camera.rotation.set(cameraRotation.x, cameraRotation.y, 0, 'YXZ');
+generateMaze(); updateHUD();
+document.querySelectorAll('.ui-layer').forEach(el => el.classList.add('hidden'));
+document.getElementById('gameHUD').classList.remove('hidden'); document.getElementById('gameHUD').classList.add('playing-mode'); document.getElementById('minimap').style.display = 'block';
+if (isMobile()) { document.getElementById('joystickZone').style.display='block'; document.getElementById('lookZone').style.display='block'; }
+if(playerArm) playerArm.visible = true;
+flashLight.intensity = isFlashlightOn ? 5.0 : 0;
+joystick.active = false; joystick.id = null; lookTouch.active = false; lookTouch.id = null;
+scene.fog = new THREE.FogExp2(0x020000, 0.18);
+createDustVFX();
+playSound('bgm');
 }
 
 function generateMaze() {
-    mazeGrid = Array(mazeWidth).fill().map(() => Array(mazeHeight).fill(false));
-    floorMesh = new THREE.Mesh(new THREE.PlaneGeometry(mazeWidth, mazeHeight), materials.floor); floorMesh.rotation.x = -Math.PI/2;
-    floorMesh.position.set(mazeWidth/2 - 0.5, 0, mazeHeight/2 - 0.5); scene.add(floorMesh);
-    let wallCount = 0;
-    for (let x=0; x<mazeWidth; x++) for (let z=0; z<mazeHeight; z++) { if (x===0 || x===mazeWidth-1 || z===0 || z===mazeHeight-1) { mazeGrid[x][z] = true; wallCount++; } else if (x>2 && z>2 && x<mazeWidth-3 && z<mazeHeight-3 && Math.random() < 0.25 + currentLevel*0.02) { mazeGrid[x][z] = true; wallCount++; } }
-    mazeGrid[1][1] = false; mazeGrid[1][2] = false; mazeGrid[2][1] = false;
-    wallInstancedMesh = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 4, 1), materials.wall, wallCount);
-    const dummy = new THREE.Object3D(); let index = 0;
-    for (let x=0; x<mazeWidth; x++) for (let z=0; z<mazeHeight; z++) if (mazeGrid[x][z]) { dummy.position.set(x, 2, z); dummy.updateMatrix(); wallInstancedMesh.setMatrixAt(index++, dummy.matrix); }
-    wallInstancedMesh.instanceMatrix.needsUpdate = true; scene.add(wallInstancedMesh);
-    exitPosition = { x: mazeWidth - 2, z: mazeHeight - 2 };
-    const exit = new THREE.Mesh(new THREE.BoxGeometry(0.8, 2.5, 0.8), new THREE.MeshStandardMaterial({color:0x22c55e, emissive:0x15803d}));
-    exit.name = "exit"; exit.position.set(exitPosition.x, 1.25, exitPosition.z); scene.add(exit);
-    
-    // توليد لمبات سقف تومض
-    ceilingLights = [];
-    for(let x=2; x<mazeWidth-2; x+=3) {
-        for(let z=2; z<mazeHeight-2; z+=3) {
-            if(!mazeGrid[x][z] && Math.random() < 0.2) {
-                const lampMat = new THREE.MeshBasicMaterial({color: 0xffeeaa});
-                const lamp = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.05, 0.3), lampMat);
-                lamp.position.set(x, 3.95, z); // أسفل السقف بقليل
-                scene.add(lamp);
-
-                const pLight = new THREE.PointLight(0xffeeaa, 1.2, 7);
-                pLight.position.set(x, 3.8, z);
-                scene.add(pLight);
-
-                ceilingLights.push({ light: pLight, mesh: lamp });
-            }
-        }
-    }
-
-    const spiderCount = 5 + currentLevel * 3;
-    for (let i=0; i<spiderCount; i++) {
-        let sx, sz; do { sx = Math.floor(Math.random()*(mazeWidth-4))+3; sz = Math.floor(Math.random()*(mazeHeight-4))+3; } while(mazeGrid[sx][sz]);
-        const sModel = createRealisticSpider(); 
-        sModel.scale.set(0.5, 0.5, 0.5);
-        sModel.position.set(sx, 0.3, sz); scene.add(sModel);
-        spiders.push({ group: sModel, x: sx, z: sz, speed: 3 + currentLevel * 0.5, dir: { x: Math.random()-0.5, z: Math.random()-0.5 }, animTime: Math.random() * Math.PI * 2 });
-    }
-    
-    const colCount = 5 + currentLevel * 2; totalCollectibles = colCount;
-    for (let i=0; i<colCount; i++) {
-        let cx, cz; do { cx = Math.floor(Math.random()*(mazeWidth-3))+2; cz = Math.floor(Math.random()*(mazeHeight-3))+2; } while(mazeGrid[cx][cz]);
-        const col = new THREE.Mesh(new THREE.OctahedronGeometry(0.2, 0), new THREE.MeshStandardMaterial({color:0x06b6d4, emissive:0x0891b2, metalness:1}));
-        col.position.set(cx, 0.8, cz); scene.add(col); collectibles.push({ mesh: col, x: cx, z: cz, collected: false, rot: Math.random()*0.05+0.02, bob: Math.random()*Math.PI*2 });
-    }
-    
-    ceilingMesh = new THREE.Mesh(new THREE.PlaneGeometry(mazeWidth, mazeHeight), materials.ceiling);
-    ceilingMesh.rotation.x = Math.PI / 2;
-    ceilingMesh.position.set(mazeWidth/2 - 0.5, 4, mazeHeight/2 - 0.5);
-    scene.add(ceilingMesh);
+mazeGrid = Array(mazeWidth).fill().map(() => Array(mazeHeight).fill(false));
+floorMesh = new THREE.Mesh(new THREE.PlaneGeometry(mazeWidth, mazeHeight), materials.floor); floorMesh.rotation.x = -Math.PI/2;
+floorMesh.position.set(mazeWidth/2 - 0.5, 0, mazeHeight/2 - 0.5); scene.add(floorMesh);
+let wallCount = 0;
+for (let x=0; x<mazeWidth; x++) for (let z=0; z<mazeHeight; z++) { if (x===0 || x===mazeWidth-1 || z===0 || z===mazeHeight-1) { mazeGrid[x][z] = true; wallCount++; } else if (x>2 && z>2 && x<mazeWidth-3 && z<mazeHeight-3 && seededRand() < 0.25 + currentLevel*0.02) { mazeGrid[x][z] = true; wallCount++; } }
+mazeGrid[1][1] = false; mazeGrid[1][2] = false; mazeGrid[2][1] = false;
+wallInstancedMesh = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 4, 1), materials.wall, wallCount);
+const dummy = new THREE.Object3D(); let index = 0;
+for (let x=0; x<mazeWidth; x++) for (let z=0; z<mazeHeight; z++) if (mazeGrid[x][z]) { dummy.position.set(x, 2, z); dummy.updateMatrix(); wallInstancedMesh.setMatrixAt(index++, dummy.matrix); }
+wallInstancedMesh.instanceMatrix.needsUpdate = true; scene.add(wallInstancedMesh);
+exitPosition = { x: mazeWidth - 2, z: mazeHeight - 2 };
+const exit = new THREE.Mesh(new THREE.BoxGeometry(0.8, 2.5, 0.8), new THREE.MeshStandardMaterial({color:0x22c55e, emissive:0x15803d}));
+exit.name = "exit"; exit.position.set(exitPosition.x, 1.25, exitPosition.z); scene.add(exit);
+ceilingLights = [];
+for(let x=2; x<mazeWidth-2; x+=3) {
+for(let z=2; z<mazeHeight-2; z+=3) {
+if(!mazeGrid[x][z] && seededRand() < 0.2) {
+const lampMat = new THREE.MeshBasicMaterial({color: 0xffeeaa});
+const lamp = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.05, 0.3), lampMat);
+lamp.position.set(x, 3.95, z);
+scene.add(lamp);
+const pLight = new THREE.PointLight(0xffeeaa, 1.2, 7);
+pLight.position.set(x, 3.8, z);
+scene.add(pLight);
+ceilingLights.push({ light: pLight, mesh: lamp });
+}
+}
+}
+const spiderCount = 5 + currentLevel * 3;
+for (let i=0; i<spiderCount; i++) {
+let sx, sz; do { sx = Math.floor(seededRand()*(mazeWidth-4))+3; sz = Math.floor(seededRand()*(mazeHeight-4))+3; } while(mazeGrid[sx][sz]);
+const sModel = createRealisticSpider();
+sModel.scale.set(0.5, 0.5, 0.5);
+sModel.position.set(sx, 0.3, sz); scene.add(sModel);
+spiders.push({ group: sModel, x: sx, z: sz, speed: 3 + currentLevel * 0.5, dir: { x: seededRand()-0.5, z: seededRand()-0.5 }, animTime: seededRand() * Math.PI * 2 });
+}
+const colCount = 5 + currentLevel * 2; totalCollectibles = colCount;
+for (let i=0; i<colCount; i++) {
+let cx, cz; do { cx = Math.floor(seededRand()*(mazeWidth-3))+2; cz = Math.floor(seededRand()*(mazeHeight-3))+2; } while(mazeGrid[cx][cz]);
+const col = new THREE.Mesh(new THREE.OctahedronGeometry(0.2, 0), new THREE.MeshStandardMaterial({color:0x06b6d4, emissive:0x0891b2, metalness:1}));
+col.position.set(cx, 0.8, cz); scene.add(col); collectibles.push({ mesh: col, x: cx, z: cz, collected: false, rot: seededRand()*0.05+0.02, bob: seededRand()*Math.PI*2 });
+}
+ceilingMesh = new THREE.Mesh(new THREE.PlaneGeometry(mazeWidth, mazeHeight), materials.ceiling);
+ceilingMesh.rotation.x = Math.PI / 2;
+ceilingMesh.position.set(mazeWidth/2 - 0.5, 4, mazeHeight/2 - 0.5);
+scene.add(ceilingMesh);
 }
 
 function mainLoop() {
-    const dt = Math.min(clock.getDelta(), 0.1);
-    if(starsParticles) starsParticles.rotation.y += 0.0005;
-    if (dustVFX) dustVFX.rotation.y += dt * 0.01; // حركة الغبار
-
-    if (currentState === GameState.MENU || currentState === GameState.SETTINGS) {
-        lobbyAngle += 0.005; camera.position.set(Math.sin(lobbyAngle) * 5, 2, Math.cos(lobbyAngle) * 5); camera.lookAt(0, 0, 0);
-        if(playerModel) playerModel.visible = false; else if(playerArm) playerArm.visible = false; 
-        flashLight.intensity = 0;
-        spiders.forEach(spider => {
-            const spiderData = spider.group.userData; spiderData.idleCycle += dt * 2; spiderData.abdomen.position.y = Math.sin(spiderData.idleCycle * 0.5) * 0.05; spiderData.abdomen.rotation.x = Math.sin(spiderData.idleCycle) * 0.1; animateLegs(spiderData, dt);
-        });
-    } else if (currentState === GameState.PLAYING) {
-        updateGame(dt); updateMinimap();
-    }
-    renderer.render(scene, camera); requestAnimationFrame(mainLoop);
+const dt = Math.min(clock.getDelta(), 0.1);
+if(starsParticles) starsParticles.rotation.y += 0.0005;
+if (dustVFX) dustVFX.rotation.y += dt * 0.03;
+if (currentState === GameState.MENU || currentState === GameState.SETTINGS) {
+lobbyAngle += 0.005; camera.position.set(Math.sin(lobbyAngle) * 5, 2, Math.cos(lobbyAngle) * 5); camera.lookAt(0, 0, 0);
+if(playerArm) playerArm.visible = false;
+flashLight.intensity = 0;
+spiders.forEach(spider => {
+const spiderData = spider.group.userData; spiderData.idleCycle += dt * 2; spiderData.abdomen.position.y = Math.sin(spiderData.idleCycle * 0.5) * 0.05; spiderData.abdomen.rotation.x = Math.sin(spiderData.idleCycle) * 0.1; animateLegs(spiderData, dt);
+});
+} else if (currentState === GameState.PLAYING) {
+updateGame(dt); updateMinimap();
+if (onlineMode) updateOtherPlayer(dt);
+}
+renderer.render(scene, camera); requestAnimationFrame(mainLoop);
 }
 
 function checkCollision(x, z, radius = player.radius) {
-    const gridX = Math.floor(x), gridZ = Math.floor(z);
-    for (let i = gridX - 1; i <= gridX + 1; i++) {
-        for (let j = gridZ - 1; j <= gridZ + 1; j++) {
-            if (i < 0 || i >= mazeWidth || j < 0 || j >= mazeHeight) return true;
-            if (mazeGrid[i][j]) {
-                const closestX = Math.max(i - 0.5, Math.min(x, i + 0.5)); const closestZ = Math.max(j - 0.5, Math.min(z, j + 0.5));
-                if (((x - closestX) ** 2 + (z - closestZ) ** 2) < (radius ** 2)) return true;
-            }
-        }
-    }
-    return false;
+const gridX = Math.floor(x), gridZ = Math.floor(z);
+for (let i = gridX - 1; i <= gridX + 1; i++) {
+for (let j = gridZ - 1; j <= gridZ + 1; j++) {
+if (i < 0 || i >= mazeWidth || j < 0 || j >= mazeHeight) return true;
+if (mazeGrid[i][j]) {
+const closestX = Math.max(i - 0.5, Math.min(x, i + 0.5)); const closestZ = Math.max(j - 0.5, Math.min(z, j + 0.5));
+if (((x - closestX) ** 2 + (z - closestZ) ** 2) < (radius ** 2)) return true;
+}
+}
+}
+return false;
 }
 
 function updateGame(dt) {
-    const elapsedTime = clock.getElapsedTime();
-    levelTime += dt; if (levelTime >= maxTime) { loseLife(); return; }
-    updateSpiders(dt, elapsedTime);
-    
-    // تشغيل وميض لمبات السقف (تأثير مرعب)
-    if(ceilingLights) {
-        ceilingLights.forEach(l => {
-            if(Math.random() < 0.08) { // فرصة 8% كل إطار لتتغير الإضاءة
-                const flicker = Math.random() > 0.4 ? 1.2 : 0; // إما مضاءة أو مطفأة
-                l.light.intensity = flicker;
-                if(l.mesh.material.color) l.mesh.material.color.setHex(flicker > 0 ? 0xffeeaa : 0x111111);
-            }
-        });
-    }
-
-    velocity.y -= 25 * dt;
-    let moveX = 0, moveZ = 0;
-    if (keys['KeyW'] || keys['ArrowUp']) moveZ = 1; if (keys['KeyS'] || keys['ArrowDown']) moveZ = -1;
-    if (keys['KeyA'] || keys['ArrowLeft']) moveX = -1; if (keys['KeyD'] || keys['ArrowRight']) moveX = 1;
-    if (joystick.active) { moveX = joystick.x; moveZ = joystick.y; }
-    let isMoving = false;
-    if (moveX !== 0 || moveZ !== 0) { const len = Math.sqrt(moveX*moveX + moveZ*moveZ); moveX /= len; moveZ /= len; isMoving = true; }
-    const dir = new THREE.Vector3(); camera.getWorldDirection(dir); dir.y = 0; dir.normalize();
-    const right = new THREE.Vector3().crossVectors(dir, new THREE.Vector3(0, 1, 0)).normalize();
-    player.speed = isCrouching ? player.baseSpeed * 0.5 : (isSprinting ? player.sprintSpeed : player.baseSpeed);
-    const speedStep = player.speed * dt;
-    const nextX = player.x + (dir.x * moveZ + right.x * moveX) * speedStep; const nextZ = player.z + (dir.z * moveZ + right.z * moveX) * speedStep;
-    if (!checkCollision(nextX, player.z)) player.x = nextX; if (!checkCollision(player.x, nextZ)) player.z = nextZ;
-    player.y += velocity.y * dt;
-    if (player.y <= player.height) { player.y = player.height; velocity.y = 0; isGrounded = true; }
-    if (isMoving && isGrounded) { 
-        bobbingTimer += dt * (isSprinting ? 15 : 10); 
-        camera.position.y = player.y + Math.sin(bobbingTimer) * 0.08; 
-        if(playerModel) playerModel.position.y = -1.2 + Math.sin(bobbingTimer * 0.5) * 0.03;
-        else if(playerArm) playerArm.position.y = Math.sin(bobbingTimer * 0.5) * 0.03; 
-        if(isSprinting) { stopSound('walk'); if(audioCache['run'] && audioCache['run'].paused) audioCache['run'].play().catch(()=>{}); } 
-        else { stopSound('run'); if(audioCache['walk'] && audioCache['walk'].paused) audioCache['walk'].play().catch(()=>{}); }
-    } else { 
-        bobbingTimer = 0; camera.position.y += (player.y - camera.position.y) * 0.1; 
-        if(playerModel) playerModel.position.y += (-1.2 - playerModel.position.y) * 0.1;
-        else if(playerArm) playerArm.position.y += (0 - playerArm.position.y) * 0.1; 
-        stopSound('walk'); stopSound('run');
-    }
-    camera.position.set(player.x, camera.position.y, player.z); camera.rotation.set(cameraRotation.x, cameraRotation.y, 0, 'YXZ');
-    
-    spiders.forEach(spider => {
-        const spiderData = spider.group.userData;
-        const dx = player.x - spider.x, dz = player.z - spider.z;
-        const dist = Math.sqrt(dx*dx + dz*dz);
-        if (dist < 15) { if (!spiderData.hasCalled) { playSound('call'); spiderData.hasCalled = true; } } else { spiderData.hasCalled = false; }
-        if (dist < 12 && !spiderData.isJumping) {
-            spider.dir.x = dx/dist; spider.dir.z = dz/dist;
-            spiderData.walkSpeed = spider.speed * (dist < 5 ? 1.8 : 1.2);
-            if (dist < 2.5 && spiderData.jumpCycle > 1.2) { triggerSpiderJump(spider); }
-        } else if (dist > 15) {
-            spiderData.walkSpeed = spider.speed * 0.4;
-            if (Math.random() < 0.02) { spider.dir.x = (Math.random() - 0.5) * 2; spider.dir.z = (Math.random() - 0.5) * 2; }
-        }
-        
-        // إصلاح اصطدام العناكب بالجدران (الفصل بين محور X ومحور Z)
-        const spiderRadius = 0.35; // حجم التصادم للعنكبوت
-        const nSX = spider.x + spider.dir.x * spider.speed * dt; 
-        const nSZ = spider.z + spider.dir.z * spider.speed * dt;
-        
-        let hitX = checkCollision(nSX, spider.z, spiderRadius);
-        let hitZ = checkCollision(spider.x, nSZ, spiderRadius);
-
-        // إذا لم يصطدم في X، تحرك. وإذا اصطدم، اعكس الاتجاه مع قليل من العشوائية.
-        if (!hitX) { 
-            spider.x = nSX; 
-        } else {
-            spider.dir.x *= -1; 
-            spider.dir.z += (Math.random() - 0.5) * 0.8;
-        }
-
-        // إذا لم يصطدم في Z، تحرك. وإذا اصطدم، اعكس الاتجاه مع قليل من العشوائية.
-        if (!hitZ) { 
-            spider.z = nSZ; 
-        } else {
-            spider.dir.z *= -1; 
-            spider.dir.x += (Math.random() - 0.5) * 0.8;
-        }
-
-        // الحفاظ على السرعة ثابتة بعد تغيير الاتجاه
-        const dirLen = Math.sqrt(spider.dir.x**2 + spider.dir.z**2);
-        if(dirLen > 0) { spider.dir.x /= dirLen; spider.dir.z /= dirLen; }
-
-        if (!spiderData.isJumping) { spider.group.position.set(spider.x, spiderData.originalY, spider.z); }
-        spider.group.rotation.y = Math.atan2(spider.dir.x, spider.dir.z);
-        if (dist < 0.9 && !spiderData.isJumping) { loseLife(); }
-    });
-    
-    collectibles.forEach(col => {
-        if (col.collected) return;
-        col.mesh.rotation.y += col.rot; col.mesh.position.y = 0.8 + Math.sin(levelTime*3 + col.bob) * 0.15;
-        if (Math.sqrt((player.x-col.x)**2 + (player.z-col.z)**2) < 1.0) { 
-            col.collected = true; 
-            createCollectVFX(col.x, col.z); 
-            scene.remove(col.mesh); 
-            collectedItems++; 
-            score += 150; 
-            playSound('collect'); 
-            updateHUD(); 
-        }
-    });
-    if (Math.sqrt((player.x-exitPosition.x)**2 + (player.z-exitPosition.z)**2) < 1.2 && collectedItems >= Math.floor(totalCollectibles/2)) winLevel();
-    updateHUD();
+const elapsedTime = clock.getElapsedTime();
+levelTime += dt; if (levelTime >= maxTime) { loseLife(); return; }
+// الـ Guest لا يشغل الـ AI للعناكب - مواقعها تأتي من الـ Host عبر Firebase
+if (!onlineMode || isHost) updateSpiders(dt, elapsedTime);
+else updateSpidersVisualOnly(dt, elapsedTime); // الـ Guest: أنيميشن بصري فقط
+if(ceilingLights) {
+ceilingLights.forEach(l => {
+if(Math.random() < 0.08) {
+const flicker = Math.random() > 0.4 ? 1.2 : 0;
+l.light.intensity = flicker;
+if(l.mesh.material.color) l.mesh.material.color.setHex(flicker > 0 ? 0xffeeaa : 0x111111);
+}
+});
+}
+velocity.y -= 25 * dt;
+let moveX = 0, moveZ = 0;
+if (keys['KeyW'] || keys['ArrowUp']) moveZ = 1; if (keys['KeyS'] || keys['ArrowDown']) moveZ = -1;
+if (keys['KeyA'] || keys['ArrowLeft']) moveX = -1; if (keys['KeyD'] || keys['ArrowRight']) moveX = 1;
+if (joystick.active) { moveX = joystick.x; moveZ = joystick.y; }
+let isMoving = false;
+if (moveX !== 0 || moveZ !== 0) { const len = Math.sqrt(moveX*moveX + moveZ*moveZ); moveX /= len; moveZ /= len; isMoving = true; }
+const dir = new THREE.Vector3(); camera.getWorldDirection(dir); dir.y = 0; dir.normalize();
+const right = new THREE.Vector3().crossVectors(dir, new THREE.Vector3(0, 1, 0)).normalize();
+player.speed = isCrouching ? player.baseSpeed * 0.5 : (isSprinting ? player.sprintSpeed : player.baseSpeed);
+const speedStep = player.speed * dt;
+const nextX = player.x + (dir.x * moveZ + right.x * moveX) * speedStep; const nextZ = player.z + (dir.z * moveZ + right.z * moveX) * speedStep;
+if (!checkCollision(nextX, player.z)) player.x = nextX; if (!checkCollision(player.x, nextZ)) player.z = nextZ;
+player.y += velocity.y * dt;
+if (player.y <= player.height) { player.y = player.height; velocity.y = 0; isGrounded = true; }
+if (isMoving && isGrounded) {
+bobbingTimer += dt * (isSprinting ? 15 : 10);
+camera.position.y = player.y + Math.sin(bobbingTimer) * 0.08;
+if(isSprinting) { stopSound('walk'); if(audioCache['run'] && audioCache['run'].paused) audioCache['run'].play().catch(()=>{}); }
+else { stopSound('run'); if(audioCache['walk'] && audioCache['walk'].paused) audioCache['walk'].play().catch(()=>{}); }
+} else {
+bobbingTimer = 0; camera.position.y += (player.y - camera.position.y) * 0.1;
+stopSound('walk'); stopSound('run');
+}
+camera.position.set(player.x, camera.position.y, player.z); camera.rotation.set(cameraRotation.x, cameraRotation.y, 0, 'YXZ');
+playerAnimTime += dt;
+if (!isGrounded) { playerAnimState = 'jump'; }
+else if (isCrouching && isMoving) { playerAnimState = 'crouch-walk'; }
+else if (isCrouching) { playerAnimState = 'crouch'; }
+else if (isMoving && isSprinting) { playerAnimState = 'run'; }
+else if (isMoving) { playerAnimState = 'walk'; }
+else { playerAnimState = 'idle'; }
+updatePlayerAnimation(dt);
+spiders.forEach(spider => {
+const spiderData = spider.group.userData;
+const dx = player.x - spider.x, dz = player.z - spider.z;
+const dist = Math.sqrt(dx*dx + dz*dz);
+if (dist < 15) { if (!spiderData.hasCalled) { playSound('call'); spiderData.hasCalled = true; } } else { spiderData.hasCalled = false; }
+if (dist < 12 && !spiderData.isJumping) {
+spider.dir.x = dx/dist; spider.dir.z = dz/dist;
+spiderData.walkSpeed = spider.speed * (dist < 5 ? 1.8 : 1.2);
+if (dist < 2.5 && spiderData.jumpCycle > 1.2) { triggerSpiderJump(spider); }
+} else if (dist > 15) {
+spiderData.walkSpeed = spider.speed * 0.4;
+if (Math.random() < 0.02) { spider.dir.x = (Math.random() - 0.5) * 2; spider.dir.z = (Math.random() - 0.5) * 2; }
+}
+const spiderRadius = 0.35;
+const nSX = spider.x + spider.dir.x * spider.speed * dt;
+const nSZ = spider.z + spider.dir.z * spider.speed * dt;
+let hitX = checkCollision(nSX, spider.z, spiderRadius);
+let hitZ = checkCollision(spider.x, nSZ, spiderRadius);
+if (!hitX) { spider.x = nSX; } else { spider.dir.x *= -1; spider.dir.z += (Math.random() - 0.5) * 0.8; }
+if (!hitZ) { spider.z = nSZ; } else { spider.dir.z *= -1; spider.dir.x += (Math.random() - 0.5) * 0.8; }
+const dirLen = Math.sqrt(spider.dir.x**2 + spider.dir.z**2);
+if(dirLen > 0) { spider.dir.x /= dirLen; spider.dir.z /= dirLen; }
+if (!spiderData.isJumping) { spider.group.position.set(spider.x, spiderData.originalY, spider.z); }
+spider.group.rotation.y = Math.atan2(spider.dir.x, spider.dir.z);
+if (dist < 0.9 && !spiderData.isJumping) { loseLife(); }
+});
+collectibles.forEach((col, colIdx) => {
+if (col.collected) return;
+col.mesh.rotation.y += col.rot; col.mesh.position.y = 0.8 + Math.sin(levelTime*3 + col.bob) * 0.15;
+if (Math.sqrt((player.x-col.x)**2 + (player.z-col.z)**2) < 1.0) {
+col.collected = true;
+createCollectVFX(col.x, col.z);
+scene.remove(col.mesh);
+collectedItems++;
+score += 150;
+playSound('collect');
+updateHUD();
+if (onlineMode) syncCollectedItem(colIdx);
+}
+});
+if (Math.sqrt((player.x-exitPosition.x)**2 + (player.z-exitPosition.z)**2) < 1.2 && collectedItems >= Math.floor(totalCollectibles/2)) winLevel();
+updateHUD();
 }
 
+function updatePlayerAnimation(dt) {
+if (!charArmLGroup || !charArmRGroup) return;
+const t = playerAnimTime;
+const BASE_Y = -0.55, BASE_Z = -1.0, BASE_RX = 0.08;
+if (playerArm) {
+playerArm.position.x = 0.3;
+playerArm.position.y = BASE_Y;
+playerArm.position.z = BASE_Z;
+playerArm.rotation.set(BASE_RX, 0, 0);
+}
+if (charTorso) charTorso.scale.y = 1;
+charArmRGroup.rotation.set(-0.55, 0, -0.08);
+charArmLGroup.rotation.set( 0.15, 0,  0.10);
+if (charForeArmR) charForeArmR.rotation.set(-0.30, 0, 0);
+if (charForeArmL) charForeArmL.rotation.set( 0.20, 0, 0);
+if (charLegLGroup) charLegLGroup.rotation.set(0, 0, 0);
+if (charLegRGroup) charLegRGroup.rotation.set(0, 0, 0);
+if (playerAnimState === 'idle') {
+const b = Math.sin(t * 1.5);
+if (charTorso) charTorso.scale.y = 1 + b * 0.010;
+charArmRGroup.rotation.x = -0.55 + b * 0.025;
+charArmLGroup.rotation.x =  0.15 + b * 0.015;
+if (charForeArmR) charForeArmR.rotation.x = -0.30 + b * 0.02;
+if (playerArm) playerArm.position.y = BASE_Y + b * 0.006;
+} else if (playerAnimState === 'walk') {
+const s = Math.sin(t * 8);
+const bY = Math.abs(Math.sin(t * 16));
+charArmRGroup.rotation.x = -0.55 - s * 0.32;
+charArmLGroup.rotation.x =  0.15 + s * 0.28;
+charArmRGroup.rotation.z = -0.08 - Math.abs(s) * 0.03;
+charArmLGroup.rotation.z =  0.10 + Math.abs(s) * 0.03;
+if (charForeArmR) charForeArmR.rotation.x = -0.30 - s * 0.15;
+if (charForeArmL) charForeArmL.rotation.x =  0.20 + s * 0.12;
+if (charLegLGroup) charLegLGroup.rotation.x =  s * 0.45;
+if (charLegRGroup) charLegRGroup.rotation.x = -s * 0.45;
+if (playerArm) {
+playerArm.position.y = BASE_Y - bY * 0.012;
+playerArm.rotation.z = s * 0.010;
+}
+} else if (playerAnimState === 'run') {
+const s = Math.sin(t * 14);
+const bY = Math.abs(Math.sin(t * 28));
+charArmRGroup.rotation.x = -0.55 - s * 0.60;
+charArmLGroup.rotation.x =  0.15 + s * 0.55;
+charArmRGroup.rotation.z = -0.10 - Math.abs(s) * 0.06;
+charArmLGroup.rotation.z =  0.12 + Math.abs(s) * 0.06;
+if (charForeArmR) charForeArmR.rotation.x = -0.30 - s * 0.28;
+if (charForeArmL) charForeArmL.rotation.x =  0.20 + s * 0.24;
+if (charLegLGroup) charLegLGroup.rotation.x =  s * 0.80;
+if (charLegRGroup) charLegRGroup.rotation.x = -s * 0.80;
+if (playerArm) {
+playerArm.position.y = BASE_Y - bY * 0.022;
+playerArm.rotation.x = BASE_RX + 0.10;
+playerArm.rotation.z = s * 0.018;
+}
+} else if (playerAnimState === 'jump') {
+charArmRGroup.rotation.x = -0.90;
+charArmLGroup.rotation.x = -0.65;
+charArmRGroup.rotation.z = -0.22;
+charArmLGroup.rotation.z =  0.28;
+if (charForeArmR) charForeArmR.rotation.x = -0.45;
+if (charForeArmL) charForeArmL.rotation.x = -0.30;
+if (playerArm) playerArm.rotation.x = BASE_RX - 0.06;
+} else if (playerAnimState === 'crouch') {
+charArmRGroup.rotation.x = -0.35;
+charArmLGroup.rotation.x =  0.30;
+charArmRGroup.rotation.z = -0.12;
+charArmLGroup.rotation.z =  0.16;
+if (charForeArmR) charForeArmR.rotation.x = 0.10;
+if (charForeArmL) charForeArmL.rotation.x = 0.35;
+if (charLegLGroup) charLegLGroup.rotation.x = 0.55;
+if (charLegRGroup) charLegRGroup.rotation.x = 0.55;
+if (playerArm) {
+playerArm.position.y = BASE_Y + 0.10;
+playerArm.rotation.x = BASE_RX + 0.15;
+}
+} else if (playerAnimState === 'crouch-walk') {
+const s = Math.sin(t * 6);
+charArmRGroup.rotation.x = -0.35 - s * 0.18;
+charArmLGroup.rotation.x =  0.30 + s * 0.16;
+charArmRGroup.rotation.z = -0.12;
+charArmLGroup.rotation.z =  0.16;
+if (charForeArmR) charForeArmR.rotation.x = 0.10 - s * 0.08;
+if (charForeArmL) charForeArmL.rotation.x = 0.35 + s * 0.07;
+if (charLegLGroup) charLegLGroup.rotation.x = 0.45 + s * 0.30;
+if (charLegRGroup) charLegRGroup.rotation.x = 0.45 - s * 0.30;
+if (playerArm) {
+playerArm.position.y = BASE_Y + 0.10;
+playerArm.rotation.x = BASE_RX + 0.15;
+}
+}
+}
+
+// === Minimap دائري يدور مع اللاعب ===
 function updateMinimap() {
-    const canvas = document.getElementById('minimapCanvas'), ctx = canvas.getContext('2d'); canvas.width = 160; canvas.height = 160; const scale = 160 / Math.max(mazeWidth, mazeHeight);
-    ctx.fillStyle = '#0f0f14'; ctx.fillRect(0, 0, 160, 160); ctx.fillStyle = '#facc15';
-    for (let x=0; x<mazeWidth; x++) for (let z=0; z<mazeHeight; z++) if (mazeGrid[x][z]) ctx.fillRect(x*scale, z*scale, scale+0.5, scale+0.5);
-    ctx.fillStyle = '#06b6d4'; collectibles.forEach(c => { if(!c.collected) ctx.fillRect(c.x*scale-2, c.z*scale-2, 4, 4); });
-    ctx.fillStyle = '#ef4444'; spiders.forEach(s => ctx.fillRect(s.x*scale-2, s.z*scale-2, 4, 4));
-    ctx.fillStyle = '#22c55e'; ctx.fillRect(exitPosition.x*scale-4, exitPosition.z*scale-4, 8, 8);
-    ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(player.x*scale, player.z*scale, 4, 0, Math.PI*2); ctx.fill();
+    const canvas = document.getElementById('minimapCanvas');
+    const ctx = canvas.getContext('2d');
+    const size = 160;
+    canvas.width = size;
+    canvas.height = size;
+    const centerX = size / 2;
+    const centerY = size / 2;
+    const scale = 4;
+    ctx.clearRect(0, 0, size, size);
+    ctx.save();
+    ctx.translate(centerX, centerY);
+    ctx.rotate(-cameraRotation.y + Math.PI);
+    ctx.fillStyle = '#facc15';
+    ctx.shadowColor = '#facc15';
+    ctx.shadowBlur = 5;
+    const viewRange = 25;
+    for (let x = Math.floor(player.x - viewRange); x <= Math.floor(player.x + viewRange); x++) {
+        for (let z = Math.floor(player.z - viewRange); z <= Math.floor(player.z + viewRange); z++) {
+            if (x >= 0 && x < mazeWidth && z >= 0 && z < mazeHeight && mazeGrid[x][z]) {
+                const drawX = (x - player.x) * scale;
+                const drawZ = (z - player.z) * scale;
+                ctx.fillRect(drawX - scale/2, drawZ - scale/2, scale, scale);
+            }
+        }
+    }
+    ctx.fillStyle = '#06b6d4';
+    ctx.shadowColor = '#06b6d4';
+    collectibles.forEach(c => {
+        if(!c.collected) {
+            const dx = (c.x - player.x) * scale;
+            const dz = (c.z - player.z) * scale;
+            ctx.beginPath();
+            ctx.arc(dx, dz, 3, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    });
+    ctx.fillStyle = '#ef4444';
+    ctx.shadowColor = '#ef4444';
+    spiders.forEach(s => {
+        const dx = (s.x - player.x) * scale;
+        const dz = (s.z - player.z) * scale;
+        ctx.fillRect(dx - 3, dz - 3, 6, 6);
+    });
+    ctx.fillStyle = '#22c55e';
+    ctx.shadowColor = '#22c55e';
+    const exitDx = (exitPosition.x - player.x) * scale;
+    const exitDz = (exitPosition.z - player.z) * scale;
+    ctx.beginPath();
+    ctx.moveTo(exitDx, exitDz - 6);
+    ctx.lineTo(exitDx + 5, exitDz + 4);
+    ctx.lineTo(exitDx - 5, exitDz + 4);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+    updateCompass();
+}
+
+function updateCompass() {
+    const compassEl = document.getElementById('minimapCompass');
+    let angle = cameraRotation.y % (Math.PI * 2);
+    if (angle < 0) angle += Math.PI * 2;
+    const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+    const index = Math.floor(((angle + Math.PI / 8) % (Math.PI * 2)) / (Math.PI / 4)) % 8;
+    const oppositeIndex = (index + 4) % 8;
+    compassEl.textContent = directions[oppositeIndex];
 }
 
 function jump(e) { if(e) { e.preventDefault(); e.stopPropagation(); } if (isGrounded && currentState===GameState.PLAYING) { velocity.y = 8; isGrounded = false; playSound('jump'); } }
@@ -854,46 +1438,542 @@ function startSprint(e) { if(e) { e.preventDefault(); e.stopPropagation(); } if(
 function endSprint(e) { if(e) { e.preventDefault(); e.stopPropagation(); } isSprinting = false; }
 
 function loseLife() {
-    lives--; playSound('hit');
-    const overlay = document.getElementById('damageOverlay');
-    
-    // --- VFX: Camera Shake & Blood Pulse ---
-    let shakeInt = 0.25;
-    const shakeInterval = setInterval(() => {
-        cameraRotation.x += (Math.random() - 0.5) * shakeInt;
-        cameraRotation.y += (Math.random() - 0.5) * shakeInt;
-        overlay.style.opacity = (shakeInt * 4).toString();
-        shakeInt -= 0.02;
-        if(shakeInt <= 0) {
-            clearInterval(shakeInterval);
-            overlay.style.opacity = '0';
-        }
-    }, 20);
-
-    if (lives <= 0) { gameOver(); } else { player.x = 1.5; player.z = 1.5; velocity.y = 0; cameraRotation.x = 0; cameraRotation.y = Math.PI; levelTime = 0; }
-    updateHUD();
+lives--; playSound('hit');
+const overlay = document.getElementById('damageOverlay');
+let shakeInt = 0.25;
+const shakeInterval = setInterval(() => {
+cameraRotation.x += (Math.random() - 0.5) * shakeInt;
+cameraRotation.y += (Math.random() - 0.5) * shakeInt;
+overlay.style.opacity = (shakeInt * 4).toString();
+shakeInt -= 0.02;
+if(shakeInt <= 0) {
+clearInterval(shakeInterval);
+overlay.style.opacity = '0';
+}
+}, 20);
+if (lives <= 0) { gameOver(); } else { player.x = 1.5; player.z = 1.5; velocity.y = 0; cameraRotation.x = 0; cameraRotation.y = Math.PI; levelTime = 0; }
+updateHUD();
 }
 
-function winLevel() { currentState = GameState.WIN; const bonus = Math.floor((maxTime - levelTime) * 25); score += bonus; document.getElementById('completedLevel').textContent = currentLevel; showScreen('winScreen'); playSound('collect'); }
+function winLevel() { 
+  currentState = GameState.WIN; 
+  const bonus = Math.floor((maxTime - levelTime) * 25); 
+  score += bonus; 
+  // فتح المستوى التالي إذا كان هذا هو أعلى مستوى مكتمل
+  if (currentLevel === unlockedLevel && currentLevel < maxLevels) {
+    unlockedLevel = currentLevel + 1;
+    saveUnlockedLevel();
+  }
+  document.getElementById('completedLevel').textContent = currentLevel; 
+  showScreen('winScreen'); 
+  playSound('collect'); 
+}
 function gameOver() { currentState = GameState.GAME_OVER; document.getElementById('finalScore').textContent = score; showScreen('gameOver'); }
 function nextLevel() { if (currentLevel < maxLevels) { currentLevel++; initLevel(); } else showMenu(); }
 function restartLevel() { lives = 3; score = 0; initLevel(); }
+
+// دالة togglePause المعدلة
 function togglePause() {
-    if (currentState === GameState.PLAYING) { currentState = GameState.PAUSED; showScreen('pauseMenu'); document.getElementById('gameHUD').classList.remove('playing-mode'); stopSound('run'); stopSound('walk'); }
-    else if (currentState === GameState.PAUSED) { currentState = GameState.PLAYING; document.getElementById('pauseMenu').classList.add('hidden'); document.getElementById('gameHUD').classList.add('playing-mode'); if (!isMobile()) document.getElementById('gameCanvas').requestPointerLock(); }
+  if (currentState === GameState.PLAYING) {
+    currentState = GameState.PAUSED;
+    showScreen('pauseMenu');
+    document.getElementById('gameHUD').classList.remove('playing-mode');
+    stopSound('run');
+    stopSound('walk');
+  } else if (currentState === GameState.PAUSED) {
+    currentState = GameState.PLAYING;
+    showScreen('gameHUD');
+    document.getElementById('gameHUD').classList.add('playing-mode');
+    if (!isMobile()) document.getElementById('gameCanvas').requestPointerLock();
+  }
 }
+
 function showMenu() {
-    currentState = GameState.MENU; cleanupLevel(); scene.add(lobbyGroup);
-    document.getElementById('minimap').style.display = 'none';
-    if(isMobile()) { document.getElementById('joystickZone').style.display = 'none'; document.getElementById('lookZone').style.display = 'none'; }
-    showScreen('mainMenu');
-    stopSound('bgm'); stopSound('run'); stopSound('walk');
+if (onlineMode) cleanupOnline();
+currentState = GameState.MENU; cleanupLevel(); scene.add(lobbyGroup);
+document.getElementById('minimap').style.display = 'none';
+if(isMobile()) { document.getElementById('joystickZone').style.display = 'none'; document.getElementById('lookZone').style.display = 'none'; }
+showScreen('mainMenu');
+stopSound('bgm'); stopSound('run'); stopSound('walk');
 }
+
 function showLevelSelect() { generateLevelButtons(); showScreen('levelSelect'); }
+
 function showScreen(id) { document.querySelectorAll('.ui-layer').forEach(el => el.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); if(!isMobile()) document.exitPointerLock(); }
+
 function updateHUD() {
-    document.getElementById('livesDisplay').textContent = lives; document.getElementById('scoreDisplay').textContent = score;
-    document.getElementById('itemsDisplay').textContent = `${collectedItems}/${Math.floor(totalCollectibles/2)}`; document.getElementById('timeDisplay').textContent = Math.floor(maxTime - levelTime);
+document.getElementById('livesDisplay').textContent = lives; document.getElementById('scoreDisplay').textContent = score;
+document.getElementById('itemsDisplay').textContent = `${collectedItems}/${Math.floor(totalCollectibles/2)}`; document.getElementById('timeDisplay').textContent = Math.floor(maxTime - levelTime);
+}
+
+// ==========================================
+// ===== نظام الأونلاين =====
+// ==========================================
+const DB_URL = 'https://chat-gpt-d17a4-default-rtdb.firebaseio.com';
+
+// === Seeded RNG للخريطة ===
+let mazeSeed = 0;
+let seededRand = Math.random;
+function initSeededRand(seed) {
+    let s = (seed >>> 0) || 1;
+    seededRand = function() {
+        s |= 0; s = s + 0x6D2B79F5 | 0;
+        let t = Math.imul(s ^ (s >>> 15), 1 | s);
+        t = t + Math.imul(t ^ (t >>> 7), 61 | t) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+}
+
+let onlineMode = false;
+let isHost = false;
+let roomCode = '';
+let myPlayerId = '';
+let playerName = 'لاعب';
+let otherPlayerMesh = null;
+let otherPlayerNameTag = null;
+let otherPlayerHeadGrp = null;
+let otherPlayerLegLGrp = null;
+let otherPlayerLegRGrp = null;
+let otherPlayerArmLGrp = null;
+let otherPlayerArmRGrp = null;
+let otherPlayerAnimTime2 = 0;
+let onlineSyncInterval = null;
+let onlinePollInterval = null;
+let lastOtherPlayerUpdate = 0;
+let otherPlayerPos = { x: 3, y: 1.2, z: 3, rotY: 0, headRotX: 0, animState: 'idle', name: 'لاعب' };
+let otherPlayerSmoothed = { x: 3, y: 1.2, z: 3, rotY: 0 };
+let spiderSyncInterval = null;
+let spiderPollInterval = null;
+let collectPollInterval = null;
+
+function showOnlineLobby() { showScreen('onlineLobby'); }
+function showJoinScreen() { showScreen('joinScreen'); document.getElementById('joinCodeInput').value = ''; document.getElementById('joinError').classList.add('hidden'); }
+function generateRoomCode() { return Math.floor(100000 + Math.random() * 900000).toString(); }
+
+async function hostGame() {
+roomCode = generateRoomCode();
+myPlayerId = 'host';
+isHost = true;
+onlineMode = true;
+playerName = (document.getElementById('playerNameInput').value.trim()) || 'Host';
+mazeSeed = Math.floor(Math.random() * 2147483647) + 1; // الـ Host يولد الـ seed
+document.getElementById('roomCodeDisplay').textContent = roomCode;
+document.getElementById('hostStatusText').textContent = 'انتظار انضمام لاعب...';
+showScreen('hostWaitScreen');
+try {
+await fetch(`${DB_URL}/rooms/${roomCode}.json`, {
+method: 'PUT',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({
+host: { x: 1.5, y: 1.2, z: 1.5, rotY: Math.PI, active: true, ts: Date.now() },
+guest: null,
+level: 1,
+seed: mazeSeed,
+state: 'waiting',
+created: Date.now()
+})
+});
+onlinePollInterval = setInterval(async () => {
+const res = await fetch(`${DB_URL}/rooms/${roomCode}.json`);
+const data = await res.json();
+if (data && data.guest && data.guest.active) {
+clearInterval(onlinePollInterval);
+document.getElementById('hostStatusText').textContent = '✅ اتصل لاعب! بتحضير المباراة...';
+setTimeout(() => startOnlineGame(1), 1000);
+}
+}, 1500);
+} catch(e) { alert('فيه مشكلة في الاتصال بالإنترنت!'); onlineMode = false; showOnlineLobby(); }
+}
+
+function copyRoomCode() {
+navigator.clipboard.writeText(roomCode).then(() => {
+const btn = event.target; btn.textContent = '✅ اتنسخ!';
+setTimeout(() => btn.textContent = '📋 نسخ الكود', 1500);
+}).catch(() => { prompt('انسخ الكود ده:', roomCode); });
+}
+
+function cancelHost() {
+if(onlinePollInterval) clearInterval(onlinePollInterval);
+if(roomCode) fetch(`${DB_URL}/rooms/${roomCode}.json`, { method: 'DELETE' }).catch(()=>{});
+onlineMode = false; isHost = false; roomCode = '';
+showOnlineLobby();
+}
+
+async function joinGame() {
+const code = document.getElementById('joinCodeInput').value.trim();
+if (code.length !== 6) { document.getElementById('joinError').classList.remove('hidden'); return; }
+document.getElementById('joinError').classList.add('hidden');
+roomCode = code;
+myPlayerId = 'guest';
+isHost = false;
+onlineMode = true;
+playerName = (document.getElementById('playerNameInput') && document.getElementById('playerNameInput').value.trim()) || 'Guest';
+try {
+const res = await fetch(`${DB_URL}/rooms/${roomCode}.json`);
+const data = await res.json();
+if (!data || !data.host || !data.host.active) {
+document.getElementById('joinError').classList.remove('hidden');
+onlineMode = false; return;
+}
+// الـ Guest يقرأ الـ seed من Firebase
+mazeSeed = data.seed || (Math.floor(Math.random() * 2147483647) + 1);
+await fetch(`${DB_URL}/rooms/${roomCode}/guest.json`, {
+method: 'PUT',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({ x: 1.5, y: 1.2, z: 1.5, rotY: Math.PI, active: true, ts: Date.now() })
+});
+startOnlineGame(data.level || 1);
+} catch(e) { document.getElementById('joinError').classList.remove('hidden'); onlineMode = false; }
+}
+
+function startOnlineGame(level) {
+if (playerArm) {
+playerArm.clear();
+const texLoader = new THREE.TextureLoader();
+texLoader.load('Textures/view.png', function(tex) {
+const aspect = tex.image.width / tex.image.height;
+const planeW = 1.8; const planeH = planeW / aspect;
+const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, alphaTest: 0.05, depthTest: false, depthWrite: false });
+const mesh = new THREE.Mesh(new THREE.PlaneGeometry(planeW, planeH), mat);
+mesh.renderOrder = 999;
+playerArm.add(mesh);
+}, undefined, function() {
+const texLoader2 = new THREE.TextureLoader();
+texLoader2.load('Textures/view.png', function(tex) {
+const aspect = tex.image.width / tex.image.height;
+const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, alphaTest: 0.05, depthTest: false, depthWrite: false });
+const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 1.8/aspect), mat);
+mesh.renderOrder = 999; playerArm.add(mesh);
+});
+});
+}
+createOtherPlayerMesh();
+startOnlineSync();
+currentLevel = level; lives = 3; score = 0;
+cameraRotation = { x: 0, y: Math.PI };
+if (!isMobile()) document.getElementById('gameCanvas').requestPointerLock();
+initLevel();
+document.getElementById('onlineHUD').style.display = 'block';
+document.getElementById('onlinePlayerName').textContent = isHost ? 'لاعب 2' : 'Host';
+}
+
+function createNameTagSprite(name) {
+const canvas = document.createElement('canvas');
+canvas.width = 256; canvas.height = 64;
+const ctx = canvas.getContext('2d');
+ctx.clearRect(0, 0, 256, 64);
+ctx.font = 'bold 28px Cairo, Arial';
+ctx.textAlign = 'center';
+ctx.textBaseline = 'middle';
+ctx.shadowColor = 'rgba(0,0,0,0.8)';
+ctx.shadowBlur = 6;
+ctx.fillStyle = '#ffffff';
+ctx.fillText(name || 'لاعب', 128, 32);
+const texture = new THREE.CanvasTexture(canvas);
+const mat = new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false });
+const sprite = new THREE.Sprite(mat);
+sprite.scale.set(1.6, 0.4, 1);
+return sprite;
+}
+
+function createOtherPlayerMesh() {
+if (otherPlayerMesh) scene.remove(otherPlayerMesh);
+otherPlayerHeadGrp = null; otherPlayerLegLGrp = null; otherPlayerLegRGrp = null;
+otherPlayerArmLGrp = null; otherPlayerArmRGrp = null;
+
+const group = new THREE.Group();
+const accentColor = isHost ? 0x06b6d4 : 0xfacc15;
+const skinColor = 0xC4916A;
+const legColor = 0x2a3a4a;
+
+// Load player texture if available
+const texLoader = new THREE.TextureLoader();
+let bodyMat = new THREE.MeshStandardMaterial({ color: accentColor, roughness: 0.8 });
+let headMat = new THREE.MeshStandardMaterial({ color: skinColor, roughness: 0.9 });
+texLoader.load('Textures/player.png', (tex) => {
+    bodyMat.map = tex; bodyMat.color.set(0xffffff);
+    bodyMat.needsUpdate = true;
+}, undefined, () => {});
+
+// Feet (y=0 to y=0.22) — grounded
+const footMat = new THREE.MeshStandardMaterial({ color: 0x3a2a1a, roughness: 0.9 });
+const footL = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.16, 0.32), footMat);
+footL.position.set(-0.17, 0.08, 0.04); footL.castShadow = true; group.add(footL);
+const footR = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.16, 0.32), footMat);
+footR.position.set(0.17, 0.08, 0.04); footR.castShadow = true; group.add(footR);
+
+// Legs as animated groups (pivot at top of leg: y=0.16, leg goes down 0.7)
+const legMat = new THREE.MeshStandardMaterial({ color: legColor, roughness: 0.9 });
+otherPlayerLegLGrp = new THREE.Group();
+otherPlayerLegLGrp.position.set(-0.17, 0.86, 0);
+const legLMesh = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.70, 0.26), legMat);
+legLMesh.position.set(0, -0.35, 0); legLMesh.castShadow = true;
+otherPlayerLegLGrp.add(legLMesh); group.add(otherPlayerLegLGrp);
+
+otherPlayerLegRGrp = new THREE.Group();
+otherPlayerLegRGrp.position.set(0.17, 0.86, 0);
+const legRMesh = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.70, 0.26), legMat);
+legRMesh.position.set(0, -0.35, 0); legRMesh.castShadow = true;
+otherPlayerLegRGrp.add(legRMesh); group.add(otherPlayerLegRGrp);
+
+// Torso (y=0.86 to y=1.76)
+const torso = new THREE.Mesh(new THREE.BoxGeometry(0.60, 0.90, 0.40), bodyMat);
+torso.position.set(0, 1.31, 0); torso.castShadow = true; group.add(torso);
+
+// Belt
+const beltMat = new THREE.MeshStandardMaterial({ color: 0x444444, roughness: 0.6 });
+const belt = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.10, 0.42), beltMat);
+belt.position.set(0, 0.87, 0); group.add(belt);
+
+// Arms as animated groups (pivot at shoulder: y=1.76)
+const armMat = new THREE.MeshStandardMaterial({ color: accentColor, roughness: 0.8 });
+otherPlayerArmLGrp = new THREE.Group();
+otherPlayerArmLGrp.position.set(-0.42, 1.72, 0);
+const armLMesh = new THREE.Mesh(new THREE.BoxGeometry(0.20, 0.58, 0.22), armMat);
+armLMesh.position.set(0, -0.29, 0); armLMesh.castShadow = true;
+// Forearm
+const foreArmLMesh = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.50, 0.20), bodyMat);
+foreArmLMesh.position.set(0, -0.54, 0); foreArmLMesh.castShadow = true;
+otherPlayerArmLGrp.add(armLMesh, foreArmLMesh);
+group.add(otherPlayerArmLGrp);
+
+otherPlayerArmRGrp = new THREE.Group();
+otherPlayerArmRGrp.position.set(0.42, 1.72, 0);
+const armRMesh = new THREE.Mesh(new THREE.BoxGeometry(0.20, 0.58, 0.22), armMat);
+armRMesh.position.set(0, -0.29, 0); armRMesh.castShadow = true;
+const foreArmRMesh = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.50, 0.20), bodyMat);
+foreArmRMesh.position.set(0, -0.54, 0); foreArmRMesh.castShadow = true;
+otherPlayerArmRGrp.add(armRMesh, foreArmRMesh);
+group.add(otherPlayerArmRGrp);
+
+// Neck + Head group (for camera pitch rotation)
+otherPlayerHeadGrp = new THREE.Group();
+otherPlayerHeadGrp.position.set(0, 1.83, 0);
+const neck = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.18, 0.22), headMat);
+neck.position.set(0, 0.09, 0); neck.castShadow = true;
+const head = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.44, 0.42), headMat);
+head.position.set(0, 0.40, 0); head.castShadow = true;
+// Eyes
+const eyeGeo = new THREE.BoxGeometry(0.10, 0.08, 0.06);
+const eyeMat2 = new THREE.MeshBasicMaterial({ color: 0x222222 });
+const eyeL = new THREE.Mesh(eyeGeo, eyeMat2); eyeL.position.set(-0.12, 0.44, -0.22); 
+const eyeR = new THREE.Mesh(eyeGeo, eyeMat2); eyeR.position.set(0.12, 0.44, -0.22);
+otherPlayerHeadGrp.add(neck, head, eyeL, eyeR);
+group.add(otherPlayerHeadGrp);
+
+// Point light
+const pLight = new THREE.PointLight(accentColor, 0.5, 5);
+pLight.position.set(0, 2.2, 0); group.add(pLight);
+
+// Name tag sprite
+const nameSprite = createNameTagSprite(otherPlayerPos.name || 'لاعب');
+nameSprite.position.set(0, 2.55, 0);
+group.add(nameSprite);
+otherPlayerNameTag = nameSprite;
+
+group.position.set(3, 0, 3);
+scene.add(group);
+otherPlayerMesh = group;
+}
+
+// === مزامنة جمع العناصر ===
+function syncCollectedItem(idx) {
+if (!onlineMode || !roomCode) return;
+fetch(`${DB_URL}/rooms/${roomCode}/collected/${idx}.json`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: 'true'
+}).catch(() => {});
+}
+
+function startOnlineSync() {
+if (onlineSyncInterval) clearInterval(onlineSyncInterval);
+if (onlinePollInterval) clearInterval(onlinePollInterval);
+if (spiderSyncInterval) clearInterval(spiderSyncInterval);
+if (spiderPollInterval) clearInterval(spiderPollInterval);
+if (collectPollInterval) clearInterval(collectPollInterval);
+
+const myRole = isHost ? 'host' : 'guest';
+const otherRole = isHost ? 'guest' : 'host';
+
+// === مزامنة موقع اللاعب ===
+onlineSyncInterval = setInterval(() => {
+if (currentState !== GameState.PLAYING) return;
+fetch(`${DB_URL}/rooms/${roomCode}/${myRole}.json`, {
+method: 'PUT',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({ x: player.x, y: player.y, z: player.z, rotY: cameraRotation.y, headRotX: cameraRotation.x, animState: playerAnimState, name: playerName, active: true, ts: Date.now() })
+}).catch(()=>{});
+}, 80);
+
+onlinePollInterval = setInterval(async () => {
+try {
+const res = await fetch(`${DB_URL}/rooms/${roomCode}/${otherRole}.json`);
+const data = await res.json();
+if (data && data.active) {
+otherPlayerPos.x = data.x || 3;
+otherPlayerPos.y = (data.y || 1.2) - 1.2;
+otherPlayerPos.z = data.z || 3;
+otherPlayerPos.rotY = data.rotY || 0;
+otherPlayerPos.headRotX = data.headRotX || 0;
+otherPlayerPos.animState = data.animState || 'idle';
+if (data.name && otherPlayerNameTag) {
+    if (otherPlayerPos.name !== data.name) {
+        otherPlayerPos.name = data.name;
+        if (otherPlayerMesh) {
+            otherPlayerMesh.remove(otherPlayerNameTag);
+            otherPlayerNameTag = createNameTagSprite(data.name);
+            otherPlayerNameTag.position.set(0, 2.55, 0);
+            otherPlayerMesh.add(otherPlayerNameTag);
+        }
+    }
+}
+lastOtherPlayerUpdate = Date.now();
+document.getElementById('onlinePing').textContent = '🟢';
+}
+} catch(e) {}
+}, 100);
+
+// === مزامنة العناكب (Host يبعت، Guest يستقبل) ===
+if (isHost) {
+spiderSyncInterval = setInterval(() => {
+    if (currentState !== GameState.PLAYING || !spiders.length) return;
+    const spiderSnap = spiders.map(s => ({
+        x: parseFloat(s.x.toFixed(3)),
+        z: parseFloat(s.z.toFixed(3)),
+        ry: parseFloat(s.group.rotation.y.toFixed(3))
+    }));
+    fetch(`${DB_URL}/rooms/${roomCode}/spiders.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(spiderSnap)
+    }).catch(() => {});
+}, 150);
+} else {
+// Guest يقرأ مواقع العناكب من Host
+spiderPollInterval = setInterval(async () => {
+    try {
+        const res = await fetch(`${DB_URL}/rooms/${roomCode}/spiders.json`);
+        const data = await res.json();
+        if (data && Array.isArray(data)) {
+            data.forEach((sd, i) => {
+                if (spiders[i] && sd) {
+                    spiders[i].x = sd.x;
+                    spiders[i].z = sd.z;
+                    const ud = spiders[i].group.userData;
+                    if (!ud.isJumping) {
+                        spiders[i].group.position.set(sd.x, ud.originalY || 0.3, sd.z);
+                    }
+                    spiders[i].group.rotation.y = sd.ry || 0;
+                }
+            });
+        }
+    } catch(e) {}
+}, 150);
+}
+
+// === مزامنة الأشياء المجمّعة (الاثنان يقرأان) ===
+collectPollInterval = setInterval(async () => {
+try {
+    const res = await fetch(`${DB_URL}/rooms/${roomCode}/collected.json`);
+    const data = await res.json();
+    if (data) {
+        Object.keys(data).forEach(idxStr => {
+            const i = parseInt(idxStr);
+            if (collectibles[i] && !collectibles[i].collected) {
+                collectibles[i].collected = true;
+                scene.remove(collectibles[i].mesh);
+                collectedItems++;
+                updateHUD();
+            }
+        });
+    }
+} catch(e) {}
+}, 300);
+}
+
+function updateOtherPlayer(dt) {
+if (!otherPlayerMesh || !onlineMode) return;
+const lerpFactor = 1 - Math.pow(0.01, dt);
+otherPlayerSmoothed.x += (otherPlayerPos.x - otherPlayerSmoothed.x) * lerpFactor;
+otherPlayerSmoothed.y += (otherPlayerPos.y - otherPlayerSmoothed.y) * lerpFactor;
+otherPlayerSmoothed.z += (otherPlayerPos.z - otherPlayerSmoothed.z) * lerpFactor;
+otherPlayerMesh.position.set(otherPlayerSmoothed.x, otherPlayerSmoothed.y, otherPlayerSmoothed.z);
+otherPlayerMesh.rotation.y = otherPlayerPos.rotY + Math.PI;
+
+// Head/neck follows camera pitch
+if (otherPlayerHeadGrp) {
+    otherPlayerHeadGrp.rotation.x = Math.max(-0.6, Math.min(0.6, otherPlayerPos.headRotX));
+}
+
+// Animate limbs based on synced animation state
+otherPlayerAnimTime2 += dt;
+const t2 = otherPlayerAnimTime2;
+const animSt = otherPlayerPos.animState || 'idle';
+if (otherPlayerLegLGrp && otherPlayerLegRGrp) {
+    if (animSt === 'walk') {
+        const s = Math.sin(t2 * 8);
+        otherPlayerLegLGrp.rotation.x = s * 0.45;
+        otherPlayerLegRGrp.rotation.x = -s * 0.45;
+        if (otherPlayerArmLGrp) otherPlayerArmLGrp.rotation.x = -s * 0.30;
+        if (otherPlayerArmRGrp) otherPlayerArmRGrp.rotation.x = s * 0.30;
+    } else if (animSt === 'run') {
+        const s = Math.sin(t2 * 14);
+        otherPlayerLegLGrp.rotation.x = s * 0.75;
+        otherPlayerLegRGrp.rotation.x = -s * 0.75;
+        if (otherPlayerArmLGrp) { otherPlayerArmLGrp.rotation.x = -s * 0.55; otherPlayerArmLGrp.rotation.z = 0.10 + Math.abs(s)*0.06; }
+        if (otherPlayerArmRGrp) { otherPlayerArmRGrp.rotation.x = s * 0.55; otherPlayerArmRGrp.rotation.z = -0.10 - Math.abs(s)*0.06; }
+    } else if (animSt === 'jump') {
+        otherPlayerLegLGrp.rotation.x = -0.40;
+        otherPlayerLegRGrp.rotation.x = -0.40;
+        if (otherPlayerArmLGrp) { otherPlayerArmLGrp.rotation.x = -0.70; otherPlayerArmLGrp.rotation.z = 0.28; }
+        if (otherPlayerArmRGrp) { otherPlayerArmRGrp.rotation.x = -0.70; otherPlayerArmRGrp.rotation.z = -0.28; }
+    } else if (animSt === 'crouch') {
+        otherPlayerLegLGrp.rotation.x = 0.55;
+        otherPlayerLegRGrp.rotation.x = 0.55;
+        otherPlayerMesh.scale.y = 0.78;
+        if (otherPlayerArmLGrp) otherPlayerArmLGrp.rotation.x = 0.25;
+        if (otherPlayerArmRGrp) otherPlayerArmRGrp.rotation.x = 0.25;
+    } else if (animSt === 'crouch-walk') {
+        const s = Math.sin(t2 * 6);
+        otherPlayerLegLGrp.rotation.x = 0.45 + s * 0.30;
+        otherPlayerLegRGrp.rotation.x = 0.45 - s * 0.30;
+        otherPlayerMesh.scale.y = 0.78;
+        if (otherPlayerArmLGrp) otherPlayerArmLGrp.rotation.x = 0.20 - s * 0.14;
+        if (otherPlayerArmRGrp) otherPlayerArmRGrp.rotation.x = 0.20 + s * 0.14;
+    } else {
+        // idle breathing
+        const b = Math.sin(t2 * 1.5) * 0.025;
+        otherPlayerLegLGrp.rotation.x = 0;
+        otherPlayerLegRGrp.rotation.x = 0;
+        if (otherPlayerArmLGrp) otherPlayerArmLGrp.rotation.x = b;
+        if (otherPlayerArmRGrp) otherPlayerArmRGrp.rotation.x = -b;
+    }
+    if (animSt !== 'crouch' && animSt !== 'crouch-walk') otherPlayerMesh.scale.y = 1;
+}
+
+const isDisconnected = Date.now() - lastOtherPlayerUpdate > 5000;
+otherPlayerMesh.visible = !isDisconnected;
+if (isDisconnected) document.getElementById('onlinePing').textContent = '🔴';
+}
+
+function cleanupOnline() {
+if (onlineSyncInterval) clearInterval(onlineSyncInterval);
+if (onlinePollInterval) clearInterval(onlinePollInterval);
+if (spiderSyncInterval) clearInterval(spiderSyncInterval);
+if (spiderPollInterval) clearInterval(spiderPollInterval);
+if (collectPollInterval) clearInterval(collectPollInterval);
+spiderSyncInterval = null; spiderPollInterval = null; collectPollInterval = null;
+if (otherPlayerMesh) { scene.remove(otherPlayerMesh); otherPlayerMesh = null; }
+otherPlayerHeadGrp = null; otherPlayerLegLGrp = null; otherPlayerLegRGrp = null;
+otherPlayerArmLGrp = null; otherPlayerArmRGrp = null; otherPlayerNameTag = null;
+otherPlayerAnimTime2 = 0;
+document.getElementById('onlineHUD').style.display = 'none';
+if (roomCode && onlineMode) {
+const myRole = isHost ? 'host' : 'guest';
+fetch(`${DB_URL}/rooms/${roomCode}/${myRole}/active.json`, { method: 'PUT', headers:{'Content-Type':'application/json'}, body: 'false' }).catch(()=>{});
+}
+onlineMode = false; isHost = false; roomCode = ''; myPlayerId = '';
 }
 </script>
 </body>
