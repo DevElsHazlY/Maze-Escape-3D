@@ -150,6 +150,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .result-panel{padding:40px 48px;max-width:380px;width:100%;}
 /* ===== SPIDER ALERT ===== */
 .spider-alert{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.75);border:1px solid currentColor;padding:8px 20px;border-radius:2px;color:currentColor;font-weight:900;font-size:0.9rem;pointer-events:none;opacity:0;transition:opacity 0.3s;z-index:100;letter-spacing:1px;}
+/* ===== JUMPSCARE ===== */
+.jumpscare{position:fixed;top:0;left:0;width:100%;height:100%;z-index:500;pointer-events:none;display:none;align-items:center;justify-content:center;}
+.jumpscare.active{display:flex;animation:jsAnim 0.7s ease-out forwards;}
+@keyframes jsAnim{0%{background:rgba(0,0,0,0);}10%{background:rgba(180,0,0,0.5);}20%{background:rgba(0,0,0,0.9);}60%{background:rgba(0,0,0,0.7);}100%{background:rgba(0,0,0,0);}}
+.jumpscare-face{font-size:min(55vw,260px);animation:jsFace 0.7s ease-out forwards;filter:drop-shadow(0 0 40px red);}
+@keyframes jsFace{0%{transform:scale(0.1) rotate(-20deg);opacity:0;}15%{transform:scale(1.4) rotate(5deg);opacity:1;}40%{transform:scale(1) rotate(0deg);}80%{opacity:1;}100%{transform:scale(2);opacity:0;}}
+/* ===== VOICE CHAT ===== */
+.voice-btn{position:absolute;width:58px;height:58px;border-radius:50%;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);border:2px solid rgba(255,255,255,0.2);color:white;font-size:1.5rem;display:flex;align-items:center;justify-content:center;cursor:pointer;pointer-events:auto;z-index:20;transition:all 0.15s;box-shadow:0 2px 10px rgba(0,0,0,0.5);}
+.voice-btn.talking{border-color:#22c55e!important;box-shadow:0 0 18px rgba(34,197,94,0.7)!important;background:rgba(34,197,94,0.25)!important;}
+.voice-btn.muted{border-color:#ef4444!important;opacity:0.55;}
 /* ===== CUSTOMIZER ===== */
 .customizer-panel{background:rgba(0,0,0,0.9);border:1px solid #06b6d4;border-radius:4px;padding:14px;width:280px;pointer-events:auto;box-shadow:0 0 20px rgba(0,0,0,0.9);}
 .editing-btn{outline:3px dashed #06b6d4!important;outline-offset:4px!important;background:rgba(6,182,212,0.25)!important;cursor:move!important;}
@@ -184,6 +194,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 <div class="damage-overlay" id="damageOverlay"></div>
 <!-- SPIDER ALERT -->
 <div class="spider-alert" id="spiderAlert"></div>
+<!-- JUMPSCARE -->
+<div class="jumpscare" id="jumpscareOverlay"><span class="jumpscare-face" id="jumpscareFace">🕷️</span></div>
 <!-- MINIMAP -->
 <div class="minimap custom-hud" id="minimap" style="bottom:200px;right:20px;">
   <div class="minimap-compass" id="minimapCompass">N</div>
@@ -202,6 +214,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
       <button class="mbtn cyan custom-click" onclick="showOnlineLobby()"><span>اللعب الجماعي</span><span class="icon">🌐</span></button>
       <button class="mbtn custom-click" onclick="showLevelSelect()"><span>المستويات</span><span class="icon">▤</span></button>
       <button class="mbtn custom-click" onclick="openSettings()"><span>الإعدادات</span><span class="icon">⚙</span></button>
+      <button class="mbtn custom-click" style="border-right-color:#06b6d4;color:rgba(6,182,212,0.8);" onclick="openCustomControls()"><span>تخصيص الـ HUD</span><span class="icon">✥</span></button>
     </div>
   </div>
 </div>
@@ -301,9 +314,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
           <div class="s-row">
             <div class="s-label">Resolution Scale<small>كلما كان أقل – أداء أفضل</small></div>
             <div class="opt-btns" id="resBtns">
-              <button class="opt-btn" onclick="setOpt('res','0.1')">10%</button>
-              <button class="opt-btn" onclick="setOpt('res','0.4')">40%</button>
+              <button class="opt-btn" onclick="setOpt('res','0.5')">50%</button>
               <button class="opt-btn" onclick="setOpt('res','0.6')">60%</button>
+              <button class="opt-btn" onclick="setOpt('res','0.7')">70%</button>
               <button class="opt-btn" onclick="setOpt('res','0.85')">85%</button>
               <button class="opt-btn active" onclick="setOpt('res','1.0')">100%</button>
             </div>
@@ -508,7 +521,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   <div class="custom-hud switch-hud-item hidden" id="switchHUD" style="position:absolute;top:120px;left:20px;z-index:10;">
     <span>⚡</span><span id="switchDisplay">0/0</span>
   </div>
-  <button id="pauseBtnHUD" class="custom-click" onclick="togglePause()">||</button>
+  <button id="pauseBtnHUD" class="custom-click" onclick="togglePause()">⏸</button>
   <div class="joystick-zone" id="joystickZone"></div>
   <div class="joystick-base" id="joystickBase"><div class="joystick-knob" id="joystickKnob"></div></div>
   <div class="look-zone" id="lookZone"></div>
@@ -517,6 +530,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   <button class="action-btn custom-hud" id="sprintBtn" style="bottom:60px;right:20px;border-color:#facc15;color:#facc15;"><img src="Textures/icons/run.png" style="width:36px;height:36px;object-fit:contain;pointer-events:none;" onerror="this.style.display='none';this.parentNode.textContent='🏃'"></button>
   <button class="action-btn custom-hud" id="flashlightBtn" style="bottom:60px;left:20px;"><img src="Textures/icons/light.png" style="width:36px;height:36px;object-fit:contain;pointer-events:none;" onerror="this.style.display='none';this.parentNode.textContent='💡'"></button>
   <button class="action-btn custom-hud" id="activateBtn" style="bottom:140px;left:20px;border-color:#a855f7;color:#a855f7;display:none;">⚡</button>
+  <!-- Voice Chat -->
+  <button class="voice-btn custom-hud" id="micBtn" style="bottom:140px;left:96px;display:none;" onclick="toggleMic()">🎤</button>
 </div>
 <!-- =================== PAUSE =================== -->
 <div class="ui-layer interactive hidden" id="pauseMenu" style="justify-content:flex-end;align-items:stretch;">
@@ -526,6 +541,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
       <div style="font-size:1.8rem;font-weight:900;color:#facc15;margin-bottom:24px;">متوقفة</div>
       <button class="mbtn custom-click" onclick="togglePause()"><span>إكمال</span><span class="icon">▶</span></button>
       <button class="mbtn custom-click" onclick="openSettings()"><span>الإعدادات</span><span class="icon">⚙</span></button>
+      <button class="mbtn custom-click" style="border-right-color:#06b6d4;color:rgba(6,182,212,0.8);" onclick="openCustomControls()"><span>تخصيص الـ HUD</span><span class="icon">✥</span></button>
       <button class="mbtn custom-click" onclick="restartLevel()"><span>إعادة</span><span class="icon">↺</span></button>
       <button class="mbtn custom-click" onclick="showMenu()"><span>خروج للساحة</span><span class="icon">✖</span></button>
     </div>
@@ -593,6 +609,31 @@ let switches = []; // {x,z,activated,mesh,light}
 let switchesTotal = 0, switchesActivated = 0;
 let exitLocked = true;
 let exitMesh = null;
+
+// JumpScare
+let jumpscareActive = false;
+let jumpscareTimer = 0;
+let lastJumpscareDist = 999;
+
+// Voice chat (WebRTC)
+let voiceMicStream = null;
+let voiceAudioCtx = null;
+let voiceAnalyser = null;
+let voiceVolume = 0;
+let voiceTalkingThreshold = 18;
+let voiceMuted = false;
+let voicePeerConn = null;
+let voiceRemoteStream = null;
+let voiceAudioEl = null;
+let voiceSignalInterval = null;
+let voiceMicActive = false;
+let micBtnVisible = false;
+
+// Online extras
+let onlineWinPollInterval = null;
+let myWinReported = false;
+let otherWinReported = false;
+let switchPollInterval = null;
 
 // Spiders
 let spiders = [];
@@ -1173,14 +1214,21 @@ function updateSpiders(dt,elapsed) {
     if(dist<15&&!ud.hasCalled){playSound('call');ud.hasCalled=true;}
     else if(dist>20){ud.hasCalled=false;}
 
-    // Spider type alert - removed subtitle names per request
-    if(dist<8&&dist>7.5&&!ud.alertShown){
-      ud.alertShown=true;
-      // No subtitle popup for spider types
-    } else if(dist>20){ud.alertShown=false;}
+    // Voice aggression: spider hears player talking
+    if(voiceMicActive&&!voiceMuted){
+      voiceVolume=getVoiceVolume();
+      if(voiceVolume>voiceTalkingThreshold&&dist<22){
+        spider.dir.x=(player.x-spider.x)/Math.max(dist,0.01);
+        spider.dir.z=(player.z-spider.z)/Math.max(dist,0.01);
+        ud.walkSpeed=Math.max(ud.walkSpeed,spider.speed*1.7);
+      }
+    }
 
-    // Damage
+    // Damage + JumpScare
     const actualDist=Math.sqrt((player.x-spider.x)**2+(player.z-spider.z)**2);
+    if(actualDist<1.4&&!ud.isJumping&&!jumpscareActive){
+      triggerJumpscare(ud.type);
+    }
     if(actualDist<0.9&&!ud.isJumping){loseLife();}
   });
 }
@@ -1206,6 +1254,139 @@ function showSpiderAlert(name,color) {
   el.style.color=color; el.style.borderColor=color;
   el.style.opacity='1';
   spiderAlertTimer=3;
+}
+// =================== JUMPSCARE ===================
+function triggerJumpscare(type) {
+  if(jumpscareActive) return;
+  jumpscareActive=true;
+  const faces={coward:'🕷️',teaser:'🕷️',predator:'🕷️'};
+  const el=document.getElementById('jumpscareOverlay');
+  const face=document.getElementById('jumpscareFace');
+  if(!el||!face) return;
+  face.textContent=faces[type]||'🕷️';
+  el.classList.remove('active');
+  void el.offsetWidth; // force reflow
+  el.classList.add('active');
+  // Camera shake
+  const shakeInt=setInterval(()=>{
+    cameraRotation.x+=(Math.random()-0.5)*0.18;
+    cameraRotation.y+=(Math.random()-0.5)*0.18;
+  },30);
+  setTimeout(()=>{
+    clearInterval(shakeInt);
+    el.classList.remove('active');
+    jumpscareActive=false;
+  },750);
+}
+
+// =================== VOICE CHAT ===================
+async function initVoiceChat() {
+  if(voiceMicStream) return;
+  try {
+    voiceMicStream = await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+    voiceAudioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    const src = voiceAudioCtx.createMediaStreamSource(voiceMicStream);
+    voiceAnalyser = voiceAudioCtx.createAnalyser();
+    voiceAnalyser.fftSize=256;
+    src.connect(voiceAnalyser);
+    voiceMicActive=true;
+    updateMicBtn();
+    if(onlineMode) startVoiceWebRTC();
+  } catch(e) {
+    console.warn('Mic access denied:', e);
+  }
+}
+function getVoiceVolume() {
+  if(!voiceAnalyser||voiceMuted) return 0;
+  const data=new Uint8Array(voiceAnalyser.frequencyBinCount);
+  voiceAnalyser.getByteFrequencyData(data);
+  let sum=0; for(let i=0;i<data.length;i++) sum+=data[i];
+  return sum/data.length;
+}
+function toggleMic() {
+  if(!voiceMicActive) { initVoiceChat(); return; }
+  voiceMuted=!voiceMuted;
+  if(voiceMicStream) voiceMicStream.getAudioTracks().forEach(t=>t.enabled=!voiceMuted);
+  updateMicBtn();
+}
+function updateMicBtn() {
+  const btn=document.getElementById('micBtn');
+  if(!btn) return;
+  if(!voiceMicActive){btn.textContent='🎤';btn.classList.remove('talking','muted');}
+  else if(voiceMuted){btn.textContent='🔇';btn.classList.add('muted');btn.classList.remove('talking');}
+  else{btn.textContent='🎤';btn.classList.remove('muted');}
+}
+// Voice WebRTC signaling via Firebase
+async function startVoiceWebRTC() {
+  if(!onlineMode||!roomCode) return;
+  const config={iceServers:[{urls:'stun:stun.l.google.com:19302'}]};
+  voicePeerConn=new RTCPeerConnection(config);
+  voiceMicStream.getTracks().forEach(t=>voicePeerConn.addTrack(t,voiceMicStream));
+  voicePeerConn.ontrack=e=>{
+    voiceRemoteStream=e.streams[0];
+    if(!voiceAudioEl){voiceAudioEl=document.createElement('audio');voiceAudioEl.autoplay=true;document.body.appendChild(voiceAudioEl);}
+    voiceAudioEl.srcObject=voiceRemoteStream;
+  };
+  voicePeerConn.onicecandidate=async e=>{
+    if(e.candidate){
+      const myRole=isHost?'host':'guest';
+      await fetch(`${DB_URL}/rooms/${roomCode}/voice/${myRole}_ice.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({cand:e.candidate.toJSON(),ts:Date.now()})}).catch(()=>{});
+    }
+  };
+  if(isHost){
+    const offer=await voicePeerConn.createOffer();
+    await voicePeerConn.setLocalDescription(offer);
+    await fetch(`${DB_URL}/rooms/${roomCode}/voice/offer.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({sdp:offer.sdp,type:offer.type})}).catch(()=>{});
+    // Poll for answer
+    voiceSignalInterval=setInterval(async()=>{
+      try{
+        const r=await fetch(`${DB_URL}/rooms/${roomCode}/voice/answer.json`);
+        const ans=await r.json();
+        if(ans&&ans.sdp&&voicePeerConn.remoteDescription===null){
+          await voicePeerConn.setRemoteDescription(new RTCSessionDescription(ans));
+          clearInterval(voiceSignalInterval);
+          startIcePoll();
+        }
+      }catch(e){}
+    },1000);
+  } else {
+    // Guest: poll for offer
+    voiceSignalInterval=setInterval(async()=>{
+      try{
+        const r=await fetch(`${DB_URL}/rooms/${roomCode}/voice/offer.json`);
+        const off=await r.json();
+        if(off&&off.sdp&&voicePeerConn.remoteDescription===null){
+          await voicePeerConn.setRemoteDescription(new RTCSessionDescription(off));
+          const answer=await voicePeerConn.createAnswer();
+          await voicePeerConn.setLocalDescription(answer);
+          await fetch(`${DB_URL}/rooms/${roomCode}/voice/answer.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({sdp:answer.sdp,type:answer.type})}).catch(()=>{});
+          clearInterval(voiceSignalInterval);
+          startIcePoll();
+        }
+      }catch(e){}
+    },1000);
+  }
+}
+function startIcePoll() {
+  const otherRole=isHost?'guest':'host';
+  const icePoll=setInterval(async()=>{
+    try{
+      const r=await fetch(`${DB_URL}/rooms/${roomCode}/voice/${otherRole}_ice.json`);
+      const ic=await r.json();
+      if(ic&&ic.cand){
+        await voicePeerConn.addIceCandidate(new RTCIceCandidate(ic.cand)).catch(()=>{});
+        clearInterval(icePoll);
+      }
+    }catch(e){}
+  },800);
+}
+function cleanupVoice() {
+  if(voiceSignalInterval) clearInterval(voiceSignalInterval);
+  if(voicePeerConn){voicePeerConn.close();voicePeerConn=null;}
+  if(voiceMicStream){voiceMicStream.getTracks().forEach(t=>t.stop());voiceMicStream=null;}
+  if(voiceAudioCtx){voiceAudioCtx.close();voiceAudioCtx=null;}
+  if(voiceAudioEl){voiceAudioEl.remove();voiceAudioEl=null;}
+  voiceMicActive=false; voiceVolume=0;
 }
 
 // =================== BATTERY ===================
@@ -1248,27 +1429,42 @@ function createBatteryPickup(x,z) {
 }
 
 // =================== SWITCH / PUZZLE ===================
-function createSwitch(x,z) {
-  const base=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.6,0.3),new THREE.MeshStandardMaterial({color:0x333333,roughness:0.8}));
-  base.position.set(x,0.3,z);
-  const btn=new THREE.Mesh(new THREE.BoxGeometry(0.18,0.18,0.18),new THREE.MeshStandardMaterial({color:0xff2200,emissive:0xff0000,emissiveIntensity:0.8}));
-  btn.position.set(x,0.7,z);
+// Puzzle types: 'button'=classic, 'plate'=floor plate, 'key'=floating key
+function createSwitch(x,z,type='button') {
+  let base,btn,glow;
+  if(type==='plate'){
+    base=new THREE.Mesh(new THREE.BoxGeometry(0.8,0.04,0.8),new THREE.MeshStandardMaterial({color:0x550055,roughness:0.6,emissive:0x220022,emissiveIntensity:0.4}));
+    base.position.set(x,0.02,z);
+    btn=new THREE.Mesh(new THREE.BoxGeometry(0.6,0.05,0.6),new THREE.MeshStandardMaterial({color:0xff00ff,emissive:0xff00ff,emissiveIntensity:0.9}));
+    btn.position.set(x,0.05,z);
+  } else if(type==='key'){
+    base=new THREE.Mesh(new THREE.BoxGeometry(0.12,0.35,0.12),new THREE.MeshStandardMaterial({color:0x885500,roughness:0.3,metalness:0.9}));
+    base.position.set(x,0.6,z);
+    btn=new THREE.Mesh(new THREE.TorusGeometry(0.12,0.04,8,16),new THREE.MeshStandardMaterial({color:0xffaa00,emissive:0xffaa00,emissiveIntensity:1,metalness:0.8}));
+    btn.position.set(x,1.0,z);
+    btn.rotation.x=Math.PI/2;
+  } else {
+    base=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.6,0.3),new THREE.MeshStandardMaterial({color:0x333333,roughness:0.8}));
+    base.position.set(x,0.3,z);
+    btn=new THREE.Mesh(new THREE.BoxGeometry(0.18,0.18,0.18),new THREE.MeshStandardMaterial({color:0xff2200,emissive:0xff0000,emissiveIntensity:0.8}));
+    btn.position.set(x,0.7,z);
+  }
   scene.add(base); scene.add(btn);
-  const glow=new THREE.PointLight(0xff2200,0.5,3);
+  glow=new THREE.PointLight(type==='key'?0xffaa00:type==='plate'?0xff00ff:0xff2200,0.5,3);
   glow.position.set(x,0.8,z); scene.add(glow);
-  switches.push({x,z,activated:false,mesh:btn,base,glow});
+  switches.push({x,z,type,activated:false,mesh:btn,base,glow,bobTime:Math.random()*Math.PI*2});
 }
 function checkNearSwitch() {
   let activated=false;
-  switches.forEach(sw=>{
+  switches.forEach((sw,idx)=>{
     if(sw.activated) return;
     const dist=Math.sqrt((player.x-sw.x)**2+(player.z-sw.z)**2);
     if(dist<1.5){
       sw.activated=true; switchesActivated++;
       sw.mesh.material.color.setHex(0x00ff44); sw.mesh.material.emissive.setHex(0x00ff00);
       sw.glow.color.setHex(0x00ff44);
-      playSound('collect');
-      activated=true;
+      playSound('collect'); activated=true;
+      if(onlineMode) syncSwitch(idx);
       if(switchesActivated>=switchesTotal) unlockExit();
     }
   });
@@ -1376,16 +1572,16 @@ function generateMaze() {
     createBatteryPickup(bx,bz);
   }
 
-  // Puzzle switches
-  switches=[]; switchesActivated=0;
-  switchesTotal=1+Math.floor(currentLevel/3);
+  const puzzleTypes=['button','plate','key'];
+  switchesTotal=1+Math.floor(currentLevel/2); // more puzzles per level
   const switchHUD=document.getElementById('switchHUD');
   if(switchHUD){switchHUD.classList.remove('hidden');}
   const activateBtn=document.getElementById('activateBtn');
   if(activateBtn&&isMobile()){activateBtn.style.display='flex';}
   for(let i=0;i<switchesTotal;i++){
     let swx,swz; do{swx=Math.floor(seededRand()*(mazeWidth-4))+3;swz=Math.floor(seededRand()*(mazeHeight-4))+3;}while(mazeGrid[swx][swz]||(swx===1&&swz===1));
-    createSwitch(swx,swz);
+    const ptype=puzzleTypes[Math.floor(seededRand()*puzzleTypes.length)];
+    createSwitch(swx,swz,ptype);
   }
   updateSwitchHUD();
 
@@ -1621,17 +1817,30 @@ function updateGame(dt) {
     }
   });
 
-  // Switches proximity (auto on mobile walk-through, E key on PC)
+  // Switches proximity + animations
   let nearSwitch=false;
-  switches.forEach(sw=>{
-    if(!sw.activated&&Math.sqrt((player.x-sw.x)**2+(player.z-sw.z)**2)<1.8) nearSwitch=true;
+  switches.forEach((sw,idx)=>{
+    // Animate key type
+    if(sw.type==='key'&&!sw.activated){
+      sw.bobTime=(sw.bobTime||0)+dt*2;
+      sw.mesh.position.y=1.0+Math.sin(sw.bobTime)*0.12;
+      sw.mesh.rotation.z+=dt*1.5;
+    }
+    if(sw.activated) return;
+    const swDist=Math.sqrt((player.x-sw.x)**2+(player.z-sw.z)**2);
+    if(swDist<1.6){
+      nearSwitch=true;
+      // Floor plate activates on walk-through automatically
+      if(sw.type==='plate') checkNearSwitch();
+    }
   });
   const activateBtn=document.getElementById('activateBtn');
-  if(activateBtn) activateBtn.style.display=(isMobile()&&nearSwitch)?'flex':'none';
+  if(activateBtn) activateBtn.style.display=(isMobile()&&nearSwitch&&switches.some(s=>!s.activated&&s.type!=='plate'))?'flex':'none';
 
   // Exit check
   const exitDist=Math.sqrt((player.x-exitPosition.x)**2+(player.z-exitPosition.z)**2);
-  if(exitDist<1.3&&collectedItems>=Math.floor(totalCollectibles/2)&&!exitLocked) winLevel();
+  if(exitDist<1.5&&collectedItems>=Math.floor(totalCollectibles/2)&&!exitLocked) winLevel();
+  if(exitDist<4&&exitLocked) showSpiderAlert('🔒 فعّل جميع المفاتيح أولاً','#a855f7');
 
   // Spider alert fade
   if(spiderAlertTimer>0){
@@ -1654,14 +1863,17 @@ function mainLoop(timestamp) {
   if(starsParticles) starsParticles.rotation.y+=0.0003;
 
   if(currentState===GameState.MENU||currentState===GameState.SETTINGS) {
-    // PUBG-style lobby camera (fixed position, slight drift)
+    // PUBG-style lobby camera
     const lt=clock.getElapsedTime();
     const camX=Math.sin(lt*0.12)*0.4-1.8;
     const camZ=2.8+Math.sin(lt*0.07)*0.15;
     camera.position.set(camX,1.6,camZ);
     camera.lookAt(-0.1,0.9,0);
-    if(playerArm) playerArm.visible=false;
-    flashLight.intensity=0;
+    // Only hide arm if NOT coming from in-game
+    if(previousState!==GameState.PLAYING&&previousState!==GameState.PAUSED){
+      if(playerArm) playerArm.visible=false;
+      flashLight.intensity=0;
+    }
     // Lobby dust
     if(dustVFX) dustVFX.rotation.y+=dt*0.05;
     // Idle animation for lobby character
@@ -1684,8 +1896,22 @@ function mainLoop(timestamp) {
       if(lobbyMCChar.leftLegGrp) lobbyMCChar.leftLegGrp.rotation.x=0;
     }
   } else if(currentState===GameState.PLAYING) {
-    updateGame(dt); updateMinimap();
+    updateGame(dt);
     if(onlineMode) updateOtherPlayer(dt);
+    // Update voice talking visual
+    if(voiceMicActive&&onlineMode){
+      voiceVolume=getVoiceVolume();
+      const mb=document.getElementById('micBtn');
+      if(mb){
+        if(!voiceMuted&&voiceVolume>voiceTalkingThreshold) mb.classList.add('talking');
+        else mb.classList.remove('talking');
+      }
+    }
+  }
+  // Minimap always visible during in-game states
+  if([GameState.PLAYING,GameState.PAUSED,GameState.WIN,GameState.GAME_OVER].includes(currentState)&&mazeGrid.length){
+    updateMinimap();
+    document.getElementById('minimap').style.display='block';
   }
 
   if(postProcessingEnabled&&composer) composer.render();
@@ -1755,17 +1981,62 @@ function loseLife() {
   updateHUD();
 }
 function winLevel() {
+  if(currentState===GameState.WIN) return; // prevent double call
   currentState=GameState.WIN;
   const bonus=Math.floor((maxTime-levelTime)*20);
   score+=bonus;
   if(currentLevel===unlockedLevel&&currentLevel<maxLevels){unlockedLevel=currentLevel+1;saveUnlockedLevel();}
   document.getElementById('completedLevel').textContent=currentLevel;
   document.getElementById('winScore').textContent=score;
-  showScreen('winScreen'); playSound('collect');
+
+  if(onlineMode){
+    // Report win to Firebase and wait for other player
+    myWinReported=true;
+    const myRole=isHost?'host':'guest';
+    fetch(`${DB_URL}/rooms/${roomCode}/win/${myRole}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:'true'}).catch(()=>{});
+    // Wait for other player to also win before showing win screen
+    const otherRole=isHost?'guest':'host';
+    onlineWinPollInterval=setInterval(async()=>{
+      try{
+        const r=await fetch(`${DB_URL}/rooms/${roomCode}/win/${otherRole}.json`);
+        const d=await r.json();
+        if(d===true){
+          clearInterval(onlineWinPollInterval);
+          showScreen('winScreen'); playSound('collect');
+        }
+      }catch(e){}
+    },500);
+    // Show a "waiting for partner" hint
+    showSpiderAlert('⏳ بتنتظر صاحبك يوصل المخرج...','#06b6d4');
+    setTimeout(()=>{
+      // Force win after 30s even if partner didn't make it
+      if(currentState===GameState.WIN&&onlineWinPollInterval){
+        clearInterval(onlineWinPollInterval);
+        showScreen('winScreen'); playSound('collect');
+      }
+    },30000);
+  } else {
+    showScreen('winScreen'); playSound('collect');
+  }
 }
-function gameOver(){currentState=GameState.GAME_OVER;document.getElementById('finalScore').textContent=score;showScreen('gameOver');}
-function nextLevel(){if(currentLevel<maxLevels){currentLevel++;initLevel();}else showMenu();}
-function restartLevel(){lives=3;score=0;initLevel();}
+function gameOver(){
+  currentState=GameState.GAME_OVER;
+  document.getElementById('finalScore').textContent=score;
+  showScreen('gameOver');
+}
+function nextLevel(){
+  // Reset score and collectibles for new level
+  collectedItems=0; score=0; myWinReported=false; otherWinReported=false;
+  if(onlineWinPollInterval){clearInterval(onlineWinPollInterval);onlineWinPollInterval=null;}
+  // Clear win flags in Firebase
+  if(onlineMode&&roomCode) fetch(`${DB_URL}/rooms/${roomCode}/win.json`,{method:'DELETE'}).catch(()=>{});
+  if(currentLevel<maxLevels){currentLevel++;initLevel();}else showMenu();
+}
+function restartLevel(){
+  lives=3; score=0; collectedItems=0; myWinReported=false;
+  if(onlineWinPollInterval){clearInterval(onlineWinPollInterval);onlineWinPollInterval=null;}
+  initLevel();
+}
 function togglePause() {
   if(currentState===GameState.PLAYING){
     currentState=GameState.PAUSED;showScreen('pauseMenu');
@@ -1776,6 +2047,8 @@ function togglePause() {
     document.querySelectorAll('.ui-layer').forEach(el=>el.classList.add('hidden'));
     document.getElementById('gameHUD').classList.remove('hidden');
     document.getElementById('gameHUD').classList.add('playing-mode');
+    if(playerArm) playerArm.visible=true;
+    flashLight.intensity=isFlashlightOn?2.5:0;
     if(!isMobile()) document.getElementById('gameCanvas').requestPointerLock();
   }
 }
@@ -1783,6 +2056,7 @@ function showMenu() {
   if(onlineMode) cleanupOnline();
   currentState=GameState.MENU; cleanupLevel(); scene.add(lobbyGroup);
   document.getElementById('minimap').style.display='none';
+  const mb=document.getElementById('micBtn'); if(mb) mb.style.display='none';
   if(isMobile()){document.getElementById('joystickZone').style.display='none';document.getElementById('lookZone').style.display='none';}
   showScreen('mainMenu'); stopSound('bgm');stopSound('run');stopSound('walk');
 }
@@ -2106,6 +2380,7 @@ function moveSelectedElement(cx, cy) {
   selectedElement.style.bottom = 'auto';
 }
 function openCustomControls() {
+  previousState = currentState; // remember where we came from
   currentState = GameState.CUSTOMIZING;
   document.querySelectorAll('.ui-layer').forEach(el=>el.classList.add('hidden'));
   document.getElementById('gameHUD').classList.remove('hidden');
@@ -2114,14 +2389,14 @@ function openCustomControls() {
   document.getElementById('customizerPanel').style.display = 'none';
   // Show all custom-hud elements so they can be dragged
   document.querySelectorAll('.custom-hud').forEach(el=>{
-    if(el.id==='switchHUD'||el.id==='activateBtn') return;
+    if(el.id==='switchHUD'||el.id==='activateBtn'||el.id==='micBtn') return;
     el.style.display='flex';
   });
   const g = document.createElement('div');
   g.id = 'customGuide';
-  g.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.92);color:white;padding:18px 36px;border-radius:4px;font-size:1.1rem;font-weight:bold;z-index:300;pointer-events:none;text-align:center;border:1px solid #06b6d4;font-family:Cairo,sans-serif;';
-  g.textContent = 'اضغط على أي عنصر لتعديله';
-  document.body.appendChild(g); setTimeout(()=>g.remove(), 2500);
+  g.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.92);color:white;padding:18px 36px;border-radius:4px;font-size:1.1rem;font-weight:bold;z-index:300;pointer-events:none;text-align:center;border:1px solid #06b6d4;font-family:Cairo,sans-serif;direction:rtl;';
+  g.innerHTML = 'اضغط على أي عنصر لتعديله<br><small style="opacity:0.5;font-size:0.8rem;">سحب = نقل · الشريط = حجم/شفافية</small>';
+  document.body.appendChild(g); setTimeout(()=>g.remove(), 3000);
 }
 function saveCustomControls() {
   const saved={};
@@ -2161,13 +2436,16 @@ function exitCustomizer() {
   document.querySelectorAll('.custom-hud').forEach(b=>b.classList.remove('editing-btn'));
   const g=document.getElementById('customGuide'); if(g) g.remove();
   document.getElementById('customizerPanel').style.display='none';
-  selectedElement=null; isDraggingElement=false;
-  // Return to settings controls tab
-  currentState=GameState.SETTINGS;
-  document.querySelectorAll('.ui-layer').forEach(el=>el.classList.add('hidden'));
-  document.getElementById('settingsMenu').classList.remove('hidden');
   document.getElementById('customizerUI').classList.add('hidden');
-  switchSettingsTab('controls');
+  selectedElement=null; isDraggingElement=false;
+  // Return to wherever we came from
+  if(previousState===GameState.PLAYING||previousState===GameState.PAUSED){
+    currentState=GameState.PAUSED;
+    showScreen('pauseMenu');
+  } else {
+    currentState=GameState.MENU;
+    showScreen('mainMenu');
+  }
 }
 
 // =================== ONLINE SYSTEM ===================
@@ -2211,9 +2489,15 @@ async function joinGame() {
 function startOnlineGame(level) {
   createOtherPlayerMesh(); startOnlineSync();
   currentLevel=level; lives=3; score=0; cameraRotation={x:0,y:Math.PI};
+  myWinReported=false; otherWinReported=false;
   initLevel();
   document.getElementById('onlineHUD').style.display='block';
   document.getElementById('onlinePlayerName').textContent=isHost?'لاعب 2':'Host';
+  // Show mic button
+  const mb=document.getElementById('micBtn');
+  if(mb){mb.style.display='flex';}
+  // Auto-init voice (will ask for mic permission)
+  setTimeout(()=>initVoiceChat(),1500);
 }
 function createNameTagSprite(name) {
   const cv=document.createElement('canvas'); cv.width=256; cv.height=64;
@@ -2342,22 +2626,47 @@ function startOnlineSync() {
       });
     }catch(e){}
   },300);
+
+  // Switch sync (both directions)
+  switchPollInterval=setInterval(async()=>{
+    try{
+      const res=await fetch(`${DB_URL}/rooms/${roomCode}/switches.json`);
+      const data=await res.json();
+      if(data) Object.keys(data).forEach(k=>{
+        const i=parseInt(k);
+        if(switches[i]&&!switches[i].activated&&data[k]===true){
+          switches[i].activated=true; switchesActivated++;
+          switches[i].mesh.material.color.setHex(0x00ff44);
+          switches[i].mesh.material.emissive.setHex(0x00ff00);
+          switches[i].glow.color.setHex(0x00ff44);
+          if(switchesActivated>=switchesTotal) unlockExit();
+          updateSwitchHUD();
+        }
+      });
+    }catch(e){}
+  },300);
+}
+function syncSwitch(idx) {
+  if(!onlineMode||!roomCode) return;
+  fetch(`${DB_URL}/rooms/${roomCode}/switches/${idx}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:'true'}).catch(()=>{});
 }
 function syncCollectedItem(idx) {
   if(!onlineMode||!roomCode) return;
   fetch(`${DB_URL}/rooms/${roomCode}/collected/${idx}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:'true'}).catch(()=>{});
 }
 function cleanupOnline() {
-  [onlineSyncInterval,onlinePollInterval,spiderSyncInterval,spiderPollInterval,collectPollInterval].forEach(iv=>{if(iv)clearInterval(iv);});
-  onlineSyncInterval=null;onlinePollInterval=null;spiderSyncInterval=null;spiderPollInterval=null;collectPollInterval=null;
+  [onlineSyncInterval,onlinePollInterval,spiderSyncInterval,spiderPollInterval,collectPollInterval,switchPollInterval,onlineWinPollInterval].forEach(iv=>{if(iv)clearInterval(iv);});
+  onlineSyncInterval=null;onlinePollInterval=null;spiderSyncInterval=null;spiderPollInterval=null;collectPollInterval=null;switchPollInterval=null;onlineWinPollInterval=null;
   if(otherPlayerMesh){scene.remove(otherPlayerMesh);otherPlayerMesh=null;}
   otherPlayerHeadGrp=null;otherPlayerUpperBodyGrp=null;otherPlayerLegLGrp=null;otherPlayerLegRGrp=null;otherPlayerArmLGrp=null;otherPlayerArmRGrp=null;otherPlayerNameTag=null;otherPlayerAnimTime2=0;
   document.getElementById('onlineHUD').style.display='none';
+  cleanupVoice();
   if(roomCode&&onlineMode){
     if(isHost) fetch(`${DB_URL}/rooms/${roomCode}.json`,{method:'DELETE'}).catch(()=>{});
     else fetch(`${DB_URL}/rooms/${roomCode}/guest/active.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:'false'}).catch(()=>{});
   }
   onlineMode=false; isHost=false; roomCode=''; myPlayerId='';
+  myWinReported=false; otherWinReported=false;
 }
 
 // =================== WINDOW LOAD ===================
