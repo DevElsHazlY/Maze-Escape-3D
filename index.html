@@ -141,8 +141,133 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .sfooter-btn:hover{filter:brightness(1.2);}
 /* ===== ONLINE LOBBY ===== */
 .online-panel{padding:40px 48px 40px 40px;max-width:400px;width:100%;}
-.text-input-field{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-bottom:2px solid currentColor;border-radius:2px;color:white;font-size:1rem;font-weight:700;text-align:center;padding:12px;outline:none;font-family:'Cairo',sans-serif;direction:rtl;transition:border-color 0.15s;}
-.text-input-field:focus{border-bottom-width:2px;}
+.text-input-field{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-bottom:2px solid currentColor;border-radius:2px;color:white;font-size:1rem;font-weight:700;text-align:right;padding:12px;outline:none;font-family:'Cairo',sans-serif;direction:rtl;transition:border-color 0.15s;}
+
+/* ===== LOBBY LAYOUT – exact match to reference image ===== */
+#onlineLobby{align-items:stretch;justify-content:flex-start;padding:0;}
+
+/* LEFT SIDEBAR – sticks to left edge, full height */
+.lobby-sidebar{
+  position:absolute; left:0; top:0; bottom:0; width:310px;
+  background:rgba(8,7,18,0.97);
+  border-right:3px solid #06b6d4;
+  box-shadow:6px 0 30px rgba(6,182,212,0.08);
+  display:flex; flex-direction:column; justify-content:center;
+  padding:36px 28px 36px 28px;
+  z-index:2;
+  touch-action:pan-y;
+}
+.lsb-title{color:#06b6d4;font-size:1.85rem;font-weight:900;line-height:1;margin-bottom:2px;}
+.lsb-sub{color:rgba(255,255,255,0.2);font-size:0.62rem;font-weight:700;letter-spacing:5px;text-transform:uppercase;margin-bottom:30px;}
+.lsb-label{color:rgba(255,255,255,0.5);font-size:0.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;text-align:right;}
+.lsb-input{
+  width:100%;background:rgba(255,255,255,0.05);
+  border:none;border-bottom:2px solid rgba(6,182,212,0.5);
+  color:white;font-size:0.95rem;font-weight:700;
+  padding:11px 12px;outline:none;
+  font-family:'Cairo',sans-serif;direction:rtl;
+  border-radius:0;transition:border-color 0.2s;
+  margin-bottom:18px;
+}
+.lsb-input:focus{border-bottom-color:#06b6d4;background:rgba(255,255,255,0.07);}
+.lsb-input::placeholder{color:rgba(255,255,255,0.18);}
+.lsb-input.pw-field{letter-spacing:4px;font-family:monospace;}
+.lsb-input.pw-field::placeholder{letter-spacing:2px;font-family:'Cairo',sans-serif;}
+.lsb-back-btn{
+  width:100%;background:rgba(239,68,68,0.07);border:none;
+  border-top:1px solid rgba(255,255,255,0.06);
+  color:rgba(255,255,255,0.45);font-weight:700;font-size:0.95rem;
+  padding:14px;cursor:pointer;font-family:'Cairo',sans-serif;
+  display:flex;align-items:center;justify-content:space-between;
+  transition:all 0.15s; margin-top:auto; padding-top:20px;
+}
+.lsb-back-btn:hover{color:#ef4444;}
+
+/* FLOATING ROOM LIST PANEL – centered, not touching edges */
+.lobby-room-panel{
+  position:absolute;
+  left:330px; right:0;
+  top:0; bottom:0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:24px 20px 100px;
+  pointer-events:none;
+}
+.room-list-card{
+  background:rgba(14,12,28,0.88);
+  backdrop-filter:blur(18px);
+  border-radius:14px;
+  width:100%; max-width:680px;
+  padding:24px 20px 20px;
+  border:1px solid rgba(255,255,255,0.06);
+  box-shadow:0 20px 60px rgba(0,0,0,0.6);
+  pointer-events:auto;
+  display:flex; flex-direction:column;
+  max-height:calc(100vh - 140px);
+}
+.rl-title-row{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.rl-title{color:#fff;font-size:1rem;font-weight:900;letter-spacing:3px;text-transform:uppercase;flex:1;}
+.rl-refresh-btn{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);padding:5px 14px;cursor:pointer;border-radius:6px;font-size:0.78rem;font-family:'Cairo',sans-serif;transition:all 0.15s;}
+.rl-refresh-btn:hover{background:rgba(6,182,212,0.15);border-color:rgba(6,182,212,0.4);color:#06b6d4;}
+.rl-spin{color:#06b6d4;font-size:0.75rem;display:none;}
+/* Table header */
+.rl-header{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(0,1fr) minmax(0,1.2fr) minmax(0,0.9fr) 32px;gap:0;padding:0 12px 10px;border-bottom:1px solid rgba(255,255,255,0.07);}
+.rl-header span{color:rgba(255,255,255,0.35);font-size:0.68rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
+/* Rows */
+.rl-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;margin-top:8px;padding-right:2px;}
+.rl-body::-webkit-scrollbar{width:3px;}
+.rl-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12);border-radius:2px;}
+.rl-row{
+  display:grid;grid-template-columns:minmax(0,1.8fr) minmax(0,1fr) minmax(0,1.2fr) minmax(0,0.9fr) 32px;
+  gap:0;padding:12px 12px;cursor:pointer;
+  border:1px solid rgba(255,255,255,0.04);border-radius:6px;
+  margin-bottom:5px;transition:all 0.12s;
+  background:rgba(255,255,255,0.018);
+}
+.rl-row:hover{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);}
+.rl-row.rl-selected{background:rgba(250,180,50,0.07);border-color:rgba(250,180,50,0.55);box-shadow:0 0 12px rgba(250,180,50,0.12);}
+.rl-row.rl-full{opacity:0.35;cursor:not-allowed;pointer-events:none;}
+.rl-row > span{color:rgba(255,255,255,0.7);font-size:0.85rem;font-weight:600;display:flex;align-items:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rl-row .rl-rname{color:#fff;font-weight:800;gap:6px;}
+.rl-lock{color:#facc15;font-size:0.72rem;}
+/* Signal bars (icon like image) */
+.sig-bars{display:flex;align-items:flex-end;gap:2px;height:14px;}
+.sig-bar{width:4px;border-radius:1px;background:#22c55e;}
+.sig-bar:nth-child(1){height:5px;}
+.sig-bar:nth-child(2){height:9px;}
+.sig-bar:nth-child(3){height:14px;}
+.sig-bars.low .sig-bar:nth-child(2),.sig-bars.low .sig-bar:nth-child(3){background:rgba(255,255,255,0.15);}
+.sig-bars.mid .sig-bar:nth-child(3){background:rgba(255,255,255,0.15);}
+.rl-empty{text-align:center;padding:48px 20px;color:rgba(255,255,255,0.18);font-size:0.9rem;}
+
+/* BOTTOM-RIGHT ACTION BUTTONS */
+.lobby-actions{
+  position:absolute; bottom:36px; right:28px;
+  display:flex; flex-direction:column; gap:10px;
+  z-index:3; pointer-events:auto;
+}
+.la-btn{
+  min-width:190px;background:rgba(10,8,22,0.88);
+  border:none;border-right:3px solid transparent;
+  color:#fff;font-weight:900;font-size:1rem;
+  padding:15px 20px;cursor:pointer;
+  font-family:'Cairo',sans-serif;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:14px;transition:all 0.15s;
+  backdrop-filter:blur(12px);
+  box-shadow:0 4px 20px rgba(0,0,0,0.4);
+}
+.la-btn.la-green{border-right-color:#22c55e;color:#22c55e;}
+.la-btn.la-green:hover{background:rgba(34,197,94,0.18);}
+.la-btn.la-yellow{border-right-color:#facc15;color:#facc15;}
+.la-btn.la-yellow:hover{background:rgba(250,204,21,0.18);}
+.la-btn.la-yellow:disabled,.la-btn.la-yellow[disabled]{opacity:0.35;cursor:not-allowed;pointer-events:none;}
+.la-btn-icon{font-size:1.1rem;flex-shrink:0;}
+
+/* Password modal */
+.pw-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);z-index:400;display:none;align-items:center;justify-content:center;}
+.pw-modal.active{display:flex;}
+.pw-box{background:rgba(10,8,22,0.98);border:1px solid rgba(250,204,21,0.3);padding:28px 32px;max-width:320px;width:90%;border-radius:10px;text-align:center;}
+
 /* ===== ROOM CODE ===== */
 .room-code-box{background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:2px;padding:20px;text-align:center;}
 .room-code{font-size:3rem;font-weight:900;color:#22c55e;letter-spacing:8px;text-shadow:0 0 20px rgba(34,197,94,0.4);}
@@ -168,6 +293,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   .game-logo-main{font-size:52px;}
   .game-logo-sub{font-size:38px;}
   .result-panel{padding:28px 24px;}
+  .lobby-sidebar{width:260px;padding:24px 18px;}
+  .lsb-title{font-size:1.4rem;}
+  .lobby-room-panel{left:270px;padding-bottom:120px;}
+  .lobby-actions{bottom:20px;right:16px;}
+  .la-btn{min-width:160px;padding:12px 14px;font-size:0.9rem;}
+  .room-list-card{padding:16px 12px 14px;}
 }
 </style>
 </head>
@@ -214,19 +345,69 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   </div>
 </div>
 <!-- =================== ONLINE LOBBY =================== -->
-<div class="ui-layer interactive hidden" id="onlineLobby" style="justify-content:flex-end;align-items:stretch;">
-  <div class="aaa-panel panel-accent-cyan" style="display:flex;height:100%;max-width:380px;width:100%;">
-    <div class="menu-left-strip" style="background:linear-gradient(180deg,transparent,#06b6d4 30%,#06b6d4 70%,transparent);"></div>
-    <div class="online-panel">
-      <div style="font-size:1.8rem;font-weight:900;color:#06b6d4;margin-bottom:4px;">اللعب الجماعي</div>
-      <div style="color:rgba(255,255,255,0.3);font-size:0.7rem;letter-spacing:3px;text-transform:uppercase;margin-bottom:24px;">MULTIPLAYER</div>
-      <div style="margin-bottom:20px;">
-        <div style="color:rgba(255,255,255,0.4);font-size:0.75rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">اسمك في اللعبة</div>
-        <input type="text" id="playerNameInput" class="text-input-field" placeholder="اكتب اسمك..." maxlength="15" style="color:#06b6d4;border-bottom-color:#06b6d4;">
+<div class="ui-layer interactive hidden" id="onlineLobby">
+
+  <!-- LEFT SIDEBAR -->
+  <div class="lobby-sidebar" ontouchstart="event.stopPropagation()" ontouchmove="event.stopPropagation()">
+    <div class="lsb-title">اللعب الجماعي</div>
+    <div class="lsb-sub">MULTIPLAYER</div>
+
+    <div class="lsb-label">اسمك في اللعبة</div>
+    <input type="text" id="playerNameInput" class="lsb-input" placeholder="اكتب اسمك..." maxlength="15" autocomplete="off">
+
+    <div class="lsb-label">إسم الغرفة</div>
+    <input type="text" id="roomNameInput" class="lsb-input" placeholder="إسم الغرفة ..." maxlength="20" autocomplete="off">
+
+    <div class="lsb-label">كلمة السر <span style="color:rgba(255,255,255,0.18);font-weight:400;text-transform:none;letter-spacing:0;">اختياري</span></div>
+    <input type="password" id="roomPasswordInput" class="lsb-input pw-field" placeholder="XXXXX" maxlength="12" autocomplete="off">
+
+    <button class="lsb-back-btn custom-click" onclick="showMenu()">
+      <span>رجوع</span><span>✖</span>
+    </button>
+  </div>
+
+  <!-- FLOATING ROOM LIST -->
+  <div class="lobby-room-panel">
+    <div class="room-list-card" ontouchstart="event.stopPropagation()" ontouchmove="event.stopPropagation()">
+      <div class="rl-title-row">
+        <div class="rl-title">ROOM LIST</div>
+        <button class="rl-refresh-btn" onclick="refreshRoomList()">↻ تحديث</button>
+        <span class="rl-spin" id="lobbyRefreshSpinner">...</span>
       </div>
-      <button class="mbtn custom-click" style="border-right-color:#22c55e;color:#22c55e;" onclick="hostGame()"><span>إنشاء غرفة</span><span class="icon">▶</span></button>
-      <button class="mbtn custom-click" style="border-right-color:#facc15;color:#facc15;" onclick="showJoinScreen()"><span>الانضمام</span><span class="icon">🏠</span></button>
-      <button class="mbtn custom-click" onclick="showMenu()"><span>رجوع</span><span class="icon">✖</span></button>
+      <div class="rl-header">
+        <span>ROOM NAME</span>
+        <span>MAP</span>
+        <span>GAMEMODE</span>
+        <span>PLAYERS</span>
+        <span></span>
+      </div>
+      <div class="rl-body" id="roomListBody">
+        <div class="rl-empty">🔄 اضغط تحديث لعرض الغرف</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM-RIGHT ACTION BUTTONS -->
+  <div class="lobby-actions">
+    <button class="la-btn la-green custom-click" onclick="hostGame()">
+      <span class="la-btn-icon">▶</span><span>إنشاء غرفة</span>
+    </button>
+    <button class="la-btn la-yellow custom-click" id="joinSelectedBtn" onclick="joinSelectedRoom()" disabled>
+      <span class="la-btn-icon">🏠</span><span>الانضمام</span>
+    </button>
+  </div>
+
+  <!-- PASSWORD MODAL -->
+  <div id="joinPasswordModal" class="pw-modal">
+    <div class="pw-box">
+      <div style="color:#facc15;font-weight:900;font-size:1.1rem;margin-bottom:12px;">🔒 غرفة محمية</div>
+      <div style="color:rgba(255,255,255,0.45);font-size:0.85rem;margin-bottom:16px;">أدخل كلمة السر للانضمام</div>
+      <input type="password" id="joinPasswordInput" class="lsb-input pw-field" placeholder="كلمة السر" maxlength="12" style="text-align:center;margin-bottom:16px;">
+      <div style="display:flex;gap:10px;justify-content:center;">
+        <button style="background:rgba(250,204,21,0.15);border:1px solid rgba(250,204,21,0.4);color:#facc15;padding:10px 22px;font-weight:900;cursor:pointer;font-family:'Cairo',sans-serif;border-radius:4px;" onclick="confirmJoinWithPassword()">انضم ✓</button>
+        <button style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.5);padding:10px 22px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif;border-radius:4px;" onclick="cancelPasswordModal()">إلغاء</button>
+      </div>
+      <p id="joinPwError" style="color:#ef4444;font-size:0.8rem;margin-top:10px;display:none;">❌ كلمة السر غلط</p>
     </div>
   </div>
 </div>
@@ -234,28 +415,34 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 <div class="ui-layer interactive hidden" id="hostWaitScreen" style="justify-content:flex-end;align-items:stretch;">
   <div class="aaa-panel panel-accent-green" style="display:flex;height:100%;max-width:380px;width:100%;">
     <div class="menu-left-strip" style="background:linear-gradient(180deg,transparent,#22c55e 30%,#22c55e 70%,transparent);"></div>
-    <div class="online-panel">
-      <div style="font-size:1.8rem;font-weight:900;color:#22c55e;margin-bottom:20px;">🏠 انتظار</div>
+    <div style="padding:40px 40px 40px 28px;display:flex;flex-direction:column;justify-content:center;width:100%;">
+      <div style="font-size:1.8rem;font-weight:900;color:#22c55e;margin-bottom:6px;">🏠 انتظار اللاعبين</div>
+      <div style="color:rgba(255,255,255,0.3);font-size:0.7rem;letter-spacing:3px;margin-bottom:24px;">أقصى عدد 4 لاعبين</div>
       <div class="room-code-box" style="margin-bottom:20px;">
         <div style="color:rgba(255,255,255,0.3);font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">كود الغرفة</div>
         <div class="room-code" id="roomCodeDisplay">------</div>
-        <button onclick="copyRoomCode()" style="margin-top:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);padding:6px 16px;cursor:pointer;border-radius:2px;font-size:0.8rem;">📋 نسخ الكود</button>
+        <button onclick="copyRoomCode()" style="margin-top:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);padding:6px 16px;cursor:pointer;border-radius:2px;font-size:0.8rem;font-family:'Cairo',sans-serif;">📋 نسخ الكود</button>
+      </div>
+      <div id="waitingPlayersList" style="margin-bottom:20px;">
+        <div style="color:rgba(255,255,255,0.3);font-size:0.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">اللاعبون الحاليون</div>
+        <div id="playerSlots" style="display:flex;flex-direction:column;gap:6px;"></div>
       </div>
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
-        <div class="loader" style="width:24px;height:24px;border-width:3px;flex-shrink:0;"></div>
-        <span style="color:rgba(255,255,255,0.5);font-size:0.9rem;" id="hostStatusText">انتظار الانضمام...</span>
+        <div class="loader" style="width:22px;height:22px;border-width:3px;flex-shrink:0;"></div>
+        <span style="color:rgba(255,255,255,0.5);font-size:0.9rem;" id="hostStatusText">انتظار اللاعبين...</span>
       </div>
+      <button class="mbtn custom-click" onclick="startHostGame()" id="startHostBtn" style="border-right-color:#22c55e;color:#22c55e;display:none;margin-bottom:8px;"><span>▶ ابدأ اللعبة</span></button>
       <button class="mbtn custom-click" style="border-right-color:#ef4444;color:#ef4444;" onclick="cancelHost()"><span>إلغاء</span><span class="icon">✖</span></button>
     </div>
   </div>
 </div>
-<!-- =================== JOIN SCREEN =================== -->
+<!-- =================== JOIN SCREEN (password only) =================== -->
 <div class="ui-layer interactive hidden" id="joinScreen" style="justify-content:flex-end;align-items:stretch;">
   <div class="aaa-panel panel-accent-yellow" style="display:flex;height:100%;max-width:380px;width:100%;">
     <div class="menu-left-strip"></div>
-    <div class="online-panel">
-      <div style="font-size:1.8rem;font-weight:900;color:#facc15;margin-bottom:20px;">انضم</div>
-      <input type="text" id="joinCodeInput" class="text-input-field" placeholder="XXXXXX" maxlength="6" style="font-size:2rem;letter-spacing:8px;color:#facc15;border-bottom-color:#facc15;font-family:monospace;margin-bottom:12px;" oninput="this.value=this.value.toUpperCase().replace(/[^0-9]/g,'')">
+    <div style="padding:40px 40px 40px 28px;display:flex;flex-direction:column;justify-content:center;width:100%;">
+      <div style="font-size:1.8rem;font-weight:900;color:#facc15;margin-bottom:20px;">انضم بكود</div>
+      <input type="text" id="joinCodeInput" class="text-input-field" placeholder="XXXXXX" maxlength="6" style="font-size:2rem;letter-spacing:8px;color:#facc15;border-bottom-color:#facc15;font-family:monospace;margin-bottom:12px;text-align:center;" oninput="this.value=this.value.toUpperCase().replace(/[^0-9]/g,'')">
       <p id="joinError" class="hidden" style="color:#ef4444;font-size:0.85rem;margin-bottom:12px;text-align:center;">❌ الكود غلط أو الغرفة مش موجودة!</p>
       <button class="mbtn custom-click" style="border-right-color:#facc15;color:#facc15;" onclick="joinGame()"><span>انضم دلوقتي</span><span class="icon">▶</span></button>
       <button class="mbtn custom-click" onclick="showOnlineLobby()"><span>رجوع</span><span class="icon">✖</span></button>
@@ -301,9 +488,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
           <div class="s-row">
             <div class="s-label">Resolution Scale<small>كلما كان أقل – أداء أفضل</small></div>
             <div class="opt-btns" id="resBtns">
-              <button class="opt-btn" onclick="setOpt('res','0.1')">10%</button>
-              <button class="opt-btn" onclick="setOpt('res','0.4')">40%</button>
+              <button class="opt-btn" onclick="setOpt('res','0.5')">50%</button>
               <button class="opt-btn" onclick="setOpt('res','0.6')">60%</button>
+              <button class="opt-btn" onclick="setOpt('res','0.7')">70%</button>
               <button class="opt-btn" onclick="setOpt('res','0.85')">85%</button>
               <button class="opt-btn active" onclick="setOpt('res','1.0')">100%</button>
             </div>
@@ -508,7 +695,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   <div class="custom-hud switch-hud-item hidden" id="switchHUD" style="position:absolute;top:120px;left:20px;z-index:10;">
     <span>⚡</span><span id="switchDisplay">0/0</span>
   </div>
-  <button id="pauseBtnHUD" class="custom-click" onclick="togglePause()">||</button>
+  <button id="pauseBtnHUD" class="custom-click" onclick="togglePause()">⏸</button>
   <div class="joystick-zone" id="joystickZone"></div>
   <div class="joystick-base" id="joystickBase"><div class="joystick-knob" id="joystickKnob"></div></div>
   <div class="look-zone" id="lookZone"></div>
@@ -1781,6 +1968,7 @@ function togglePause() {
 }
 function showMenu() {
   if(onlineMode) cleanupOnline();
+  if(roomListRefreshInterval){clearInterval(roomListRefreshInterval);roomListRefreshInterval=null;}
   currentState=GameState.MENU; cleanupLevel(); scene.add(lobbyGroup);
   document.getElementById('minimap').style.display='none';
   if(isMobile()){document.getElementById('joystickZone').style.display='none';document.getElementById('lookZone').style.display='none';}
@@ -2172,41 +2360,154 @@ function exitCustomizer() {
 
 // =================== ONLINE SYSTEM ===================
 const DB_URL2='https://chat-gpt-d17a4-default-rtdb.firebaseio.com';
-function showOnlineLobby(){showScreen('onlineLobby');}
-function showJoinScreen(){showScreen('joinScreen');document.getElementById('joinCodeInput').value='';document.getElementById('joinError').classList.add('hidden');}
-function generateRoomCode(){return Math.floor(100000+Math.random()*900000).toString();}
-async function hostGame() {
-  roomCode=generateRoomCode(); myPlayerId='host'; isHost=true; onlineMode=true;
-  playerName=(document.getElementById('playerNameInput').value.trim())||'Host';
-  mazeSeed=Math.floor(Math.random()*2147483647)+1;
-  document.getElementById('roomCodeDisplay').textContent=roomCode;
-  document.getElementById('hostStatusText').textContent='انتظار انضمام لاعب...';
-  showScreen('hostWaitScreen');
-  try {
-    await fetch(`${DB_URL}/rooms/${roomCode}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({host:{x:1.5,y:1.2,z:1.5,rotY:Math.PI,active:true,ts:Date.now()},guest:null,level:1,seed:mazeSeed,state:'waiting',created:Date.now()})});
-    onlinePollInterval=setInterval(async()=>{
-      try{const res=await fetch(`${DB_URL}/rooms/${roomCode}.json`);const data=await res.json();
-      if(data&&data.guest&&data.guest.active){clearInterval(onlinePollInterval);document.getElementById('hostStatusText').textContent='✅ اتصل لاعب!';setTimeout(()=>startOnlineGame(1),1000);}
-      }catch(e){}
-    },1500);
-  } catch(e){alert('خطأ في الاتصال!');onlineMode=false;showOnlineLobby();}
+const MAX_PLAYERS=4;
+let selectedRoomCode=null, selectedRoomData=null, roomListRefreshInterval=null;
+
+function showOnlineLobby(){
+  selectedRoomCode=null; selectedRoomData=null;
+  const jb=document.getElementById('joinSelectedBtn');
+  if(jb){jb.disabled=true;}
+  showScreen('onlineLobby');
+  refreshRoomList();
+  if(roomListRefreshInterval) clearInterval(roomListRefreshInterval);
+  roomListRefreshInterval=setInterval(refreshRoomList,5000);
 }
-function copyRoomCode(){navigator.clipboard.writeText(roomCode).then(()=>{event.target.textContent='✅ اتنسخ!';setTimeout(()=>event.target.textContent='📋 نسخ الكود',1500);}).catch(()=>prompt('الكود:',roomCode));}
-function cancelHost(){if(onlinePollInterval)clearInterval(onlinePollInterval);if(roomCode)fetch(`${DB_URL}/rooms/${roomCode}.json`,{method:'DELETE'}).catch(()=>{});onlineMode=false;isHost=false;roomCode='';showOnlineLobby();}
-async function joinGame() {
+async function refreshRoomList(){
+  const sp=document.getElementById('lobbyRefreshSpinner'); if(sp) sp.style.display='inline';
+  try{
+    const res=await fetch(`${DB_URL}/rooms.json`);
+    const data=await res.json(); renderRoomList(data);
+  }catch(e){const b=document.getElementById('roomListBody');if(b)b.innerHTML='<div class="room-list-empty">⚠ تعذر الاتصال</div>';}
+  if(sp) sp.style.display='none';
+}
+function renderRoomList(data){
+  const body=document.getElementById('roomListBody'); if(!body) return;
+  if(!data){body.innerHTML='<div class="rl-empty">لا توجد غرف — أنشئ واحدة!</div>';return;}
+  const rooms=Object.entries(data).filter(([c,r])=>r&&r.host&&r.host.active&&r.state==='waiting');
+  if(!rooms.length){body.innerHTML='<div class="rl-empty">لا توجد غرف — أنشئ واحدة!</div>';return;}
+  body.innerHTML='';
+  rooms.forEach(([code,r])=>{
+    const pc=countPlayers(r); const isFull=pc>=MAX_PLAYERS;
+    const hasPass=!!(r.password);
+    const sigClass=pc<=1?'low':pc<=2?'mid':'';
+    const row=document.createElement('div');
+    row.className='rl-row'+(isFull?' rl-full':'')+(code===selectedRoomCode?' rl-selected':'');
+    row.dataset.code=code;
+    row.innerHTML=`
+      <span class="rl-rname">${r.roomName||'غرفة '+code}${hasPass?'<span class="rl-lock">🔒</span>':''}</span>
+      <span>${r.mapName||'Dark Woods'}</span>
+      <span>${r.gamemode||'Maze Escape'}</span>
+      <span>${pc}/${MAX_PLAYERS}</span>
+      <span><div class="sig-bars ${sigClass}"><div class="sig-bar"></div><div class="sig-bar"></div><div class="sig-bar"></div></div></span>`;
+    row.onclick=()=>selectRoom(code,r);
+    body.appendChild(row);
+  });
+}
+function countPlayers(r){let n=0;['host','guest','guest2','guest3'].forEach(s=>{if(r[s]&&r[s].active)n++;});return n;}
+function selectRoom(code,data){
+  selectedRoomCode=code; selectedRoomData=data;
+  document.querySelectorAll('.rl-row').forEach(r=>r.classList.remove('rl-selected'));
+  const row=document.querySelector(`.rl-row[data-code="${code}"]`); if(row) row.classList.add('rl-selected');
+  const btn=document.getElementById('joinSelectedBtn');
+  if(btn){btn.disabled=false;btn.style.opacity='';btn.style.cursor='';}
+}
+function joinSelectedRoom(){
+  if(!selectedRoomCode||!selectedRoomData) return;
+  if(countPlayers(selectedRoomData)>=MAX_PLAYERS){showSpiderAlert('الغرفة ممتلئة!','#ef4444');return;}
+  const pname=document.getElementById('playerNameInput').value.trim()||'';
+  if(!pname){showSpiderAlert('اكتب اسمك أولاً','#facc15');return;}
+  if(selectedRoomData.password){
+    document.getElementById('joinPasswordInput').value='';
+    document.getElementById('joinPwError').style.display='none';
+    document.getElementById('joinPasswordModal').classList.add('active');
+  } else { doJoinRoom(selectedRoomCode,''); }
+}
+function confirmJoinWithPassword(){
+  const pw=document.getElementById('joinPasswordInput').value.trim();
+  if(pw!==selectedRoomData.password){document.getElementById('joinPwError').style.display='block';return;}
+  cancelPasswordModal(); doJoinRoom(selectedRoomCode,pw);
+}
+function cancelPasswordModal(){document.getElementById('joinPasswordModal').classList.remove('active');}
+async function doJoinRoom(code,pw){
+  if(roomListRefreshInterval){clearInterval(roomListRefreshInterval);roomListRefreshInterval=null;}
+  roomCode=code; isHost=false; onlineMode=true;
+  playerName=document.getElementById('playerNameInput').value.trim()||'ضيف';
+  try{
+    const res=await fetch(`${DB_URL}/rooms/${roomCode}.json`);
+    const data=await res.json();
+    if(!data||!data.host||!data.host.active){showSpiderAlert('الغرفة مش موجودة!','#ef4444');onlineMode=false;return;}
+    if(countPlayers(data)>=MAX_PLAYERS){showSpiderAlert('الغرفة ممتلئة!','#ef4444');onlineMode=false;return;}
+    mazeSeed=data.seed||(Math.floor(Math.random()*2147483647)+1);
+    let slot='guest';
+    if(data.guest&&data.guest.active) slot='guest2';
+    if(data.guest2&&data.guest2.active) slot='guest3';
+    myPlayerId=slot;
+    await fetch(`${DB_URL}/rooms/${roomCode}/${slot}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({x:1.5,y:1.2,z:1.5,rotY:Math.PI,active:true,name:playerName,ts:Date.now()})});
+    startOnlineGame(data.level||1);
+  }catch(e){showSpiderAlert('خطأ في الاتصال!','#ef4444');onlineMode=false;}
+}
+function showJoinScreen(){showScreen('joinScreen');document.getElementById('joinCodeInput').value='';document.getElementById('joinError').classList.add('hidden');}
+async function joinGame(){
   const code=document.getElementById('joinCodeInput').value.trim();
   if(code.length!==6){document.getElementById('joinError').classList.remove('hidden');return;}
   document.getElementById('joinError').classList.add('hidden');
-  roomCode=code; myPlayerId='guest'; isHost=false; onlineMode=true;
-  playerName=(document.getElementById('playerNameInput').value.trim())||'Guest';
-  try {
-    const res=await fetch(`${DB_URL}/rooms/${roomCode}.json`);
+  selectedRoomCode=code;
+  try{
+    const res=await fetch(`${DB_URL}/rooms/${code}.json`);
     const data=await res.json();
-    if(!data||!data.host||!data.host.active){document.getElementById('joinError').classList.remove('hidden');onlineMode=false;return;}
-    mazeSeed=data.seed||(Math.floor(Math.random()*2147483647)+1);
-    await fetch(`${DB_URL}/rooms/${roomCode}/guest.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({x:1.5,y:1.2,z:1.5,rotY:Math.PI,active:true,ts:Date.now()})});
-    startOnlineGame(data.level||1);
-  } catch(e){document.getElementById('joinError').classList.remove('hidden');onlineMode=false;}
+    if(!data||!data.host||!data.host.active){document.getElementById('joinError').classList.remove('hidden');return;}
+    selectedRoomData=data; doJoinRoom(code,'');
+  }catch(e){document.getElementById('joinError').classList.remove('hidden');}
+}
+function generateRoomCode(){return Math.floor(100000+Math.random()*900000).toString();}
+async function hostGame(){
+  const pname=document.getElementById('playerNameInput').value.trim()||'Host';
+  const rname=document.getElementById('roomNameInput').value.trim()||('غرفة '+pname);
+  const rpw=document.getElementById('roomPasswordInput').value.trim();
+  if(roomListRefreshInterval){clearInterval(roomListRefreshInterval);roomListRefreshInterval=null;}
+  roomCode=generateRoomCode(); myPlayerId='host'; isHost=true; onlineMode=true; playerName=pname;
+  mazeSeed=Math.floor(Math.random()*2147483647)+1;
+  document.getElementById('roomCodeDisplay').textContent=roomCode;
+  document.getElementById('hostStatusText').textContent='انتظار اللاعبين...';
+  renderPlayerSlots({host:{name:playerName,active:true}});
+  showScreen('hostWaitScreen');
+  try{
+    const rd={host:{x:1.5,y:1.2,z:1.5,rotY:Math.PI,active:true,name:playerName,ts:Date.now()},guest:null,guest2:null,guest3:null,level:1,seed:mazeSeed,state:'waiting',roomName:rname,mapName:'Dark Woods',gamemode:'Maze Escape',created:Date.now(),maxPlayers:MAX_PLAYERS};
+    if(rpw) rd.password=rpw;
+    await fetch(`${DB_URL}/rooms/${roomCode}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(rd)});
+    onlinePollInterval=setInterval(async()=>{
+      try{
+        const res=await fetch(`${DB_URL}/rooms/${roomCode}.json`); const data=await res.json(); if(!data) return;
+        const pc=countPlayers(data); renderPlayerSlots(data);
+        document.getElementById('hostStatusText').textContent=`${pc}/${MAX_PLAYERS} لاعب`;
+        const sb=document.getElementById('startHostBtn'); if(sb) sb.style.display=pc>=2?'flex':'none';
+        if(pc>=MAX_PLAYERS){clearInterval(onlinePollInterval);startHostGame();}
+      }catch(e){}
+    },1500);
+  }catch(e){showSpiderAlert('خطأ في الاتصال!','#ef4444');onlineMode=false;showOnlineLobby();}
+}
+function renderPlayerSlots(roomData){
+  const c=document.getElementById('playerSlots'); if(!c) return;
+  const slots=[{r:'host',l:'Host'},{r:'guest',l:'لاعب 2'},{r:'guest2',l:'لاعب 3'},{r:'guest3',l:'لاعب 4'}];
+  c.innerHTML='';
+  slots.forEach(s=>{
+    const p=roomData[s.r]; const active=p&&p.active; const name=active?(p.name||s.l):'-';
+    const div=document.createElement('div');
+    div.style.cssText=`display:flex;align-items:center;gap:8px;padding:7px 10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,${active?'0.1':'0.04'});border-radius:2px;`;
+    div.innerHTML=`<span style="width:8px;height:8px;border-radius:50%;background:${active?'#22c55e':'rgba(255,255,255,0.15)'};flex-shrink:0;box-shadow:${active?'0 0 6px #22c55e':'none'};"></span><span style="color:${active?'#fff':'rgba(255,255,255,0.25)'};font-size:0.85rem;font-weight:700;">${name}</span>`;
+    c.appendChild(div);
+  });
+}
+function startHostGame(){
+  if(onlinePollInterval){clearInterval(onlinePollInterval);onlinePollInterval=null;}
+  fetch(`${DB_URL}/rooms/${roomCode}/state.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:'"playing"'}).catch(()=>{});
+  startOnlineGame(1);
+}
+function copyRoomCode(){navigator.clipboard.writeText(roomCode).then(()=>{event.target.textContent='✅ اتنسخ!';setTimeout(()=>event.target.textContent='📋 نسخ الكود',1500);}).catch(()=>prompt('الكود:',roomCode));}
+function cancelHost(){
+  if(onlinePollInterval)clearInterval(onlinePollInterval);
+  if(roomCode)fetch(`${DB_URL}/rooms/${roomCode}.json`,{method:'DELETE'}).catch(()=>{});
+  onlineMode=false;isHost=false;roomCode='';showOnlineLobby();
 }
 function startOnlineGame(level) {
   createOtherPlayerMesh(); startOnlineSync();
