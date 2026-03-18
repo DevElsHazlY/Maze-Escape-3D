@@ -488,8 +488,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
           <div class="s-row">
             <div class="s-label">Resolution Scale<small>كلما كان أقل – أداء أفضل</small></div>
             <div class="opt-btns" id="resBtns">
-              <button class="opt-btn" onclick="setOpt('res','0.5')">50%</button>
-              <button class="opt-btn" onclick="setOpt('res','0.6')">60%</button>
+                <button class="opt-btn" onclick="setOpt('res','0.08')">Low End device</button>
+                <button class="opt-btn" onclick="setOpt('res','0.15')">Low</button>
+              <button class="opt-btn" onclick="setOpt('res','0.3')">30%</button>
+              <button class="opt-btn" onclick="setOpt('res','0.55')">55%</button>
               <button class="opt-btn" onclick="setOpt('res','0.7')">70%</button>
               <button class="opt-btn" onclick="setOpt('res','0.85')">85%</button>
               <button class="opt-btn active" onclick="setOpt('res','1.0')">100%</button>
@@ -693,7 +695,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   </div>
   <!-- Switches HUD -->
   <div class="custom-hud switch-hud-item hidden" id="switchHUD" style="position:absolute;top:120px;left:20px;z-index:10;">
-    <span>⚡</span><span id="switchDisplay">0/0</span>
+    <span>🔘</span><span id="switchDisplay">0/0</span>
   </div>
   <button id="pauseBtnHUD" class="custom-click" onclick="togglePause()">⏸</button>
   <div class="joystick-zone" id="joystickZone"></div>
@@ -703,7 +705,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   <button class="action-btn custom-hud" id="crouchBtn" style="bottom:140px;right:20px;"><img src="Textures/icons/crouch.png" style="width:36px;height:36px;object-fit:contain;pointer-events:none;" onerror="this.style.display='none';this.parentNode.textContent='↓'"></button>
   <button class="action-btn custom-hud" id="sprintBtn" style="bottom:60px;right:20px;border-color:#facc15;color:#facc15;"><img src="Textures/icons/run.png" style="width:36px;height:36px;object-fit:contain;pointer-events:none;" onerror="this.style.display='none';this.parentNode.textContent='🏃'"></button>
   <button class="action-btn custom-hud" id="flashlightBtn" style="bottom:60px;left:20px;"><img src="Textures/icons/light.png" style="width:36px;height:36px;object-fit:contain;pointer-events:none;" onerror="this.style.display='none';this.parentNode.textContent='💡'"></button>
-  <button class="action-btn custom-hud" id="activateBtn" style="bottom:140px;left:20px;border-color:#a855f7;color:#a855f7;display:none;">⚡</button>
+  <button class="action-btn custom-hud" id="activateBtn" style="bottom:140px;left:20px;border-color:#a855f7;color:#a855f7;display:none;">E</button>
 </div>
 <!-- =================== PAUSE =================== -->
 <div class="ui-layer interactive hidden" id="pauseMenu" style="justify-content:flex-end;align-items:stretch;">
