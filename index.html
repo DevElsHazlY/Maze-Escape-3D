@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=0.5, maximum-scale=0.5, user-scalable=no">
-<title>MAZE ESCAPE – Season 1: Dark Woods</title>
+<title>MAZE ESCAPE – Season 2: Digital Echoes</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
@@ -300,13 +300,87 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   .la-btn{min-width:160px;padding:12px 14px;font-size:0.9rem;}
   .room-list-card{padding:16px 12px 14px;}
 }
+
+/* ===== SEASON 2 – MEMORY OVERLAY ===== */
+.memory-overlay{
+  position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+  background:linear-gradient(135deg,rgba(10,5,25,0.96),rgba(6,20,40,0.96));
+  border:1px solid rgba(6,182,212,0.35);border-bottom:2px solid #06b6d4;
+  border-radius:4px;padding:14px 22px;max-width:480px;width:90%;
+  pointer-events:none;z-index:60;
+  transition:opacity 0.7s ease;opacity:0;
+  box-shadow:0 0 30px rgba(6,182,212,0.15);backdrop-filter:blur(12px);
+}
+.memory-title{color:#06b6d4;font-size:0.8rem;font-weight:900;letter-spacing:3px;
+  text-transform:uppercase;margin-bottom:6px;}
+.memory-text{color:rgba(255,255,255,0.88);font-size:0.95rem;line-height:1.6;
+  font-style:italic;}
+/* ===== ROLE BADGE ===== */
+.role-badge{
+  background:rgba(0,0,0,0.55);border-radius:2px;padding:4px 12px;
+  font-size:0.78rem;font-weight:900;letter-spacing:3px;text-transform:uppercase;
+  backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.08);
+  display:inline-block;
+}
+.role-host{color:#facc15;border-bottom:2px solid #facc15;}
+.role-guest{color:#06b6d4;border-bottom:2px solid #06b6d4;}
+/* ===== LIGHT LINK METER ===== */
+.lightlink-hud{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(0,0,0,0.55);border:1px solid rgba(255,255,255,0.08);
+  border-bottom:2px solid #a855f7;border-radius:2px;
+  padding:5px 14px;backdrop-filter:blur(6px);
+  font-size:0.8rem;color:rgba(255,255,255,0.7);font-weight:700;
+}
+.lightlink-bar-bg{width:50px;height:6px;background:rgba(255,255,255,0.12);border-radius:3px;overflow:hidden;}
+.lightlink-bar-fill{height:100%;background:#a855f7;border-radius:3px;transition:width 0.4s,background 0.4s;}
+.lightlink-far .lightlink-bar-fill{background:#ef4444;animation:battblink 0.6s ease infinite;}
+/* ===== LEADERBOARD ===== */
+#leaderboardScreen{z-index:150;}
+.lb-panel{
+  background:linear-gradient(160deg,rgba(6,4,16,0.98),rgba(10,8,24,0.97));
+  border:1px solid rgba(255,255,255,0.06);border-right:3px solid #06b6d4;
+  box-shadow:0 0 60px rgba(0,0,0,0.9),-6px 0 30px rgba(6,182,212,0.08);
+  padding:40px 40px 40px 36px;max-width:520px;width:95%;max-height:90vh;
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.lb-title{color:#06b6d4;font-size:1.8rem;font-weight:900;margin-bottom:4px;}
+.lb-sub{color:rgba(255,255,255,0.25);font-size:0.65rem;font-weight:700;
+  letter-spacing:5px;text-transform:uppercase;margin-bottom:24px;}
+.lb-header{display:grid;grid-template-columns:40px 1fr 60px 50px 70px;
+  gap:0;padding:0 8px 10px;border-bottom:1px solid rgba(255,255,255,0.07);}
+.lb-header span{color:rgba(255,255,255,0.3);font-size:0.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
+.lb-body{flex:1;overflow-y:auto;margin-top:8px;padding-right:2px;}
+.lb-body::-webkit-scrollbar{width:3px;}
+.lb-body::-webkit-scrollbar-thumb{background:rgba(6,182,212,0.3);border-radius:2px;}
+.lb-row{
+  display:grid;grid-template-columns:40px 1fr 60px 50px 70px;
+  gap:0;padding:10px 8px;border:1px solid rgba(255,255,255,0.04);
+  border-radius:3px;margin-bottom:4px;background:rgba(255,255,255,0.018);
+  transition:background 0.12s;
+}
+.lb-row:hover{background:rgba(255,255,255,0.04);}
+.lb-row.lb-gold{background:rgba(250,204,21,0.07);border-color:rgba(250,204,21,0.2);}
+.lb-row.lb-silver{background:rgba(192,192,192,0.05);border-color:rgba(192,192,192,0.15);}
+.lb-row.lb-bronze{background:rgba(205,127,50,0.05);border-color:rgba(205,127,50,0.15);}
+.lb-row span{color:rgba(255,255,255,0.8);font-size:0.88rem;font-weight:700;
+  display:flex;align-items:center;}
+/* ===== SEASON 2 MENU BADGE ===== */
+.s2-badge{
+  display:inline-block;background:linear-gradient(90deg,#06b6d4,#a855f7);
+  color:#000;font-size:0.6rem;font-weight:900;letter-spacing:3px;
+  padding:3px 8px;border-radius:2px;margin-bottom:8px;text-transform:uppercase;
+}
+/* ===== WHISPER TEXT ===== */
+@keyframes whisperPulse{0%,100%{opacity:0.5;}50%{opacity:0.9;}}
+
 </style>
 </head>
 <body>
 <!-- LOADING -->
 <div class="loading-screen" id="loadingScreen">
   <div class="loader"></div>
-  <div class="load-title">MAZE ESCAPE</div>
+  <div class="load-title">MAZE ESCAPE S2</div>
   <div class="load-bar-wrap"><div class="load-bar"></div></div>
 </div>
 <!-- CANVAS -->
@@ -327,10 +401,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
     <div class="menu-content">
       <div class="game-logo-main">MAZE</div>
       <div class="game-logo-sub">ESCAPE</div>
-      <div class="game-season">SEASON 1 · DARK WOODS</div>
+      <div class="game-season" id="menuSeasonText"><span class="s2-badge">S2</span> Digital Echoes</div>
       <div class="menu-divider"></div>
       <button class="mbtn custom-click" onclick="startGame(1)"><span>اللعب الفردي</span><span class="icon">▶</span></button>
-      <button class="mbtn cyan custom-click" onclick="showOnlineLobby()"><span>اللعب الجماعي</span><span class="icon">🌐</span></button>
+      <button class="mbtn custom-click" style="border-right-color:#06b6d4;color:#06b6d4;" onclick="showLeaderboard()"><span>🏆 لوحة الصدارة</span><span class="icon">▶</span></button>
+          <button class="mbtn cyan custom-click" onclick="showOnlineLobby()"><span>اللعب الجماعي</span><span class="icon">🌐</span></button>
       <button class="mbtn custom-click" onclick="showLevelSelect()"><span>المستويات</span><span class="icon">▤</span></button>
       <button class="mbtn custom-click" onclick="openSettings()"><span>الإعدادات</span><span class="icon">⚙</span></button>
     </div>
@@ -845,6 +920,32 @@ let spiderSyncInterval=null, spiderPollInterval=null, collectPollInterval=null;
 // Spider alert
 let spiderAlertTimer = 0;
 
+// =================== SEASON 2 – DIGITAL ECHOES ===================
+let mySkinBase64 = null;
+let otherSkinImage = null;
+let skinSyncDone = false;
+let skinPollInterval = null;
+let memoryOverlayTimer = 0;
+let memoryCollectedCount = 0;
+
+const MEMORY_FRAGMENTS = [
+  { title: 'ذكرى الطفولة', text: 'أتذكر يوم كنت صغيراً... أمي كانت تغني في المطبخ. الضوء الذهبي كان يملأ الغرفة.' },
+  { title: 'لحظة الحب', text: 'رأيتها لأول مرة في مكتبة المدينة. ابتسمت وكأن العالم توقف.' },
+  { title: 'صديق قديم', text: 'كنا نركض في الشوارع حتى الغروب. أين ذهبت يا صاحبي؟' },
+  { title: 'صوت المطر', text: 'كان المطر يقرع النافذة تلك الليلة... كنت أعرف أن شيئاً ما سيتغير.' },
+  { title: 'رحلة الجبال', text: 'قمة الجبل كانت تلمس السحاب. شعرت أنني أستطيع أن أطير.' },
+  { title: 'الفرح الأخير', text: 'آخر مرة ضحكنا معاً... لم أكن أعلم أنها ستكون الأخيرة.' },
+  { title: 'شجرة العائلة', text: 'كانت الشجرة في الحديقة تشهد كل شيء. تحتها دفنا أسراراً لم تُقَل.' },
+  { title: 'لحظة الوداع', text: 'قالت: "سأعود قريباً." ولم تعد... أو ربما عادت، لكنني لم أكن هناك.' },
+  { title: 'النور المفقود', text: 'كان ثمة نور في داخلي مرة. الظلام أكله ببطء دون أن أشعر.' },
+  { title: 'كلمة لم تُقَل', text: 'أردت أن أقول "أحبك" ألف مرة... لكن الكلمات تجمدت في حلقي دائماً.' },
+  { title: 'رائحة البحر', text: 'رائحة البحر تعيدني إلى ذلك الصيف البعيد. كل شيء كان ممكناً آنذاك.' },
+  { title: 'الحقيقة', text: 'كل ما تجمعه هنا... هي حياته الحقيقية. لا تدعها تختفي في الظلام.' },
+  { title: 'صوت الضحكة', text: 'لا أتذكر وجهه كثيراً، لكن ضحكته... ضحكته لن تمحى أبداً.' },
+  { title: 'الحلم المتكرر', text: 'في كل ليلة كان يحلم بنفس الغرفة، نفس الباب، ولا شيء خلفه.' },
+  { title: 'خطوة لم تُكمَل', text: 'وقف على حافة القرار وخاف. لو عاد الزمن، هل كان سيجرؤ؟' },
+];
+
 // Skin UV map
 const MC_UV = {
   head:     [[16,8,8,8],[0,8,8,8],[8,0,8,8],[16,0,8,8],[8,8,8,8],[24,8,8,8]],
@@ -1024,9 +1125,35 @@ function buildMinecraftCharacter(skinImg) {
   lLeg.position.set(0,-6*S,0); lLegGrp.add(lLeg); charG.add(lLegGrp);
   return { outerGroup:outer, charGroup:charG, upperBodyGrp, headGrp, rightArmGrp:rArmGrp, leftArmGrp:lArmGrp, rightLegGrp:rLegGrp, leftLegGrp:lLegGrp };
 }
+function saveMySkinBase64(img) {
+  try {
+    const cv=document.createElement('canvas'); cv.width=64; cv.height=64;
+    const ctx=cv.getContext('2d'); ctx.drawImage(img,0,0,64,64);
+    mySkinBase64=cv.toDataURL('image/png');
+  } catch(e) {}
+}
+async function uploadMySkin() {
+  if(!onlineMode||!roomCode||!mySkinBase64) return;
+  const myRole=isHost?'host':'guest';
+  try {
+    await fetch(`${DB_URL}/rooms/${roomCode}/${myRole}/skin.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(mySkinBase64)});
+  } catch(e) {}
+}
+async function fetchOtherSkin() {
+  if(!onlineMode||!roomCode) return;
+  const otherRole=isHost?'guest':'host';
+  try {
+    const res=await fetch(`${DB_URL}/rooms/${roomCode}/${otherRole}/skin.json`);
+    const data=await res.json();
+    if(!data||typeof data!=='string') return;
+    const img=new Image();
+    img.onload=()=>{ otherSkinImage=img; if(otherPlayerMesh&&scene) createOtherPlayerMesh(); };
+    img.src=data;
+  } catch(e) {}
+}
 function loadDefaultSkin() {
   const img=new Image(); img.crossOrigin='anonymous';
-  img.onload=()=>{ mcSkinImage=img; document.getElementById('skinStatus').textContent='✅ تم تحميل السكن'; rebuildLobbyMCChar(); };
+  img.onload=()=>{ mcSkinImage=img; saveMySkinBase64(img); document.getElementById('skinStatus').textContent='✅ تم تحميل السكن'; rebuildLobbyMCChar(); };
   img.onerror=()=>{ document.getElementById('skinStatus').textContent='⚠ السكن الافتراضي'; rebuildLobbyMCChar(); };
   img.src='Textures/player.png';
 }
@@ -1049,6 +1176,8 @@ function setupSkinUpload() {
       img.onload=()=>{
         if(img.width===64&&img.height===64){
           mcSkinImage=img;
+          saveMySkinBase64(img);
+          if(onlineMode&&roomCode) uploadMySkin();
           document.getElementById('skinStatus').textContent='✅ تم تطبيق السكن!';
           rebuildLobbyMCChar();
           if(onlineMode&&otherPlayerMesh) createOtherPlayerMesh();
@@ -1389,6 +1518,59 @@ function updateSpidersVisualOnly(dt,elapsed) {
     else if(actualDist>5){ud.hasCalled=false;}
   });
 }
+// =================== MEMORY FRAGMENT ===================
+function showMemoryFragment(idx) {
+  const frag=MEMORY_FRAGMENTS[idx%MEMORY_FRAGMENTS.length];
+  const overlay=document.getElementById('memoryOverlay');
+  const title=document.getElementById('memoryTitle');
+  const text=document.getElementById('memoryText');
+  if(!overlay||!title||!text) return;
+  title.textContent='💠 '+frag.title;
+  text.textContent=frag.text;
+  overlay.style.opacity='1';
+  memoryOverlayTimer=5.0;
+}
+
+// =================== LEADERBOARD ===================
+async function submitLeaderboard() {
+  const nm=playerName||document.getElementById('playerNameInput')?.value?.trim()||'مجهول';
+  const entry={name:nm,memories:collectedItems,level:currentLevel,score:score,ts:Date.now()};
+  try {
+    await fetch(`${DB_URL}/leaderboard.json`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(entry)});
+  } catch(e) {}
+}
+async function fetchLeaderboardData() {
+  try {
+    const res=await fetch(`${DB_URL}/leaderboard.json`);
+    const data=await res.json();
+    if(!data) return [];
+    return Object.values(data).sort((a,b)=>b.memories-a.memories||b.score-a.score).slice(0,12);
+  } catch(e) { return []; }
+}
+async function showLeaderboard() {
+  showScreen('leaderboardScreen');
+  document.getElementById('leaderboardBody').innerHTML='<div style="color:rgba(255,255,255,0.4);text-align:center;padding:24px;">جاري التحميل...</div>';
+  const entries=await fetchLeaderboardData();
+  const body=document.getElementById('leaderboardBody');
+  if(!entries.length){
+    body.innerHTML='<div style="color:rgba(255,255,255,0.4);text-align:center;padding:24px;">لا توجد سجلات بعد. كن الأول! 🏆</div>';
+    return;
+  }
+  const medals=['🥇','🥈','🥉'];
+  const classes=['lb-gold','lb-silver','lb-bronze'];
+  body.innerHTML=entries.map((e,i)=>`
+    <div class="lb-row ${i<3?classes[i]:''}">
+      <span style="color:${i===0?'#facc15':i===1?'#c0c0c0':i===2?'#cd7f32':'rgba(255,255,255,0.3)'}">
+        ${i<3?medals[i]:'#'+(i+1)}</span>
+      <span>${e.name||'مجهول'}</span>
+      <span style="color:#06b6d4;justify-content:center;">${e.memories||0}</span>
+      <span style="color:rgba(255,255,255,0.5);">Lv.${e.level||1}</span>
+      <span style="color:#facc15;">${(e.score||0).toLocaleString()}</span>
+    </div>
+  `).join('');
+}
+function hideLeaderboard() { showScreen('mainMenu'); }
+
 function showSpiderAlert(name,color) {
   const el=document.getElementById('spiderAlert');
   el.textContent='⚠ '+name;
@@ -1399,8 +1581,36 @@ function showSpiderAlert(name,color) {
 
 // =================== BATTERY ===================
 function updateBattery(dt) {
+  // LIGHT LINK – online co-op mechanic
+  let effectiveDrain=batteryDrainRate;
+  if(onlineMode&&otherPlayerMesh&&otherPlayerMesh.visible){
+    const dx=player.x-otherPlayerSmoothed.x, dz=player.z-otherPlayerSmoothed.z;
+    const partnerDist=Math.sqrt(dx*dx+dz*dz);
+    const llHUD=document.getElementById('lightlinkHUD');
+    const llFill=document.getElementById('lightlinkBarFill');
+    const llLabel=document.getElementById('lightlinkLabel');
+    if(llHUD) llHUD.style.display='flex';
+    const proximity=Math.max(0,Math.min(1,1-partnerDist/20));
+    if(llFill) llFill.style.width=(proximity*100)+'%';
+    if(partnerDist>15){
+      effectiveDrain=batteryDrainRate*2.5;
+      if(llFill) llFill.style.background='#ef4444';
+      if(llLabel){llLabel.textContent='بعيد!';llLabel.style.color='#ef4444';}
+      if(llHUD) llHUD.classList.add('lightlink-far');
+    } else if(partnerDist<4){
+      // Close – slow recharge
+      if(batteryLevel<100) batteryLevel=Math.min(100,batteryLevel+0.06*dt);
+      if(llFill) llFill.style.background='#22c55e';
+      if(llLabel){llLabel.textContent='متزامنان';llLabel.style.color='#22c55e';}
+      if(llHUD) llHUD.classList.remove('lightlink-far');
+    } else {
+      if(llFill) llFill.style.background='#a855f7';
+      if(llLabel){llLabel.textContent='متصلان';llLabel.style.color='#a855f7';}
+      if(llHUD) llHUD.classList.remove('lightlink-far');
+    }
+  }
   if(isFlashlightOn&&batteryLevel>0) {
-    batteryLevel=Math.max(0,batteryLevel-batteryDrainRate*dt);
+    batteryLevel=Math.max(0,batteryLevel-effectiveDrain*dt);
     if(batteryLevel<=0){
       batteryLevel=0;
       isFlashlightOn=false;
@@ -1448,6 +1658,11 @@ function createSwitch(x,z) {
   switches.push({x,z,activated:false,mesh:btn,base,glow});
 }
 function checkNearSwitch() {
+  // In online mode: only Host activates switches
+  if(onlineMode&&!isHost){
+    showSpiderAlert('🔑 الـ Host فقط يفعّل المفاتيح!','#facc15');
+    return false;
+  }
   let activated=false;
   switches.forEach(sw=>{
     if(sw.activated) return;
@@ -1581,6 +1796,39 @@ function generateMaze() {
   // Ceiling
   ceilingMesh=new THREE.Mesh(new THREE.PlaneGeometry(mazeWidth,mazeHeight),materials.ceiling);
   ceilingMesh.rotation.x=Math.PI/2; ceilingMesh.position.set(mazeWidth/2-0.5,4,mazeHeight/2-0.5); scene.add(ceilingMesh);
+
+  // Wall Whispers – Season 2 Story Layer
+  addWallWhispers();
+}
+
+function addWallWhispers() {
+  const whispers=['تذكرني...','لا تنس','أنا هنا','ساعدني','الحقيقة في الظلام',
+    'لا تخف','أكمل المهمة','هم يراقبون','الوقت ينفد','ابحث عن الضوء',
+    'من أنا؟','الذاكرة تتلاشى','لا تتركني','العودة مستحيلة','أنقذ الذكريات'];
+  const count=3+Math.floor(currentLevel/2);
+  const wallDirs=[[1,0],[-1,0],[0,1],[0,-1]];
+  for(let i=0;i<count;i++){
+    let wx,wz,tries=0;
+    do{wx=Math.floor(seededRand()*(mazeWidth-4))+2;wz=Math.floor(seededRand()*(mazeHeight-4))+2;tries++;}
+    while(mazeGrid[wx][wz]&&tries<60);
+    if(tries>=60) continue;
+    const wd=wallDirs[Math.floor(seededRand()*4)];
+    const text=whispers[Math.floor(seededRand()*whispers.length)];
+    const cv=document.createElement('canvas'); cv.width=256; cv.height=64;
+    const ctx=cv.getContext('2d'); ctx.clearRect(0,0,256,64);
+    ctx.font='bold 26px Cairo,Arial'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.shadowColor='#a855f7'; ctx.shadowBlur=15;
+    ctx.fillStyle='rgba(200,160,255,0.85)'; ctx.fillText(text,128,32);
+    const tex=new THREE.CanvasTexture(cv);
+    const mat=new THREE.MeshBasicMaterial({map:tex,transparent:true,alphaTest:0.04,side:THREE.DoubleSide,depthWrite:false});
+    const mesh=new THREE.Mesh(new THREE.PlaneGeometry(1.5,0.38),mat);
+    const offsetY=1.4+seededRand()*0.8;
+    mesh.position.set(wx+wd[0]*0.51,offsetY,wz+wd[1]*0.51);
+    if(wd[0]!==0) mesh.rotation.y=wd[0]>0?-Math.PI/2:Math.PI/2;
+    // Subtle pulse via userData
+    mesh.userData.whisperPhase=seededRand()*Math.PI*2;
+    scene.add(mesh);
+  }
 }
 function checkCollision(x,z,radius=player.radius) {
   const gx=Math.floor(x), gz=Math.floor(z);
@@ -1791,8 +2039,14 @@ function updateGame(dt) {
     col.mesh.rotation.y+=col.rot;
     col.mesh.position.y=0.8+Math.sin(levelTime*3+col.bob)*0.12;
     if(Math.sqrt((player.x-col.x)**2+(player.z-col.z)**2)<1.0){
+      // In online mode: only Guest collects memories
+      if(onlineMode&&isHost){
+        showSpiderAlert('🧩 الـ Guest يجمع الذكريات!','#06b6d4');
+        return;
+      }
       col.collected=true; createCollectVFX(col.x,col.z); scene.remove(col.mesh);
       collectedItems++; score+=150; playSound('collect'); updateHUD();
+      showMemoryFragment(memoryCollectedCount++);
       if(onlineMode) syncCollectedItem(idx);
     }
   });
@@ -1826,6 +2080,14 @@ function updateGame(dt) {
   if(spiderAlertTimer>0){
     spiderAlertTimer-=dt;
     if(spiderAlertTimer<=0){document.getElementById('spiderAlert').style.opacity='0';}
+  }
+  // Memory overlay fade
+  if(memoryOverlayTimer>0){
+    memoryOverlayTimer-=dt;
+    if(memoryOverlayTimer<=0){
+      const mo=document.getElementById('memoryOverlay');
+      if(mo) mo.style.opacity='0';
+    }
   }
   updateHUD();
 }
@@ -1951,6 +2213,7 @@ function winLevel() {
   document.getElementById('completedLevel').textContent=currentLevel;
   document.getElementById('winScore').textContent=score;
   showScreen('winScreen'); playSound('collect');
+  submitLeaderboard();
 }
 function gameOver(){currentState=GameState.GAME_OVER;document.getElementById('finalScore').textContent=score;showScreen('gameOver');}
 function nextLevel(){if(currentLevel<maxLevels){currentLevel++;initLevel();}else showMenu();}
@@ -2514,9 +2777,18 @@ function cancelHost(){
 function startOnlineGame(level) {
   createOtherPlayerMesh(); startOnlineSync();
   currentLevel=level; lives=3; score=0; cameraRotation={x:0,y:Math.PI};
+  memoryCollectedCount=0;
   initLevel();
   document.getElementById('onlineHUD').style.display='block';
   document.getElementById('onlinePlayerName').textContent=isHost?'لاعب 2':'Host';
+  // Role badge
+  const rb=document.getElementById('roleBadge');
+  const rbc=document.getElementById('roleBadgeContainer');
+  if(rb&&rbc){
+    rb.className='role-badge '+(isHost?'role-host':'role-guest');
+    rb.textContent=isHost?'🔑 HOST – مُفعِّل المفاتيح':'🧩 GUEST – جامع الذكريات';
+    rbc.style.display='block';
+  }
 }
 function createNameTagSprite(name) {
   const cv=document.createElement('canvas'); cv.width=256; cv.height=64;
@@ -2530,7 +2802,7 @@ function createNameTagSprite(name) {
 function createOtherPlayerMesh() {
   if(otherPlayerMesh) scene.remove(otherPlayerMesh);
   otherPlayerHeadGrp=null;otherPlayerUpperBodyGrp=null;otherPlayerLegLGrp=null;otherPlayerLegRGrp=null;otherPlayerArmLGrp=null;otherPlayerArmRGrp=null;
-  const mc=buildMinecraftCharacter(mcSkinImage);
+  const mc=buildMinecraftCharacter(otherSkinImage||null);
   otherPlayerHeadGrp=mc.headGrp; otherPlayerUpperBodyGrp=mc.upperBodyGrp;
   otherPlayerLegLGrp=mc.leftLegGrp; otherPlayerLegRGrp=mc.rightLegGrp;
   otherPlayerArmLGrp=mc.leftArmGrp; otherPlayerArmRGrp=mc.rightArmGrp;
@@ -2585,6 +2857,12 @@ function updateOtherPlayer(dt) {
 function startOnlineSync() {
   [onlineSyncInterval,onlinePollInterval,spiderSyncInterval,spiderPollInterval,collectPollInterval].forEach(iv=>{if(iv)clearInterval(iv);});
   onlineSyncInterval=null;onlinePollInterval=null;spiderSyncInterval=null;spiderPollInterval=null;collectPollInterval=null;
+  // Skin sync – upload mine once, poll other player's skin
+  skinSyncDone=false;
+  if(skinPollInterval){clearInterval(skinPollInterval);skinPollInterval=null;}
+  setTimeout(()=>{ uploadMySkin(); },600);
+  setTimeout(()=>{ fetchOtherSkin(); },2500);
+  skinPollInterval=setInterval(()=>{ if(onlineMode&&!otherSkinImage) fetchOtherSkin(); },8000);
   const myRole=isHost?'host':'guest', otherRole=isHost?'guest':'host';
   onlineSyncInterval=setInterval(()=>{
     if(currentState!==GameState.PLAYING) return;
@@ -2651,8 +2929,9 @@ function syncCollectedItem(idx) {
   fetch(`${DB_URL}/rooms/${roomCode}/collected/${idx}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:'true'}).catch(()=>{});
 }
 function cleanupOnline() {
-  [onlineSyncInterval,onlinePollInterval,spiderSyncInterval,spiderPollInterval,collectPollInterval].forEach(iv=>{if(iv)clearInterval(iv);});
-  onlineSyncInterval=null;onlinePollInterval=null;spiderSyncInterval=null;spiderPollInterval=null;collectPollInterval=null;
+  [onlineSyncInterval,onlinePollInterval,spiderSyncInterval,spiderPollInterval,collectPollInterval,skinPollInterval].forEach(iv=>{if(iv)clearInterval(iv);});
+  onlineSyncInterval=null;onlinePollInterval=null;spiderSyncInterval=null;spiderPollInterval=null;collectPollInterval=null;skinPollInterval=null;
+  otherSkinImage=null; skinSyncDone=false;
   if(otherPlayerMesh){scene.remove(otherPlayerMesh);otherPlayerMesh=null;}
   otherPlayerHeadGrp=null;otherPlayerUpperBodyGrp=null;otherPlayerLegLGrp=null;otherPlayerLegRGrp=null;otherPlayerArmLGrp=null;otherPlayerArmRGrp=null;otherPlayerNameTag=null;otherPlayerAnimTime2=0;
   document.getElementById('onlineHUD').style.display='none';
@@ -2684,5 +2963,32 @@ window.addEventListener('beforeunload',()=>{
   }
 });
 </script>
+
+<!-- =================== MEMORY OVERLAY =================== -->
+<div class="memory-overlay" id="memoryOverlay">
+  <div class="memory-title" id="memoryTitle">شظية ذاكرة</div>
+  <div class="memory-text" id="memoryText"></div>
+</div>
+
+<!-- =================== LEADERBOARD SCREEN =================== -->
+<div class="ui-layer interactive hidden" id="leaderboardScreen" style="justify-content:flex-end;align-items:stretch;">
+  <div style="display:flex;height:100%;max-width:560px;width:100%;">
+    <div style="width:4px;background:linear-gradient(180deg,transparent,#06b6d4 30%,#06b6d4 70%,transparent);flex-shrink:0;"></div>
+    <div class="lb-panel">
+      <div class="lb-title">🏆 لوحة الصدارة</div>
+      <div class="lb-sub">أكثر الذاكرة جمعاً – الصدى الرقمي</div>
+      <div class="lb-header">
+        <span>#</span><span>اللاعب</span><span style="text-align:center;">🧩</span><span>المستوى</span><span style="text-align:left;">النقاط</span>
+      </div>
+      <div class="lb-body" id="leaderboardBody">
+        <div style="color:rgba(255,255,255,0.4);text-align:center;padding:24px;">جاري التحميل...</div>
+      </div>
+      <div style="margin-top:16px;display:flex;gap:10px;">
+        <button class="mbtn custom-click" onclick="hideLeaderboard()" style="flex:1;"><span>رجوع</span><span class="icon">✖</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
