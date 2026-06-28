@@ -998,17 +998,12 @@ function updateVolumeSettings() {
 
 // =================== TEXTURES ===================
 function generateStylizedTextures() {
-  // Floor
-  const fc=document.createElement('canvas'); fc.width=512; fc.height=512;
-  const fx=fc.getContext('2d');
-  fx.fillStyle='#e0e0e0'; fx.fillRect(0,0,512,512);
-  fx.strokeStyle='#b0b0b0'; fx.lineWidth=3;
-  for(let i=0;i<=512;i+=128){fx.beginPath();fx.moveTo(i,0);fx.lineTo(i,512);fx.stroke();fx.beginPath();fx.moveTo(0,i);fx.lineTo(512,i);fx.stroke();}
-  const g=fx.createRadialGradient(256,256,0,256,256,360);
-  g.addColorStop(0,'rgba(255,255,255,0.07)'); g.addColorStop(1,'rgba(180,180,180,0.02)');
-  fx.fillStyle=g; fx.fillRect(0,0,512,512);
-  const ft=new THREE.CanvasTexture(fc); ft.wrapS=ft.wrapT=THREE.RepeatWrapping; ft.repeat.set(12,12);
-  materials.floor=new THREE.MeshStandardMaterial({map:ft,roughness:0.4,metalness:0.15});
+  // Floor (using wood.png)
+  materials.floor=new THREE.MeshStandardMaterial({roughness:0.8,metalness:0.1});
+  new THREE.TextureLoader().load('Textures/wood.png', t=>{
+    t.wrapS=t.wrapT=THREE.RepeatWrapping; t.repeat.set(12,12);
+    materials.floor.map=t; materials.floor.needsUpdate=true;
+  });
 
   // Water
   const wc=document.createElement('canvas'); wc.width=256; wc.height=256;
@@ -1018,24 +1013,19 @@ function generateStylizedTextures() {
   const wt=new THREE.CanvasTexture(wc); wt.wrapS=wt.wrapT=THREE.RepeatWrapping; wt.repeat.set(8,8);
   materials.water=new THREE.MeshStandardMaterial({map:wt,transparent:true,opacity:0.2,roughness:0.1,metalness:0.7,side:THREE.FrontSide});
 
-  // Wall
-  const wac=document.createElement('canvas'); wac.width=512; wac.height=512;
-  const wax=wac.getContext('2d');
-  wax.fillStyle='#c8c8d2'; wax.fillRect(0,0,512,512);
-  for(let y=0;y<512;y+=64) for(let x=0;x<512;x+=64){wax.fillStyle=Math.random()>0.5?'#c0c0ca':'#d0d0da';wax.fillRect(x+2,y+2,60,60);}
-  wax.strokeStyle='#9898a2'; wax.lineWidth=3;
-  for(let i=0;i<=512;i+=64){wax.beginPath();wax.moveTo(i,0);wax.lineTo(i,512);wax.stroke();wax.beginPath();wax.moveTo(0,i);wax.lineTo(512,i);wax.stroke();}
-  const wat=new THREE.CanvasTexture(wac); wat.wrapS=wat.wrapT=THREE.RepeatWrapping; wat.repeat.set(1,4);
-  materials.wall=new THREE.MeshStandardMaterial({map:wat,roughness:0.5,metalness:0.2});
+  // Wall (using india_floor05.png)
+  materials.wall=new THREE.MeshStandardMaterial({roughness:0.6,metalness:0.2});
+  new THREE.TextureLoader().load('Textures/india_floor05.png', t=>{
+    t.wrapS=t.wrapT=THREE.RepeatWrapping; t.repeat.set(1,4);
+    materials.wall.map=t; materials.wall.needsUpdate=true;
+  });
 
-  // Ceiling
-  const cc=document.createElement('canvas'); cc.width=256; cc.height=256;
-  const cx=cc.getContext('2d');
-  cx.fillStyle='#060606'; cx.fillRect(0,0,256,256);
-  cx.strokeStyle='#121212'; cx.lineWidth=6;
-  for(let i=0;i<=256;i+=64){cx.beginPath();cx.moveTo(i,0);cx.lineTo(i,256);cx.stroke();cx.beginPath();cx.moveTo(0,i);cx.lineTo(256,i);cx.stroke();}
-  const ct=new THREE.CanvasTexture(cc); ct.wrapS=ct.wrapT=THREE.RepeatWrapping; ct.repeat.set(10,10);
-  materials.ceiling=new THREE.MeshStandardMaterial({map:ct,transparent:true,opacity:0.88,side:THREE.DoubleSide});
+  // Ceiling (using aa_duvar0001.png)
+  materials.ceiling=new THREE.MeshStandardMaterial({transparent:true,opacity:0.88,side:THREE.DoubleSide,roughness:0.7,metalness:0.2});
+  new THREE.TextureLoader().load('Textures/aa_duvar0001.png', t=>{
+    t.wrapS=t.wrapT=THREE.RepeatWrapping; t.repeat.set(10,10);
+    materials.ceiling.map=t; materials.ceiling.needsUpdate=true;
+  });
 
   // Battery texture (canvas fallback)
   const bc=document.createElement('canvas'); bc.width=64; bc.height=32;
