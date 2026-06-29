@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=0.5, maximum-scale=0.5, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=0.5, user-scalable=no">
 <title>MAZE ESCAPE – Season 2: Digital Echoes</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
@@ -34,28 +34,111 @@ body{overflow:hidden;background:#000;user-select:none;-webkit-user-select:none;}
 .interactive{pointer-events:auto;}
 .ui-layer.hidden{display:none!important;}
 /* ===== AAA GLASS PANEL ===== */
-.aaa-panel{background:linear-gradient(160deg,rgba(8,6,18,0.97) 0%,rgba(12,10,24,0.95) 100%);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.06);box-shadow:0 0 60px rgba(0,0,0,0.9),inset 0 1px 0 rgba(255,255,255,0.05);}
+.aaa-panel{background:linear-gradient(160deg,rgba(10,8,22,0.98) 0%,rgba(15,12,30,0.96) 100%);backdrop-filter:blur(25px);border:1px solid rgba(255,255,255,0.08);box-shadow:0 0 80px rgba(0,0,0,0.95),inset 0 1px 0 rgba(255,255,255,0.06);border-radius:4px;}
 .panel-accent-yellow{border-right:3px solid #facc15;box-shadow:0 0 60px rgba(0,0,0,0.9),-6px 0 30px rgba(250,204,21,0.08);}
 .panel-accent-cyan{border-right:3px solid #06b6d4;box-shadow:0 0 60px rgba(0,0,0,0.9),-6px 0 30px rgba(6,182,212,0.08);}
 .panel-accent-green{border-right:3px solid #22c55e;box-shadow:0 0 60px rgba(0,0,0,0.9),-6px 0 30px rgba(34,197,94,0.08);}
 .panel-accent-red{border-right:3px solid #ef4444;box-shadow:0 0 60px rgba(0,0,0,0.9),-6px 0 30px rgba(239,68,68,0.08);}
-/* ===== MAIN MENU ===== */
-#mainMenu{justify-content:flex-end;align-items:stretch;}
-.menu-left-strip{width:4px;background:linear-gradient(180deg,transparent,#facc15 30%,#facc15 70%,transparent);flex-shrink:0;}
-.menu-content{padding:40px 48px 40px 40px;display:flex;flex-direction:column;justify-content:center;max-width:400px;width:100%;}
-.game-logo-main{font-size:72px;font-weight:900;color:#fff;line-height:0.9;text-shadow:0 0 40px rgba(250,204,21,0.3);}
-.game-logo-sub{font-size:52px;font-weight:900;color:#facc15;text-shadow:0 0 25px rgba(250,204,21,0.6);}
-.game-season{color:rgba(255,255,255,0.3);font-size:0.7rem;font-weight:700;letter-spacing:4px;text-transform:uppercase;margin:10px 0 32px;}
-.menu-divider{width:60px;height:2px;background:linear-gradient(90deg,#facc15,transparent);margin-bottom:28px;}
-/* ===== MENU BUTTONS ===== */
-.mbtn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:14px 20px;margin-bottom:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-right:3px solid transparent;color:rgba(255,255,255,0.8);font-size:1.05rem;font-weight:700;cursor:pointer;transition:all 0.15s;text-align:right;position:relative;overflow:hidden;}
-.mbtn::before{content:'';position:absolute;top:0;left:0;width:0;height:100%;background:rgba(250,204,21,0.07);transition:width 0.2s;}
+/* ===== MAIN MENU – CS:SOURCE STYLE ===== */
+#mainMenu{justify-content:flex-start;align-items:stretch;pointer-events:auto;}
+.css-overlay{
+  position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle at 20% 50%, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 100%),
+             linear-gradient(90deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 40%, transparent 100%);
+  z-index:0;
+}
+.css-overlay::after{
+  content:'';position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  opacity:0.2;mix-blend-mode:overlay;pointer-events:none;
+}
+.css-left{
+  position:relative;z-index:2;
+  display:flex;flex-direction:column;justify-content:center;align-items:flex-start;
+  padding:0 40px;
+  width:100%;
+  max-width:100vw;
+  height:100%;
+  pointer-events:auto;
+  overflow:hidden;
+}
+.css-logo-block{
+  position:relative;z-index:2;
+  text-align:left;pointer-events:none;
+  margin-bottom:40px;
+  width:100%;
+}
+.css-logo-main{
+  font-size:clamp(32px, 8vw, 72px); /* Dynamically scales font to fit screen */
+  font-weight:900;color:#fff;
+  line-height:1;letter-spacing:-1.5px;
+  text-transform:uppercase;
+  font-family:'Arial Black', sans-serif;
+  text-shadow:0 0 20px rgba(255,255,255,0.15);
+  white-space:nowrap; /* Forces text to stay in one line */
+  overflow:hidden;
+  text-overflow:clip;
+  width:max-content;
+  max-width:calc(100vw - 80px); /* Prevents overflow based on padding */
+}
+.css-logo-edition{
+  color:rgba(255,255,255,0.3);
+  font-size:clamp(12px, 1.5vw, 18px);
+  overflow:hidden;
+  text-overflow:clip;
+  width:max-content;
+  max-width:calc(100vw - 80px);
+  font-weight:700;
+  letter-spacing:6px;text-transform:uppercase;margin-top:4px;
+  font-family:sans-serif;
+}
+.css-menu-list{
+  display:flex;flex-direction:column;gap:4px;
+}
+.css-mitem{
+  background:none;border:none;padding:6px 0;
+  color:rgba(255,255,255,0.55);
+  font-size:0.95rem;font-weight:700;letter-spacing:0.5px;
+  text-transform:uppercase;font-family:sans-serif;
+  cursor:pointer;text-align:left;
+  transition:all 0.1s;
+  position:relative;display:block;width:fit-content;
+}
+.css-mitem:hover{
+  color:#fff;
+  text-shadow:0 0 8px rgba(255,255,255,0.4);
+  transform:translateX(5px);
+}
+.css-mitem:active{color:#facc15;}
+.css-copyright{
+  color:rgba(255,255,255,0.12);font-size:0.75rem;
+  letter-spacing:1px;margin-top:60px;text-align:left;
+  text-transform:uppercase;
+  font-weight:400;
+}
+.css-mitem:hover::after{width:3px;}
+.css-mitem:active{color:#facc15;background:rgba(250,204,21,0.15);}
+.css-mitem.css-cyan:hover{color:#06b6d4;background:rgba(6,182,212,0.08);border-color:rgba(6,182,212,0.3);}
+.css-mitem.css-cyan:hover::after{background:#06b6d4;}
+/* Copyright line */
+.css-copyright{
+  color:rgba(255,255,255,0.25);font-size:0.62rem;
+  letter-spacing:1px;margin-top:28px;text-align:right;
+  text-transform:uppercase;width:100%;
+  font-weight:600;
+}
+/* ===== MENU BUTTONS (kept for other screens) ===== */
+.mbtn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:12px 18px;margin-bottom:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-right:4px solid transparent;color:rgba(255,255,255,0.85);font-size:1rem;font-weight:700;cursor:pointer;transition:all 0.2s ease;text-align:right;position:relative;overflow:hidden;border-radius:2px;}
+.mbtn::before{content:'';position:absolute;top:0;right:0;width:0;height:100%;background:linear-gradient(90deg, transparent, rgba(250,204,21,0.08));transition:width 0.3s ease;}
 .mbtn:hover::before{width:100%;}
-.mbtn:hover{border-right-color:#facc15;color:#fff;transform:translateX(-4px);}
-.mbtn:active{background:rgba(250,204,21,0.15);}
+.mbtn:hover{border-right-color:#facc15;color:#fff;transform:translateX(-6px);background:rgba(255,255,255,0.06);box-shadow:0 4px 15px rgba(0,0,0,0.3);}
+.mbtn:active{background:rgba(250,204,21,0.12);transform:translateX(-2px);}
 .mbtn.cyan:hover{border-right-color:#06b6d4;}
 .mbtn.cyan:hover::before{background:rgba(6,182,212,0.07);}
 .mbtn .icon{opacity:0.5;font-size:1.2rem;}
+/* Legacy – hide old strips/content if leftover */
+.menu-left-strip{display:none;}
+.menu-content{display:none;}
 /* ===== HUD ===== */
 .ui-layer.hidden{display:none!important;}
 .hud-stat{background:rgba(0,0,0,0.55);border:1px solid rgba(255,255,255,0.08);border-bottom:2px solid #facc15;border-radius:2px;padding:5px 14px;color:white;font-weight:900;display:flex;align-items:center;gap:6px;font-size:1rem;backdrop-filter:blur(6px);}
@@ -287,8 +370,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .level-grid-item-locked{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);color:rgba(255,255,255,0.2);cursor:not-allowed;border-radius:2px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;}
 /* ===== ONLINE HUD ===== */
 #onlineHUD{position:fixed;top:20px;right:195px;z-index:20;display:none;pointer-events:none;}
-/* ===== RESPONSIVE ===== */
+/* ===== VIGNETTE ===== */
+#gameCanvas::after{content:'';position:fixed;inset:0;pointer-events:none;
+  box-shadow:inset 0 0 120px rgba(0,0,0,0.7);z-index:1;}
+/* ===== RESPONSIVE CSS MENU ===== */
 @media(max-width:480px){
+  .css-left{padding:0 20px 36px 0;}
+  .css-logo-main{font-size:40px;}
+  .css-logo-sub{font-size:26px;letter-spacing:5px;}
+  .css-mitem{font-size:0.72rem;padding:6px 0;}
+}
   .menu-content{padding:28px 24px 28px 20px;}
   .game-logo-main{font-size:52px;}
   .game-logo-sub{font-size:38px;}
@@ -380,7 +471,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 <!-- LOADING -->
 <div class="loading-screen" id="loadingScreen">
   <div class="loader"></div>
-  <div class="load-title">MAZE ESCAPE S2</div>
+  <div class="load-title"></div>
   <div class="load-bar-wrap"><div class="load-bar"></div></div>
 </div>
 <!-- CANVAS -->
@@ -396,27 +487,29 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 </div>
 <!-- =================== MAIN MENU =================== -->
 <div class="ui-layer interactive" id="mainMenu" style="justify-content:flex-end;align-items:stretch;">
-  <div class="aaa-panel panel-accent-yellow" style="display:flex;height:100%;max-width:380px;width:100%;" ontouchstart="event.stopPropagation()" ontouchmove="event.stopPropagation();">
-    <div class="menu-left-strip"></div>
-    <div class="menu-content">
-      <div class="game-logo-main">MAZE</div>
-      <div class="game-logo-sub">ESCAPE</div>
-      <div class="game-season" id="menuSeasonText"><span class="s2-badge">S2</span> Digital Echoes</div>
-      <div class="menu-divider"></div>
-      <button class="mbtn custom-click" onclick="startGame(1)"><span>اللعب الفردي</span><span class="icon">▶</span></button>
-      <button class="mbtn custom-click" style="border-right-color:#06b6d4;color:#06b6d4;" onclick="showLeaderboard()"><span>🏆 لوحة الصدارة</span><span class="icon">▶</span></button>
-          <button class="mbtn cyan custom-click" onclick="showOnlineLobby()"><span>اللعب الجماعي</span><span class="icon">🌐</span></button>
-      <button class="mbtn custom-click" onclick="showLevelSelect()"><span>المستويات</span><span class="icon">▤</span></button>
-      <button class="mbtn custom-click" onclick="openSettings()"><span>الإعدادات</span><span class="icon">⚙</span></button>
+  <div class="css-overlay"></div>
+  <!-- Right column: logo then menu -->
+  <div class="css-left" ontouchstart="event.stopPropagation()" ontouchmove="event.stopPropagation()">
+    <div class="css-logo-block">
+      <div class="css-logo-main">MAZE ESCAPE</div>
+      <div class="css-logo-edition"><span class="s2-badge" style="font-size:0.30rem;letter-spacing:2px;">SEASON 2</span> Digital Echoes</div>
     </div>
+    <div class="css-menu-list">
+      <button class="css-mitem custom-click" onclick="startGame(1)">New Game</button>
+      <button class="css-mitem css-cyan custom-click" onclick="showOnlineLobby()">Multiplayer</button>
+      <button class="css-mitem custom-click" onclick="showLevelSelect()">Levels</button>
+      <button class="css-mitem custom-click" onclick="showLeaderboard()">Leaderboard</button>
+      <button class="css-mitem custom-click" onclick="openSettings()">Settings</button>
+    </div>
+    <div class="css-copyright">© MAZE ESCAPE S2 · Digital Echoes</div>
   </div>
 </div>
 <!-- =================== LEVEL SELECT =================== -->
 <div class="ui-layer interactive hidden" id="levelSelect">
   <div class="aaa-panel" style="padding:32px;max-width:560px;width:92%;max-height:88vh;display:flex;flex-direction:column;">
-    <h2 style="color:#facc15;font-size:1.6rem;font-weight:900;margin-bottom:20px;text-align:center;letter-spacing:2px;">اختيار المنطقة</h2>
+    <h2 style="color:#facc15;font-size:1.6rem;font-weight:900;margin-bottom:20px;text-align:center;letter-spacing:2px;">Select Level</h2>
     <div id="levelGrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;overflow-y:auto;flex:1;max-height:50vh;"></div>
-    <button class="mbtn custom-click" style="margin-top:16px;" onclick="showMenu()"><span>رجوع</span><span class="icon">✖</span></button>
+    <button class="mbtn custom-click" style="margin-top:16px;" onclick="showMenu()"><span>Back</span><span class="icon">✖</span></button>
   </div>
 </div>
 <!-- =================== ONLINE LOBBY =================== -->
@@ -424,20 +517,20 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 
   <!-- LEFT SIDEBAR -->
   <div class="lobby-sidebar" ontouchstart="event.stopPropagation()" ontouchmove="event.stopPropagation()">
-    <div class="lsb-title">اللعب الجماعي</div>
+    <div class="lsb-title">Multiplayer</div>
     <div class="lsb-sub">MULTIPLAYER</div>
 
-    <div class="lsb-label">اسمك في اللعبة</div>
-    <input type="text" id="playerNameInput" class="lsb-input" placeholder="اكتب اسمك..." maxlength="15" autocomplete="off">
+    <div class="lsb-label">Your Name</div>
+    <input type="text" id="playerNameInput" class="lsb-input" placeholder="Enter your name..." maxlength="15" autocomplete="off">
 
-    <div class="lsb-label">إسم الغرفة</div>
-    <input type="text" id="roomNameInput" class="lsb-input" placeholder="إسم الغرفة ..." maxlength="20" autocomplete="off">
+    <div class="lsb-label">Room Name</div>
+    <input type="text" id="roomNameInput" class="lsb-input" placeholder="Room name..." maxlength="20" autocomplete="off">
 
-    <div class="lsb-label">كلمة السر <span style="color:rgba(255,255,255,0.18);font-weight:400;text-transform:none;letter-spacing:0;">اختياري</span></div>
+    <div class="lsb-label">Password <span style="color:rgba(255,255,255,0.18);font-weight:400;text-transform:none;letter-spacing:0;">optional</span></div>
     <input type="password" id="roomPasswordInput" class="lsb-input pw-field" placeholder="XXXXX" maxlength="12" autocomplete="off">
 
     <button class="lsb-back-btn custom-click" onclick="showMenu()">
-      <span>رجوع</span><span>✖</span>
+      <span>Back</span><span>✖</span>
     </button>
   </div>
 
@@ -446,7 +539,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
     <div class="room-list-card" ontouchstart="event.stopPropagation()" ontouchmove="event.stopPropagation()">
       <div class="rl-title-row">
         <div class="rl-title">ROOM LIST</div>
-        <button class="rl-refresh-btn" onclick="refreshRoomList()">↻ تحديث</button>
+        <button class="rl-refresh-btn" onclick="refreshRoomList()">↻ Refresh</button>
         <span class="rl-spin" id="lobbyRefreshSpinner">...</span>
       </div>
       <div class="rl-header">
@@ -457,7 +550,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
         <span></span>
       </div>
       <div class="rl-body" id="roomListBody">
-        <div class="rl-empty">🔄 اضغط تحديث لعرض الغرف</div>
+        <div class="rl-empty">🔄 Press refresh to show rooms</div>
       </div>
     </div>
   </div>
@@ -465,24 +558,24 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   <!-- BOTTOM-RIGHT ACTION BUTTONS -->
   <div class="lobby-actions">
     <button class="la-btn la-green custom-click" onclick="hostGame()">
-      <span class="la-btn-icon">▶</span><span>إنشاء غرفة</span>
+      <span class="la-btn-icon">▶</span><span>Host Game</span>
     </button>
     <button class="la-btn la-yellow custom-click" id="joinSelectedBtn" onclick="joinSelectedRoom()" disabled>
-      <span class="la-btn-icon">🏠</span><span>الانضمام</span>
+      <span class="la-btn-icon">🏠</span><span>Join</span>
     </button>
   </div>
 
   <!-- PASSWORD MODAL -->
   <div id="joinPasswordModal" class="pw-modal">
     <div class="pw-box">
-      <div style="color:#facc15;font-weight:900;font-size:1.1rem;margin-bottom:12px;">🔒 غرفة محمية</div>
-      <div style="color:rgba(255,255,255,0.45);font-size:0.85rem;margin-bottom:16px;">أدخل كلمة السر للانضمام</div>
-      <input type="password" id="joinPasswordInput" class="lsb-input pw-field" placeholder="كلمة السر" maxlength="12" style="text-align:center;margin-bottom:16px;">
+      <div style="color:#facc15;font-weight:900;font-size:1.1rem;margin-bottom:12px;">🔒 Protected Room</div>
+      <div style="color:rgba(255,255,255,0.45);font-size:0.85rem;margin-bottom:16px;">Enter password to join</div>
+      <input type="password" id="joinPasswordInput" class="lsb-input pw-field" placeholder="Password" maxlength="12" style="text-align:center;margin-bottom:16px;">
       <div style="display:flex;gap:10px;justify-content:center;">
-        <button style="background:rgba(250,204,21,0.15);border:1px solid rgba(250,204,21,0.4);color:#facc15;padding:10px 22px;font-weight:900;cursor:pointer;font-family:'Cairo',sans-serif;border-radius:4px;" onclick="confirmJoinWithPassword()">انضم ✓</button>
-        <button style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.5);padding:10px 22px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif;border-radius:4px;" onclick="cancelPasswordModal()">إلغاء</button>
+        <button style="background:rgba(250,204,21,0.15);border:1px solid rgba(250,204,21,0.4);color:#facc15;padding:10px 22px;font-weight:900;cursor:pointer;font-family:'Cairo',sans-serif;border-radius:4px;" onclick="confirmJoinWithPassword()">Join ✓</button>
+        <button style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.5);padding:10px 22px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif;border-radius:4px;" onclick="cancelPasswordModal()">Cancel</button>
       </div>
-      <p id="joinPwError" style="color:#ef4444;font-size:0.8rem;margin-top:10px;display:none;">❌ كلمة السر غلط</p>
+      <p id="joinPwError" style="color:#ef4444;font-size:0.8rem;margin-top:10px;display:none;">❌ Wrong password</p>
     </div>
   </div>
 </div>
@@ -491,23 +584,23 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   <div class="aaa-panel panel-accent-green" style="display:flex;height:100%;max-width:380px;width:100%;">
     <div class="menu-left-strip" style="background:linear-gradient(180deg,transparent,#22c55e 30%,#22c55e 70%,transparent);"></div>
     <div style="padding:40px 40px 40px 28px;display:flex;flex-direction:column;justify-content:center;width:100%;">
-      <div style="font-size:1.8rem;font-weight:900;color:#22c55e;margin-bottom:6px;">🏠 انتظار اللاعبين</div>
-      <div style="color:rgba(255,255,255,0.3);font-size:0.7rem;letter-spacing:3px;margin-bottom:24px;">أقصى عدد 4 لاعبين</div>
+      <div style="font-size:1.8rem;font-weight:900;color:#22c55e;margin-bottom:6px;">🏠 Waiting for Players</div>
+      <div style="color:rgba(255,255,255,0.3);font-size:0.7rem;letter-spacing:3px;margin-bottom:24px;">Max 4 players</div>
       <div class="room-code-box" style="margin-bottom:20px;">
-        <div style="color:rgba(255,255,255,0.3);font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">كود الغرفة</div>
+        <div style="color:rgba(255,255,255,0.3);font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">Room Code</div>
         <div class="room-code" id="roomCodeDisplay">------</div>
-        <button onclick="copyRoomCode()" style="margin-top:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);padding:6px 16px;cursor:pointer;border-radius:2px;font-size:0.8rem;font-family:'Cairo',sans-serif;">📋 نسخ الكود</button>
+        <button onclick="copyRoomCode()" style="margin-top:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);padding:6px 16px;cursor:pointer;border-radius:2px;font-size:0.8rem;font-family:'Cairo',sans-serif;">📋 Copy Code</button>
       </div>
       <div id="waitingPlayersList" style="margin-bottom:20px;">
-        <div style="color:rgba(255,255,255,0.3);font-size:0.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">اللاعبون الحاليون</div>
+        <div style="color:rgba(255,255,255,0.3);font-size:0.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">Current Players</div>
         <div id="playerSlots" style="display:flex;flex-direction:column;gap:6px;"></div>
       </div>
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
         <div class="loader" style="width:22px;height:22px;border-width:3px;flex-shrink:0;"></div>
-        <span style="color:rgba(255,255,255,0.5);font-size:0.9rem;" id="hostStatusText">انتظار اللاعبين...</span>
+        <span style="color:rgba(255,255,255,0.5);font-size:0.9rem;" id="hostStatusText">Waiting for players...</span>
       </div>
-      <button class="mbtn custom-click" onclick="startHostGame()" id="startHostBtn" style="border-right-color:#22c55e;color:#22c55e;display:none;margin-bottom:8px;"><span>▶ ابدأ اللعبة</span></button>
-      <button class="mbtn custom-click" style="border-right-color:#ef4444;color:#ef4444;" onclick="cancelHost()"><span>إلغاء</span><span class="icon">✖</span></button>
+      <button class="mbtn custom-click" onclick="startHostGame()" id="startHostBtn" style="border-right-color:#22c55e;color:#22c55e;display:none;margin-bottom:8px;"><span>▶ Start Game</span></button>
+      <button class="mbtn custom-click" style="border-right-color:#ef4444;color:#ef4444;" onclick="cancelHost()"><span>Cancel</span><span class="icon">✖</span></button>
     </div>
   </div>
 </div>
@@ -516,18 +609,18 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   <div class="aaa-panel panel-accent-yellow" style="display:flex;height:100%;max-width:380px;width:100%;">
     <div class="menu-left-strip"></div>
     <div style="padding:40px 40px 40px 28px;display:flex;flex-direction:column;justify-content:center;width:100%;">
-      <div style="font-size:1.8rem;font-weight:900;color:#facc15;margin-bottom:20px;">انضم بكود</div>
+      <div style="font-size:1.8rem;font-weight:900;color:#facc15;margin-bottom:20px;">Join with Code</div>
       <input type="text" id="joinCodeInput" class="text-input-field" placeholder="XXXXXX" maxlength="6" style="font-size:2rem;letter-spacing:8px;color:#facc15;border-bottom-color:#facc15;font-family:monospace;margin-bottom:12px;text-align:center;" oninput="this.value=this.value.toUpperCase().replace(/[^0-9]/g,'')">
-      <p id="joinError" class="hidden" style="color:#ef4444;font-size:0.85rem;margin-bottom:12px;text-align:center;">❌ الكود غلط أو الغرفة مش موجودة!</p>
-      <button class="mbtn custom-click" style="border-right-color:#facc15;color:#facc15;" onclick="joinGame()"><span>انضم دلوقتي</span><span class="icon">▶</span></button>
-      <button class="mbtn custom-click" onclick="showOnlineLobby()"><span>رجوع</span><span class="icon">✖</span></button>
+      <p id="joinError" class="hidden" style="color:#ef4444;font-size:0.85rem;margin-bottom:12px;text-align:center;">❌ Invalid code or room not found!</p>
+      <button class="mbtn custom-click" style="border-right-color:#facc15;color:#facc15;" onclick="joinGame()"><span>Join Now</span><span class="icon">▶</span></button>
+      <button class="mbtn custom-click" onclick="showOnlineLobby()"><span>Back</span><span class="icon">✖</span></button>
     </div>
   </div>
 </div>
 <!-- =================== ONLINE HUD =================== -->
 <div id="onlineHUD" style="pointer-events:none;">
   <div class="hud-stat" style="border-bottom-color:#06b6d4;background:rgba(6,182,212,0.12);">
-    <span style="color:#06b6d4;">🟢</span><span id="onlinePlayerName" style="color:#06b6d4;font-weight:900;">لاعب 2</span><span style="color:rgba(255,255,255,0.4);font-size:0.8rem;" id="onlinePing">متصل</span>
+    <span style="color:#06b6d4;">🟢</span><span id="onlinePlayerName" style="color:#06b6d4;font-weight:900;">Player 2</span><span style="color:rgba(255,255,255,0.4);font-size:0.8rem;" id="onlinePing">Connected</span>
   </div>
 </div>
 <!-- =================== SETTINGS =================== -->
@@ -536,32 +629,32 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
     ontouchstart="event.stopPropagation()"
     ontouchmove="event.stopPropagation()">
     <div class="settings-header">
-      <h2>⚙ الإعدادات</h2>
+      <h2>⚙ Settings</h2>
       <button class="settings-close" onclick="closeSettings()">✕</button>
     </div>
     <div class="settings-tabs">
-      <button class="s-tab active" onclick="switchSettingsTab('display')" id="tab-display">📺 العرض</button>
-      <button class="s-tab" onclick="switchSettingsTab('graphics')" id="tab-graphics">🎨 الرسومات</button>
-      <button class="s-tab" onclick="switchSettingsTab('audio')" id="tab-audio">🔊 الصوت</button>
-      <button class="s-tab" onclick="switchSettingsTab('controls')" id="tab-controls">🎮 التحكم</button>
-      <button class="s-tab" onclick="switchSettingsTab('skin')" id="tab-skin">👤 الشخصية</button>
+      <button class="s-tab active" onclick="switchSettingsTab('display')" id="tab-display">📺 Display</button>
+      <button class="s-tab" onclick="switchSettingsTab('graphics')" id="tab-graphics">🎨 Graphics</button>
+      <button class="s-tab" onclick="switchSettingsTab('audio')" id="tab-audio">🔊 Audio</button>
+      <button class="s-tab" onclick="switchSettingsTab('controls')" id="tab-controls">🎮 Controls</button>
+      <button class="s-tab" onclick="switchSettingsTab('skin')" id="tab-skin">👤 Skin</button>
     </div>
     <div class="settings-body" ontouchstart="event.stopPropagation()" ontouchmove="event.stopPropagation();">
       <!-- DISPLAY TAB -->
       <div id="stab-display">
         <div class="s-section">
-          <div class="s-section-title">إعدادات مسبقة</div>
+          <div class="s-section-title">Presets</div>
           <div class="preset-btns" id="presetBtns">
-            <button class="preset-btn" onclick="applyPreset('low')">منخفض</button>
-            <button class="preset-btn" onclick="applyPreset('medium')">متوسط</button>
-            <button class="preset-btn active" onclick="applyPreset('high')">عالي</button>
+            <button class="preset-btn" onclick="applyPreset('low')">Low</button>
+            <button class="preset-btn" onclick="applyPreset('medium')">Medium</button>
+            <button class="preset-btn active" onclick="applyPreset('high')">High</button>
             <button class="preset-btn" onclick="applyPreset('ultra')">Ultra</button>
           </div>
         </div>
         <div class="s-section">
-          <div class="s-section-title">الأداء</div>
+          <div class="s-section-title">Performance</div>
           <div class="s-row">
-            <div class="s-label">Resolution Scale<small>كلما كان أقل – أداء أفضل</small></div>
+            <div class="s-label">Resolution Scale<small>Lower = Better performance</small></div>
             <div class="opt-btns" id="resBtns">
                 <button class="opt-btn" onclick="setOpt('res','0.08')">Low End device</button>
                 <button class="opt-btn" onclick="setOpt('res','0.15')">Low</button>
@@ -573,7 +666,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
             </div>
           </div>
           <div class="s-row">
-            <div class="s-label">FPS Cap<small>30: توفير بطارية · 120: سلاسة</small></div>
+            <div class="s-label">FPS Cap<small>30: Battery saver · 120: Smooth</small></div>
             <div class="opt-btns" id="fpsBtns">
               <button class="opt-btn" onclick="setOpt('fps','30')">30</button>
               <button class="opt-btn" onclick="setOpt('fps','60')">60</button>
@@ -582,19 +675,19 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
             </div>
           </div>
           <div class="s-row">
-            <div class="s-label">V-Sync<small>يمنع تقطع الصورة</small></div>
+            <div class="s-label">V-Sync<small>Prevents screen tearing</small></div>
             <label class="toggle-sw"><input type="checkbox" id="vsyncToggle" onchange="updateSettings()"><span class="toggle-track"></span></label>
           </div>
         </div>
         <div class="s-section">
-          <div class="s-section-title">الحساسية</div>
+          <div class="s-section-title">Sensitivity</div>
           <div class="s-row">
-            <div class="s-label">حساسية الكاميرا</div>
+            <div class="s-label">Camera Sensitivity</div>
             <div class="s-val" id="sensVal">5</div>
           </div>
           <input type="range" id="sensRange" min="1" max="20" step="1" value="5" oninput="document.getElementById('sensVal').textContent=this.value;updateSettings()">
           <div class="s-row" style="margin-top:12px;">
-            <div class="s-label">حساسية الموس (PC)</div>
+            <div class="s-label">Mouse Sensitivity (PC)</div>
             <div class="s-val" id="mouseVal">3</div>
           </div>
           <input type="range" id="mouseRange" min="1" max="10" step="1" value="3" oninput="document.getElementById('mouseVal').textContent=this.value;updateSettings()">
@@ -603,9 +696,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
       <!-- GRAPHICS TAB -->
       <div id="stab-graphics" style="display:none;">
         <div class="s-section">
-          <div class="s-section-title">الإضاءة والظلال</div>
+          <div class="s-section-title">Lighting & Shadows</div>
           <div class="s-row">
-            <div class="s-label">Shadow Quality<small>أكبر تأثير على الأداء</small></div>
+            <div class="s-label">Shadow Quality<small>Highest impact on performance</small></div>
             <div class="opt-btns" id="shadowQBtns">
               <button class="opt-btn" onclick="setOpt('shadowQ','off')">Off</button>
               <button class="opt-btn" onclick="setOpt('shadowQ','low')">Low</button>
@@ -619,14 +712,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
           </div>
           <input type="range" id="shadowDistRange" min="10" max="100" step="5" value="50" oninput="document.getElementById('shadowDVal').textContent=this.value;updateSettings()">
           <div class="s-row" style="margin-top:12px;">
-            <div class="s-label">Ambient Occlusion (SSAO)<small>ظلال في الأركان – واقعية عالية</small></div>
+            <div class="s-label">Ambient Occlusion (SSAO)<small>Corner shadows – High realism</small></div>
             <label class="toggle-sw"><input type="checkbox" id="ssaoToggle" onchange="updateSettings()"><span class="toggle-track"></span></label>
           </div>
         </div>
         <div class="s-section">
-          <div class="s-section-title">معالجة ما بعد التصيير</div>
+          <div class="s-section-title">Post Processing</div>
           <div class="s-row">
-            <div class="s-label">Anti-Aliasing<small>تنعيم الحواف المشرشرة</small></div>
+            <div class="s-label">Anti-Aliasing<small>Smooths jagged edges</small></div>
             <div class="opt-btns" id="aaBtns">
               <button class="opt-btn" onclick="setOpt('aa','off')">Off</button>
               <button class="opt-btn active" onclick="setOpt('aa','fxaa')">FXAA</button>
@@ -634,7 +727,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
             </div>
           </div>
           <div class="s-row">
-            <div class="s-label">Bloom<small>توهج الإضاءة القوية</small></div>
+            <div class="s-label">Bloom<small>Light glow</small></div>
             <label class="toggle-sw"><input type="checkbox" id="bloomToggle" onchange="updateSettings()"><span class="toggle-track"></span></label>
           </div>
           <div class="s-row" id="bloomStrRow" style="display:none;">
@@ -643,16 +736,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
           </div>
           <input type="range" id="bloomStrRange" min="0.1" max="1.5" step="0.1" value="0.5" style="display:none;" oninput="document.getElementById('bloomStrVal').textContent=parseFloat(this.value).toFixed(1);updateSettings()">
           <div class="s-row">
-            <div class="s-label">Motion Blur<small>غبش الحركة</small></div>
+            <div class="s-label">Motion Blur<small>Blur when moving</small></div>
             <label class="toggle-sw"><input type="checkbox" id="motionBlurToggle" onchange="updateSettings()"><span class="toggle-track"></span></label>
           </div>
           <div class="s-row">
-            <div class="s-label">Chromatic Aberration<small>تشتت الضوء على الأطراف</small></div>
+            <div class="s-label">Chromatic Aberration<small>Light distortion at edges</small></div>
             <label class="toggle-sw"><input type="checkbox" id="chromaticToggle" onchange="updateSettings()"><span class="toggle-track"></span></label>
           </div>
         </div>
         <div class="s-section">
-          <div class="s-section-title">جودة البيئة</div>
+          <div class="s-section-title">Environment Quality</div>
           <div class="s-row">
             <div class="s-label">Texture Quality</div>
             <div class="opt-btns" id="texQBtns">
@@ -667,11 +760,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
           </div>
           <input type="range" id="viewDistRange" min="20" max="150" step="5" value="80" oninput="document.getElementById('viewDistVal').textContent=this.value;updateSettings()">
           <div class="s-row" style="margin-top:12px;">
-            <div class="s-label">Anisotropic Filtering<small>وضوح التكسچر بالزوايا المائلة</small></div>
+            <div class="s-label">Anisotropic Filtering<small>Clarity at slanted angles</small></div>
             <label class="toggle-sw"><input type="checkbox" id="afToggle" checked onchange="updateSettings()"><span class="toggle-track"></span></label>
           </div>
           <div class="s-row">
-            <div class="s-label">Surface Reflections<small>انعكاسات الأسطح</small></div>
+            <div class="s-label">Surface Reflections<small>Surface reflections</small></div>
             <label class="toggle-sw"><input type="checkbox" id="reflectToggle" onchange="updateSettings()"><span class="toggle-track"></span></label>
           </div>
         </div>
@@ -679,19 +772,19 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
       <!-- AUDIO TAB -->
       <div id="stab-audio" style="display:none;">
         <div class="s-section">
-          <div class="s-section-title">مستوى الصوت</div>
+          <div class="s-section-title">Volume</div>
           <div class="s-row">
-            <div class="s-label">الصوت الكلي</div>
+            <div class="s-label">Master Volume</div>
             <div class="s-val" id="masterVolVal">80</div>
           </div>
           <input type="range" id="masterVolRange" min="0" max="100" step="1" value="80" oninput="document.getElementById('masterVolVal').textContent=this.value;updateSettings()">
           <div class="s-row" style="margin-top:12px;">
-            <div class="s-label">مؤثرات صوتية</div>
+            <div class="s-label">SFX</div>
             <div class="s-val" id="sfxVolVal">100</div>
           </div>
           <input type="range" id="sfxVolRange" min="0" max="100" step="1" value="100" oninput="document.getElementById('sfxVolVal').textContent=this.value;updateSettings()">
           <div class="s-row" style="margin-top:12px;">
-            <div class="s-label">موسيقى الخلفية</div>
+            <div class="s-label">Music</div>
             <div class="s-val" id="bgmVolVal">50</div>
           </div>
           <input type="range" id="bgmVolRange" min="0" max="100" step="1" value="50" oninput="document.getElementById('bgmVolVal').textContent=this.value;updateSettings()">
@@ -700,31 +793,31 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
       <!-- CONTROLS TAB -->
       <div id="stab-controls" style="display:none;">
         <div class="s-section">
-          <div class="s-section-title">تخصيص واجهة الموبايل</div>
-          <button class="mbtn custom-click" onclick="openCustomControls()"><span>تحريك عناصر الـ HUD</span><span class="icon">✥</span></button>
+          <div class="s-section-title">Mobile HUD Customization</div>
+          <button class="mbtn custom-click" onclick="openCustomControls()"><span>Edit HUD Elements</span><span class="icon">✥</span></button>
         </div>
         <div class="s-section">
-          <div class="s-section-title">أزرار التحكم</div>
+          <div class="s-section-title">Controls</div>
           <div style="color:rgba(255,255,255,0.5);font-size:0.85rem;line-height:2;">
-            <div>W / ↑ : تقدم أمام</div>
-            <div>S / ↓ : تراجع للخلف</div>
-            <div>A / ← : يسار</div>
-            <div>D / → : يمين</div>
-            <div>Space : قفز</div>
-            <div>Shift : جري</div>
-            <div>C / Ctrl : انحناء</div>
-            <div>F : الكشاف</div>
-            <div>E : تفعيل المفاتيح</div>
-            <div>Esc : إيقاف مؤقت</div>
+            <div>W / ↑ : Move Forward</div>
+            <div>S / ↓ : Move Backward</div>
+            <div>A / ← : Left</div>
+            <div>D / → : Right</div>
+            <div>Space : Jump</div>
+            <div>Shift : Sprint</div>
+            <div>C / Ctrl : Crouch</div>
+            <div>F : Flashlight</div>
+            <div>E : Activate/Interact</div>
+            <div>Esc : Pause</div>
           </div>
         </div>
       </div>
       <!-- SKIN TAB -->
       <div id="stab-skin" style="display:none;">
         <div class="s-section">
-          <div class="s-section-title">سكن الشخصية (Minecraft 64×64)</div>
+          <div class="s-section-title">Character Skin (Minecraft 64×64)</div>
           <label class="skin-upload-label" for="skinFileInput">
-            <span>🎨 اختر ملف سكن PNG</span><span style="color:#e6c2a5;opacity:0.6;">64×64</span>
+            <span>🎨 Select PNG Skin file</span><span style="color:#e6c2a5;opacity:0.6;">64×64</span>
           </label>
           <input type="file" id="skinFileInput" accept="image/png,image/jpeg" style="display:none">
           <p id="skinStatus" style="color:#a0aec0;font-size:0.8rem;text-align:center;margin-top:8px;"></p>
@@ -732,23 +825,23 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
       </div>
     </div>
     <div class="settings-footer">
-      <button class="sfooter-btn primary custom-click" onclick="closeSettings()">حفظ وإغلاق</button>
-      <button class="sfooter-btn custom-click" onclick="resetAllSettings()">إعادة الضبط</button>
+      <button class="sfooter-btn primary custom-click" onclick="closeSettings()">Save and Close</button>
+      <button class="sfooter-btn custom-click" onclick="resetAllSettings()">Reset All</button>
     </div>
   </div>
 </div>
 <!-- =================== CUSTOMIZER =================== -->
 <div class="ui-layer hidden" id="customizerUI">
   <div style="position:absolute;top:16px;right:16px;display:flex;gap:8px;z-index:50;pointer-events:auto;">
-    <button style="background:#ef4444;color:#fff;padding:10px 20px;border:none;font-weight:700;cursor:pointer;border-radius:2px;font-family:'Cairo',sans-serif;font-size:1rem;pointer-events:auto;" onclick="resetCustomControls()">إعادة الضبط</button>
-    <button style="background:#22c55e;color:#fff;padding:10px 20px;border:none;font-weight:700;cursor:pointer;border-radius:2px;font-family:'Cairo',sans-serif;font-size:1rem;pointer-events:auto;" onclick="saveCustomControls()">حفظ وخروج</button>
+    <button style="background:#ef4444;color:#fff;padding:10px 20px;border:none;font-weight:700;cursor:pointer;border-radius:2px;font-family:'Cairo',sans-serif;font-size:1rem;pointer-events:auto;" onclick="resetCustomControls()">Reset</button>
+    <button style="background:#22c55e;color:#fff;padding:10px 20px;border:none;font-weight:700;cursor:pointer;border-radius:2px;font-family:'Cairo',sans-serif;font-size:1rem;pointer-events:auto;" onclick="saveCustomControls()">Save & Exit</button>
   </div>
   <div id="customizerPanel" style="position:absolute;top:70px;left:50%;transform:translateX(-50%);display:none;pointer-events:auto;z-index:50;">
     <div class="customizer-panel">
-      <p style="color:#fff;text-align:center;margin-bottom:12px;font-weight:700;border-bottom:1px solid #06b6d4;padding-bottom:8px;">تعديل العنصر</p>
-      <div style="color:rgba(255,255,255,0.7);font-size:0.85rem;margin-bottom:6px;">الحجم</div>
+      <p style="color:#fff;text-align:center;margin-bottom:12px;font-weight:700;border-bottom:1px solid #06b6d4;padding-bottom:8px;">Edit Element</p>
+      <div style="color:rgba(255,255,255,0.7);font-size:0.85rem;margin-bottom:6px;">Size</div>
       <input type="range" id="cSize" min="0.4" max="2.5" step="0.05" value="1" oninput="updateSelectedElementStyle()" style="touch-action:pan-x;">
-      <div style="color:rgba(255,255,255,0.7);font-size:0.85rem;margin:10px 0 6px;">الشفافية</div>
+      <div style="color:rgba(255,255,255,0.7);font-size:0.85rem;margin:10px 0 6px;">Opacity</div>
       <input type="range" id="cOpac" min="0.1" max="1" step="0.05" value="1" oninput="updateSelectedElementStyle()" style="touch-action:pan-x;">
       <div id="customizerValDisplay" style="color:#facc15;font-size:0.75rem;margin-top:8px;text-align:center;"></div>
     </div>
@@ -781,17 +874,22 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   <button class="action-btn custom-hud" id="sprintBtn" style="bottom:60px;right:20px;border-color:#facc15;color:#facc15;"><img src="Textures/icons/run.png" style="width:36px;height:36px;object-fit:contain;pointer-events:none;" onerror="this.style.display='none';this.parentNode.textContent='🏃'"></button>
   <button class="action-btn custom-hud" id="flashlightBtn" style="bottom:60px;left:20px;"><img src="Textures/icons/light.png" style="width:36px;height:36px;object-fit:contain;pointer-events:none;" onerror="this.style.display='none';this.parentNode.textContent='💡'"></button>
   <button class="action-btn custom-hud" id="activateBtn" style="bottom:140px;left:20px;border-color:#a855f7;color:#a855f7;display:none;">E</button>
+  <!-- CROSSHAIR -->
+  <img id="crosshairImg" src="Textures/crosshair018.png"
+    style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+           width:48px;height:48px;object-fit:contain;pointer-events:none;
+           z-index:25;image-rendering:pixelated;">
 </div>
 <!-- =================== PAUSE =================== -->
 <div class="ui-layer interactive hidden" id="pauseMenu" style="justify-content:flex-end;align-items:stretch;">
   <div class="aaa-panel panel-accent-yellow" style="display:flex;height:100%;max-width:340px;width:100%;">
     <div class="menu-left-strip"></div>
     <div class="result-panel">
-      <div style="font-size:1.8rem;font-weight:900;color:#facc15;margin-bottom:24px;">متوقفة</div>
-      <button class="mbtn custom-click" onclick="togglePause()"><span>إكمال</span><span class="icon">▶</span></button>
-      <button class="mbtn custom-click" onclick="openSettings()"><span>الإعدادات</span><span class="icon">⚙</span></button>
-      <button class="mbtn custom-click" onclick="restartLevel()"><span>إعادة</span><span class="icon">↺</span></button>
-      <button class="mbtn custom-click" onclick="showMenu()"><span>خروج للساحة</span><span class="icon">✖</span></button>
+      <div style="font-size:1.8rem;font-weight:900;color:#facc15;margin-bottom:24px;">Paused</div>
+      <button class="mbtn custom-click" onclick="togglePause()"><span>Resume</span><span class="icon">▶</span></button>
+      <button class="mbtn custom-click" onclick="openSettings()"><span>Settings</span><span class="icon">⚙</span></button>
+      <button class="mbtn custom-click" onclick="restartLevel()"><span>Restart</span><span class="icon">↺</span></button>
+      <button class="mbtn custom-click" onclick="showMenu()"><span>Exit to Menu</span><span class="icon">✖</span></button>
     </div>
   </div>
 </div>
@@ -800,10 +898,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   <div class="aaa-panel panel-accent-red" style="display:flex;height:100%;max-width:340px;width:100%;">
     <div class="menu-left-strip" style="background:linear-gradient(180deg,transparent,#ef4444 30%,#ef4444 70%,transparent);"></div>
     <div class="result-panel">
-      <div style="font-size:2.5rem;font-weight:900;color:#ef4444;margin-bottom:4px;">أنت ميت</div>
-      <div style="color:rgba(255,255,255,0.5);font-size:0.9rem;margin-bottom:24px;">النقاط: <span id="finalScore" style="color:#facc15;font-weight:900;">0</span></div>
-      <button class="mbtn custom-click" onclick="restartLevel()"><span>مباراة جديدة</span><span class="icon">↺</span></button>
-      <button class="mbtn custom-click" onclick="showMenu()"><span>العودة للساحة</span><span class="icon">✖</span></button>
+      <div style="font-size:2.5rem;font-weight:900;color:#ef4444;margin-bottom:4px;">You Died</div>
+      <div style="color:rgba(255,255,255,0.5);font-size:0.9rem;margin-bottom:24px;">Score: <span id="finalScore" style="color:#facc15;font-weight:900;">0</span></div>
+      <button class="mbtn custom-click" onclick="restartLevel()"><span>New Match</span><span class="icon">↺</span></button>
+      <button class="mbtn custom-click" onclick="showMenu()"><span>Return to Menu</span><span class="icon">✖</span></button>
     </div>
   </div>
 </div>
@@ -813,13 +911,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
     <div class="menu-left-strip" style="background:linear-gradient(180deg,transparent,#22c55e 30%,#22c55e 70%,transparent);"></div>
     <div class="result-panel">
       <div style="font-size:2.5rem;font-weight:900;color:#22c55e;margin-bottom:4px;">WINNER!</div>
-      <div style="color:rgba(255,255,255,0.5);font-size:0.9rem;margin-bottom:4px;">أتممت المستوى <span id="completedLevel" style="color:#facc15;font-weight:900;">1</span></div>
-      <div style="color:rgba(255,255,255,0.5);font-size:0.9rem;margin-bottom:24px;">النقاط: <span id="winScore" style="color:#facc15;font-weight:900;">0</span></div>
-      <button class="mbtn custom-click" onclick="nextLevel()"><span>المستوى التالي</span><span class="icon">▶</span></button>
-      <button class="mbtn custom-click" onclick="showMenu()"><span>العودة للساحة</span><span class="icon">✖</span></button>
+      <div style="color:rgba(255,255,255,0.5);font-size:0.9rem;margin-bottom:4px;">Level <span id="completedLevel" style="color:#facc15;font-weight:900;">1</span> Completed</div>
+      <div style="color:rgba(255,255,255,0.5);font-size:0.9rem;margin-bottom:24px;">Score: <span id="winScore" style="color:#facc15;font-weight:900;">0</span></div>
+      <button class="mbtn custom-click" onclick="nextLevel()"><span>Next Level</span><span class="icon">▶</span></button>
+      <button class="mbtn custom-click" onclick="showMenu()"><span>Return to Menu</span><span class="icon">✖</span></button>
     </div>
   </div>
 </div>
+
 
 <script>
 // =================== GAME STATE ===================
@@ -1186,16 +1285,16 @@ function buildLobbyScene() {
   const sp=new Float32Array(3000*3);
   for(let i=0;i<3000*3;i++) sp[i]=(Math.random()-0.5)*800;
   sg.setAttribute('position',new THREE.BufferAttribute(sp,3));
-  starsParticles=new THREE.Points(sg,new THREE.PointsMaterial({color:0xffd090,size:0.8,transparent:true,opacity:0.5}));
+  starsParticles=new THREE.Points(sg,new THREE.PointsMaterial({color:0x8a9070,size:0.5,transparent:true,opacity:0.25}));
   scene.add(starsParticles);
-  scene.fog=new THREE.FogExp2(0x080614,0.05);
-  scene.background=new THREE.Color(0x080614);
+  scene.fog=new THREE.FogExp2(0x0a0c08,0.055);
+  scene.background=new THREE.Color(0x0a0c08);
 
   // Maze corridor background
   const lobbyFloor=new THREE.Mesh(new THREE.PlaneGeometry(12,30),materials.floor);
   lobbyFloor.rotation.x=-Math.PI/2; lobbyFloor.position.set(0,0,-6); lobbyGroup.add(lobbyFloor);
 
-  const wallMat=materials.wall.clone(); wallMat.color.setHex(0xaaaaaa);
+  const wallMat=materials.wall.clone(); wallMat.color.setHex(0x7a8070);
   const wallL=new THREE.Mesh(new THREE.PlaneGeometry(30,5),wallMat);
   wallL.rotation.y=Math.PI/2; wallL.position.set(-4,2.5,-6); lobbyGroup.add(wallL);
   const wallR=new THREE.Mesh(new THREE.PlaneGeometry(30,5),wallMat);
@@ -1208,12 +1307,19 @@ function buildLobbyScene() {
   // Foreground platform
   const platMat=new THREE.MeshStandardMaterial({color:0x18161e,roughness:0.7,metalness:0.3});
   const plat=new THREE.Mesh(new THREE.CylinderGeometry(2.2,2.5,0.08,32),platMat);
-  plat.position.set(0,-0.04,0); lobbyGroup.add(plat);
-  // Platform ring glow
-  const ringGeo=new THREE.TorusGeometry(2.2,0.05,8,64);
-  const ringMat=new THREE.MeshBasicMaterial({color:0xfacc15});
-  const ring=new THREE.Mesh(ringGeo,ringMat); ring.rotation.x=Math.PI/2; ring.position.y=-0.03;
+  plat.position.set(0,-0.04,0); plat.renderOrder=0; lobbyGroup.add(plat);
+  // Platform ring glow – raised above platform to avoid z-fighting
+  const ringGeo=new THREE.TorusGeometry(2.18,0.06,8,64);
+  const ringMat=new THREE.MeshBasicMaterial({color:0xfacc15,transparent:true,opacity:0.9});
+  const ring=new THREE.Mesh(ringGeo,ringMat);
+  ring.rotation.x=Math.PI/2; ring.position.y=0.06; ring.renderOrder=1;
   lobbyGroup.add(ring);
+  // Ground point light under character – stable, no flicker
+  const groundLight=new THREE.PointLight(0xfacc15,1.2,4);
+  groundLight.position.set(0,0.05,0); lobbyGroup.add(groundLight);
+  // Store ring reference for animation
+  lobbyGroup.userData.ring=ring;
+  lobbyGroup.userData.groundLight=groundLight;
 
   // Ceiling lights in corridor
   for(let z=-4;z>=-18;z-=5) {
@@ -1222,15 +1328,15 @@ function buildLobbyScene() {
     const pl2=new THREE.PointLight(0xffeecc,0.6,8); pl2.position.set(0,4.7,z); lobbyGroup.add(pl2);
   }
 
-  // Dramatic spotlight on character
-  const spot=new THREE.SpotLight(0xffffff,2.5,15,Math.PI/8,0.6,1.2);
+  // Dramatic spotlight on character – cooler military tone
+  const spot=new THREE.SpotLight(0xdde8cc,2.8,15,Math.PI/8,0.5,1.0);
   spot.position.set(0.5,6,1);
   const sTarget=new THREE.Object3D(); sTarget.position.set(0,0.8,0);
   lobbyGroup.add(sTarget); spot.target=sTarget; lobbyGroup.add(spot);
   spot.castShadow=true;
 
-  // Cold ambient fill
-  const ambC=new THREE.PointLight(0x1a2a5a,0.3,20);
+  // Military green-grey ambient fill
+  const ambC=new THREE.PointLight(0x2a3520,0.5,20);
   ambC.position.set(-4,3,-3); lobbyGroup.add(ambC);
 
   // Floating dust particles
@@ -1244,7 +1350,7 @@ function buildLobbyScene() {
   // Player character (idle only)
   lobbyMCChar=buildMinecraftCharacter(mcSkinImage);
   lobbyMCChar.outerGroup.position.set(0,0,0);
-  lobbyMCChar.outerGroup.rotation.y=Math.PI-0.3;
+  lobbyMCChar.outerGroup.rotation.y = 0;
   lobbyGroup.add(lobbyMCChar.outerGroup);
 
   scene.add(lobbyGroup);
@@ -2105,11 +2211,19 @@ function mainLoop(timestamp) {
     flashLight.intensity=0;
     // Lobby dust
     if(dustVFX) dustVFX.rotation.y+=dt*0.05;
+    // Ring pulse – smooth sine, no flicker
+    const ring=lobbyGroup.userData.ring;
+    const gl=lobbyGroup.userData.groundLight;
+    if(ring){
+      const pulse=0.55+Math.sin(lt*1.8)*0.45;
+      ring.material.opacity=0.35+pulse*0.6;
+      if(gl) gl.intensity=0.6+pulse*0.9;
+    }
     // Idle animation for lobby character
     if(lobbyMCChar){
       const breathe=Math.sin(lt*1.3)*0.012;
       lobbyMCChar.outerGroup.position.y=breathe;
-      lobbyMCChar.outerGroup.rotation.y=Math.PI-0.3+Math.sin(lt*0.2)*0.15;
+      lobbyMCChar.outerGroup.rotation.y = Math.sin(lt*0.2)*0.12;
       if(lobbyMCChar.headGrp) lobbyMCChar.headGrp.rotation.y=Math.sin(lt*0.25)*0.28;
       if(lobbyMCChar.headGrp) lobbyMCChar.headGrp.rotation.x=Math.sin(lt*0.18)*0.05;
       if(lobbyMCChar.upperBodyGrp){
